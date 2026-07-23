@@ -1,0 +1,131 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { generateText } from "ai";
+import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+
+type Body = { threadId: string; messages: { role: "user" | "assistant"; content: string }[] };
+
+const SYSTEM_PROMPT = `Você é o Copilot do "Zero ao Trade", um app educacional sobre opções da B3.
+
+REGRAS ABSOLUTAS (nunca quebre):
+- Responda SOMENTE com base no conteúdo educacional do app, nas regras que o usuário definiu, ou no histórico registrado por ele.
+- NUNCA dê recomendação de compra/venda de um ativo específico ("devo comprar essa call?" → redirecione: "Isso é conteúdo educacional, não recomendação de investimento. Posso te ajudar a analisar a estrutura, os riscos e verificar se ela respeita suas próprias regras.").
+- Não invente dados de mercado. Se o usuário citar preços reais, trate como hipótese didática.
+- Use as MESMAS analogias do guia sempre que possível: vale-ingresso (call), seguro de carro (put), iogurte (extrínseco/intrínseco), plano de celular com teto (rolagem), carro de corrida com limitador (trava de alta).
+
+TOM:
+- Português brasileiro, direto, sem jargão desnecessário.
+- Curto por padrão (2-4 parágrafos). Use listas quando ajudar.
+- Nunca use "eu recomendo" — use "o guia mostra que…", "as regras que você definiu dizem…".
+
+QUANDO O USUÁRIO PERGUNTAR SOBRE UMA DECISÃO OU SIMULAÇÃO DELE:
+- Reforce se ela respeita as regras pessoais registradas.
+- Explique por que o lucro máximo, breakeven ou perda máxima têm aquele valor.
+- Nunca julgue se "é uma boa operação" — só explique a mecânica.
+`;
+
+export const Route = createFileRoute("/api/chat")({
+  server: {
+    handlers: {
+      POST: async ({ request }) => {
+        const authHeader = request.headers.get("authorization");
+        if (!authHeader?.startsWith("Bearer ")) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+        const key = process.env.LOVABLE_API_KEY;
+        if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
+
+        const body = (await request.json()) as Body;
+        if (!body?.messages?.length) return new Response("messages required", { status: 400 });
+
+        // Load user context (rules + recent diary) via admin client, but scoped to the caller
+        const token = authHeader.slice(7);
+        const { createClient } = await import("@supabase/supabase-js");
+        const supabaseUser = createClient(
+          process.env.SUPABASE_URL!,
+          process.env.SUPABASE_PUBLISHABLE_KEY!,
+          {
+            global: {
+              fetch: (input, init) => {
+                const h = new Headers(init?.headers);
+                if (h.get("Authorization") === `Bearer ${process.env.SUPABASE_PUBLISHABLE_KEY}`)
+                  h.delete("Authorization");
+                h.set("apikey", process.env.SUPABASE_PUBLISHABLE_KEY!);
+                h.set("Authorization", `Bearer ${token}`);
+                return fetch(input, { ...init, headers: h });
+              },
+            },
+            auth: { persistSession: false, autoRefreshToken: false },
+          },
+        );
+
+        const [rulesRes, diaryRes, threadRes] = await Promise.all([
+          supabaseUser.from("personal_rules").select("categoria,texto").eq("ativa", true),
+          supabaseUser
+            .from("diary_entries")
+            .select("ativo,estrutura,motivo,seguiu_regra,resultado,status,created_at")
+            .order("created_at", { ascending: false })
+            .limit(10),
+          supabaseUser.from("chat_threads").select("id,user_id,context_type").eq("id", body.threadId).maybeSingle(),
+        ]);
+
+        if (!threadRes.data) return new Response("Thread not found", { status: 404 });
+        const userId = threadRes.data.user_id;
+
+        const rulesText = (rulesRes.data ?? []).map((r) => `- [${r.categoria}] ${r.texto}`).join("\n") || "(nenhuma)";
+        const diaryText =
+          (diaryRes.data ?? [])
+            .map(
+              (d) =>
+                `- ${d.ativo} ${d.estrutura} (${d.status}) resultado=${d.resultado ?? "?"} seguiu_regra=${d.seguiu_regra}${d.motivo ? ` motivo="${d.motivo}"` : ""}`,
+            )
+            .join("\n") || "(vazio)";
+
+        const contextBlock = `\n\n===\nREGRAS PESSOAIS DO USUÁRIO:\n${rulesText}\n\nÚLTIMAS 10 DECISÕES DO DIÁRIO:\n${diaryText}\n===\n`;
+
+        const gateway = createLovableAiGatewayProvider(key);
+        const model = gateway("google/gemini-3.6-flash");
+
+        try {
+          const result = await generateText({
+            model,
+            system: SYSTEM_PROMPT + contextBlock,
+            messages: body.messages,
+          });
+
+          // persist both messages
+          await supabaseUser.from("chat_messages").insert([
+            {
+              thread_id: body.threadId,
+              user_id: userId,
+              role: "user",
+              content: body.messages[body.messages.length - 1].content,
+            },
+            {
+              thread_id: body.threadId,
+              user_id: userId,
+              role: "assistant",
+              content: result.text,
+            },
+          ]);
+          await supabaseUser
+            .from("chat_threads")
+            .update({ updated_at: new Date().toISOString() })
+            .eq("id", body.threadId);
+
+          return Response.json({ text: result.text });
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e);
+          const status = /429/.test(msg) ? 429 : /402/.test(msg) ? 402 : 500;
+          return new Response(
+            status === 429
+              ? "Muitas requisições. Tente novamente em instantes."
+              : status === 402
+                ? "Créditos de IA esgotados. Adicione créditos na sua workspace."
+                : msg,
+            { status },
+          );
+        }
+      },
+    },
+  },
+});
