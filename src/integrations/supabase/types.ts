@@ -14,7 +14,257 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          parts: Json | null
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          parts?: Json | null
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          parts?: Json | null
+          role?: string
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          context_ref: string | null
+          context_type: string
+          created_at: string
+          id: string
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          context_ref?: string | null
+          context_type?: string
+          created_at?: string
+          id?: string
+          titulo?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          context_ref?: string | null
+          context_type?: string
+          created_at?: string
+          id?: string
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      diary_entries: {
+        Row: {
+          ativo: string
+          created_at: string
+          estrutura: string
+          id: string
+          motivo: string | null
+          resultado: number | null
+          rule_id: string | null
+          seguiu_regra: boolean | null
+          simulation_id: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          ativo: string
+          created_at?: string
+          estrutura: string
+          id?: string
+          motivo?: string | null
+          resultado?: number | null
+          rule_id?: string | null
+          seguiu_regra?: boolean | null
+          simulation_id?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          ativo?: string
+          created_at?: string
+          estrutura?: string
+          id?: string
+          motivo?: string | null
+          resultado?: number | null
+          rule_id?: string | null
+          seguiu_regra?: boolean | null
+          simulation_id?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diary_entries_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "personal_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diary_entries_simulation_id_fkey"
+            columns: ["simulation_id"]
+            isOneToOne: false
+            referencedRelation: "simulations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons_progress: {
+        Row: {
+          attempts: number
+          completed_at: string | null
+          lesson_slug: string
+          quiz_score: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          completed_at?: string | null
+          lesson_slug: string
+          quiz_score?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          completed_at?: string | null
+          lesson_slug?: string
+          quiz_score?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      personal_rules: {
+        Row: {
+          ativa: boolean
+          categoria: string
+          created_at: string
+          id: string
+          texto: string
+          user_id: string
+        }
+        Insert: {
+          ativa?: boolean
+          categoria?: string
+          created_at?: string
+          id?: string
+          texto: string
+          user_id: string
+        }
+        Update: {
+          ativa?: boolean
+          categoria?: string
+          created_at?: string
+          id?: string
+          texto?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          ja_operou: boolean
+          nivel_atual: number
+          nome: string | null
+          onboarded: boolean
+          streak_dias: number
+          ultima_atividade: string | null
+          updated_at: string
+          xp_total: number
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          ja_operou?: boolean
+          nivel_atual?: number
+          nome?: string | null
+          onboarded?: boolean
+          streak_dias?: number
+          ultima_atividade?: string | null
+          updated_at?: string
+          xp_total?: number
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          ja_operou?: boolean
+          nivel_atual?: number
+          nome?: string | null
+          onboarded?: boolean
+          streak_dias?: number
+          ultima_atividade?: string | null
+          updated_at?: string
+          xp_total?: number
+        }
+        Relationships: []
+      }
+      simulations: {
+        Row: {
+          ativo: string | null
+          created_at: string
+          id: string
+          pernas: Json
+          preco_atual: number | null
+          tipo_estrategia: string
+          user_id: string
+        }
+        Insert: {
+          ativo?: string | null
+          created_at?: string
+          id?: string
+          pernas: Json
+          preco_atual?: number | null
+          tipo_estrategia: string
+          user_id: string
+        }
+        Update: {
+          ativo?: string | null
+          created_at?: string
+          id?: string
+          pernas?: Json
+          preco_atual?: number | null
+          tipo_estrategia?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
