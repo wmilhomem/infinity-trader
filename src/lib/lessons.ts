@@ -618,7 +618,23 @@ Prejuízo de um mês **abate lucro futuro** — sem prazo de validade. Registre 
         explicacao: "Day trade = 20% sobre o lucro líquido mensal.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Apure o mês",
+        enunciado:
+          "Em maio você fez três operações comuns de opções: +R$1.200, +R$800 e −R$600. IRRF retido no mês: R$8. Quanto vai de DARF?",
+        dica: "Lucro líquido × 15% − IRRF.",
+        gabarito: "Lucro líquido = R$1.400. IR = 15%×1400 = R$210. DARF = R$210 − R$8 = R$202.",
+      },
+      {
+        titulo: "Swing vs day trade",
+        enunciado:
+          "No mesmo mês: swing +R$500 e day trade em opções +R$400. Some tudo e calcule o IR devido (ignore IRRF).",
+        gabarito: "Modalidades separadas. Swing: 15%×500 = R$75. Day: 20%×400 = R$80. Total = R$155.",
+      },
+    ],
   },
+
   {
     slug: "darf-e-compensacao",
     ordem: 15,
