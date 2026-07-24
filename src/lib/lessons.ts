@@ -387,7 +387,24 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
         explicacao: "Trava barateia a aposta em queda em troca de tampar o ganho no extremo.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Simule a trava de baixa",
+        enunciado:
+          "No Simulador, monte: compra put strike 38 a R$1,40 e venda put strike 36 a R$0,50. Qual o lucro máximo em reais no lote (100 ações) e a que preço do ativo ele acontece?",
+        gabarito: "Lucro máx = R$110 por lote, atingido a partir de PETR4 ≤ R$36.",
+      },
+      {
+        titulo: "Comparação com put pura",
+        enunciado:
+          "Compare no papel: comprar put strike 38 pura por R$1,40 vs. a trava por R$0,90 líquidos. Se PETR4 cair pra R$30, qual estrutura ganha mais? E se cair só pra R$37?",
+        dica: "Na trava, ganho para depois do strike inferior.",
+        gabarito:
+          "Cair pra R$30: put pura ganha R$8,00 − R$1,40 = R$6,60; trava ganha R$1,10 (teto). Cair pra R$37: put pura ganha R$1,00 − R$1,40 = −R$0,40; trava ganha R$1,00 − R$0,90 = R$0,10.",
+      },
+    ],
   },
+
   {
     slug: "rolagem-defensiva",
     ordem: 12,
