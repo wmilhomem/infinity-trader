@@ -239,8 +239,24 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
         explicacao: "Roll Out = alongar o vencimento sem mexer no strike.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Diagnóstico de rolagem",
+        enunciado:
+          "Você vendeu uma call PETRK40 por R$1,20. Faltam 8 dias pro vencimento e PETR4 está a R$41,50. A call agora vale R$1,80. Rolar Up and Out pra PETRL42 (próximo mês) sai a débito de R$0,30. Deve rolar? Justifique com os 3 critérios da lição.",
+        dica: "Tese ainda vale? Débito é pequeno? Já rolou antes?",
+        gabarito:
+          "Rolagem aceitável: débito baixo (< 30% do prêmio original de R$1,20), primeira rolagem, e Up and Out reduz risco de exercício. Se a tese de estabilidade em PETR4 caiu, encerra ao invés de rolar.",
+      },
+      {
+        titulo: "Registro no diário",
+        enunciado:
+          "Abra o Diário e registre uma operação hipotética com estrutura 'venda coberta', ativo VALE3, marque 'seguiu a regra' e escreva no motivo: 'rolei uma vez, dentro do limite'. Depois vá em Revisão e confira se a linha aparece.",
+        gabarito: "Fluxo esperado: Diário → nova entrada → Revisão mostra a operação na coluna 'seguiu regra'.",
+      },
+    ],
   },
-  {
+
     slug: "trava-de-alta",
     ordem: 10,
     nivel: 4,
