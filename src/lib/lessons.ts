@@ -312,7 +312,24 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
         explicacao: "Breakeven = strike comprado + custo = 38 + 0,90 = R$38,90.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Monte no simulador",
+        enunciado:
+          "Abra o Simulador, escolha 'Trava de Alta' e adicione duas pernas: compra call strike 38 a R$1,50 e venda call strike 40 a R$0,60. Confirme visualmente no gráfico: onde está o breakeven, o lucro máximo e a perda máxima?",
+        gabarito:
+          "Breakeven em R$38,90; lucro máximo R$1,10/ação a partir de R$40; perda máxima R$0,90/ação até R$38.",
+      },
+      {
+        titulo: "Ajuste de risco",
+        enunciado:
+          "Você tem R$20.000 de patrimônio e a regra do 1%. Quantos lotes dessa trava (custo R$0,90/ação, lote 100) pode montar sem furar o limite?",
+        dica: "1% do patrimônio ÷ risco por lote.",
+        gabarito: "Risco máx = R$200. Cada lote arrisca R$90. Máximo 2 lotes (2×R$90 = R$180).",
+      },
+    ],
   },
+
   {
     slug: "trava-de-baixa",
     ordem: 11,
