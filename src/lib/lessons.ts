@@ -541,7 +541,29 @@ Defina no diário **antes de abrir**:
         explicacao: "Expectativa negativa é insustentável — mesmo vitórias esporádicas não compensam a série de perdas.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Calcule position sizing",
+        enunciado:
+          "Patrimônio R$120.000, regra do 1%. Uma trava custa R$1,40/ação (lote 100). Quantos lotes você pode montar? Se aumentar o custo pra R$3,00/ação, quantos lotes cabem?",
+        gabarito: "R$1.200 de risco máx. A R$140/lote → 8 lotes. A R$300/lote → 4 lotes.",
+      },
+      {
+        titulo: "Expectativa matemática",
+        enunciado:
+          "Estratégia com 60% de acerto, ganho médio R$150, perda média R$250. Qual a expectativa por trade? Você deve operar?",
+        dica: "EM = (P_acerto × ganho) − (P_erro × perda).",
+        gabarito: "EM = 0,6×150 − 0,4×250 = 90 − 100 = −R$10. Negativa: não operar.",
+      },
+      {
+        titulo: "Defina seus 3 stops",
+        enunciado:
+          "No Diário, ao registrar sua próxima operação (real ou hipotética), escreva no campo motivo os 3 stops: prêmio, ativo e tempo. Ex: 'Encerro se trava valer 50%, se PETR4 furar R$36, ou 5 dias antes do vencimento.'",
+        gabarito: "Todo trade registrado com os 3 stops explícitos antes de abrir.",
+      },
+    ],
   },
+
   {
     slug: "tributacao-basica",
     ordem: 14,
