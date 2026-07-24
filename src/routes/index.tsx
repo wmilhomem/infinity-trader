@@ -10,10 +10,10 @@ export const Route = createFileRoute("/")({
         content:
           "Um Decision OS que ensina opções do zero e organiza suas decisões: aprenda, defina regras, simule, registre e revise. O copilot informa — você decide.",
       },
-      { property: "og:title", content: "Zero ao Trade" },
+      { property: "og:title", content: "Zero ao Trade — Aprenda opções da B3 com disciplina" },
       {
         property: "og:description",
-        content: "Aprender · Definir · Simular · Registrar · Revisar. Um loop de decisão para opções da B3.",
+        content: "Um Decision OS que ensina opções do zero e organiza suas decisões: aprenda, defina regras, simule, registre e revise. O copilot informa — você decide.",
       },
     ],
   }),
