@@ -256,6 +256,8 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
       },
     ],
   },
+  {
+
 
     slug: "trava-de-alta",
     ordem: 10,
