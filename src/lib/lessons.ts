@@ -692,7 +692,29 @@ Planilha própria ou o **diário do Zero ao Trade** — os campos de resultado a
         explicacao: "Vence sempre no último dia útil do mês seguinte à apuração.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Compensação em cadeia",
+        enunciado:
+          "Jan: −R$1.500 (swing). Fev: +R$400 (swing). Mar: +R$2.000 (swing). Quanto de IR paga em cada mês?",
+        gabarito:
+          "Jan: 0 (prejuízo R$1.500 acumulado). Fev: 0 (compensa R$400, sobra R$1.100 de prejuízo). Mar: 15%×(2000−1100) = R$135.",
+      },
+      {
+        titulo: "Simule seu DARF",
+        enunciado:
+          "Vá em Revisão e some seus resultados registrados no diário no mês corrente. Aplique 15% (swing) ou 20% (day trade). Esse valor é o DARF estimado. Verifique se bate com o que sua corretora envia.",
+        gabarito: "Fluxo: Revisão → total do mês × alíquota da modalidade − IRRF = DARF a pagar.",
+      },
+      {
+        titulo: "Regra de disciplina fiscal",
+        enunciado:
+          "Crie no menu Regras a regra: 'Todo dia 1º do mês, fecho a apuração e gero o DARF antes do dia 20'. Categoria: gestão.",
+        gabarito: "Regra ativa que aparece automaticamente na revisão mensal.",
+      },
+    ],
   },
+
 ];
 
 export function getLesson(slug: string) {
