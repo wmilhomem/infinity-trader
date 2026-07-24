@@ -84,6 +84,17 @@ function LicaoPage() {
           <article className="prose prose-invert max-w-none prose-headings:font-semibold prose-h2:text-lg prose-h2:mt-6 prose-p:text-sm prose-p:text-muted-foreground prose-li:text-sm prose-li:text-muted-foreground prose-strong:text-foreground prose-table:text-sm">
             <ReactMarkdown>{lesson.conteudo}</ReactMarkdown>
           </article>
+          {lesson.exercicios && lesson.exercicios.length > 0 && (
+            <section className="mt-8">
+              <h2 className="text-lg font-semibold mb-3">Exercícios práticos</h2>
+              <div className="space-y-3">
+                {lesson.exercicios.map((ex, i) => (
+                  <ExerciseCard key={i} index={i} ex={ex} />
+                ))}
+              </div>
+            </section>
+          )}
+
           <div className="mt-8 flex gap-3">
             <button
               onClick={() => setStep("quiz")}
