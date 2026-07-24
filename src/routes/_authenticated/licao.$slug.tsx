@@ -5,8 +5,33 @@ import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { getLesson, LESSONS } from "@/lib/lessons";
-import { Check, MessageCircle, X } from "lucide-react";
+import { getLesson, LESSONS, type Exercise } from "@/lib/lessons";
+import { Check, ChevronDown, ChevronUp, MessageCircle, X } from "lucide-react";
+
+function ExerciseCard({ index, ex }: { index: number; ex: Exercise }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-lg border border-border bg-card p-4">
+      <div className="text-xs uppercase text-muted-foreground">Exercício {index + 1}</div>
+      <div className="mt-1 font-semibold">{ex.titulo}</div>
+      <p className="mt-2 text-sm whitespace-pre-line text-muted-foreground">{ex.enunciado}</p>
+      {ex.dica && <p className="mt-2 text-xs text-primary">Dica: {ex.dica}</p>}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="mt-3 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+      >
+        {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+        {open ? "Esconder gabarito" : "Ver gabarito"}
+      </button>
+      {open && (
+        <div className="mt-2 rounded-md border border-success/40 bg-success/10 p-3 text-sm whitespace-pre-line">
+          {ex.gabarito}
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 export const Route = createFileRoute("/_authenticated/licao/$slug")({
   head: ({ params }) => {
@@ -84,6 +109,17 @@ function LicaoPage() {
           <article className="prose prose-invert max-w-none prose-headings:font-semibold prose-h2:text-lg prose-h2:mt-6 prose-p:text-sm prose-p:text-muted-foreground prose-li:text-sm prose-li:text-muted-foreground prose-strong:text-foreground prose-table:text-sm">
             <ReactMarkdown>{lesson.conteudo}</ReactMarkdown>
           </article>
+          {lesson.exercicios && lesson.exercicios.length > 0 && (
+            <section className="mt-8">
+              <h2 className="text-lg font-semibold mb-3">Exercícios práticos</h2>
+              <div className="space-y-3">
+                {lesson.exercicios.map((ex, i) => (
+                  <ExerciseCard key={i} index={i} ex={ex} />
+                ))}
+              </div>
+            </section>
+          )}
+
           <div className="mt-8 flex gap-3">
             <button
               onClick={() => setStep("quiz")}

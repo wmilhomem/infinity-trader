@@ -5,6 +5,13 @@ export type QuizQuestion = {
   explicacao: string;
 };
 
+export type Exercise = {
+  titulo: string;
+  enunciado: string;
+  dica?: string;
+  gabarito: string;
+};
+
 export type Lesson = {
   slug: string;
   ordem: number;
@@ -14,7 +21,9 @@ export type Lesson = {
   analogia: string;
   conteudo: string; // markdown
   quiz: QuizQuestion[];
+  exercicios?: Exercise[];
 };
+
 
 export const LESSONS: Lesson[] = [
   {
@@ -230,8 +239,26 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
         explicacao: "Roll Out = alongar o vencimento sem mexer no strike.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Diagnóstico de rolagem",
+        enunciado:
+          "Você vendeu uma call PETRK40 por R$1,20. Faltam 8 dias pro vencimento e PETR4 está a R$41,50. A call agora vale R$1,80. Rolar Up and Out pra PETRL42 (próximo mês) sai a débito de R$0,30. Deve rolar? Justifique com os 3 critérios da lição.",
+        dica: "Tese ainda vale? Débito é pequeno? Já rolou antes?",
+        gabarito:
+          "Rolagem aceitável: débito baixo (< 30% do prêmio original de R$1,20), primeira rolagem, e Up and Out reduz risco de exercício. Se a tese de estabilidade em PETR4 caiu, encerra ao invés de rolar.",
+      },
+      {
+        titulo: "Registro no diário",
+        enunciado:
+          "Abra o Diário e registre uma operação hipotética com estrutura 'venda coberta', ativo VALE3, marque 'seguiu a regra' e escreva no motivo: 'rolei uma vez, dentro do limite'. Depois vá em Revisão e confira se a linha aparece.",
+        gabarito: "Fluxo esperado: Diário → nova entrada → Revisão mostra a operação na coluna 'seguiu regra'.",
+      },
+    ],
   },
   {
+
+
     slug: "trava-de-alta",
     ordem: 10,
     nivel: 4,
@@ -285,7 +312,24 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
         explicacao: "Breakeven = strike comprado + custo = 38 + 0,90 = R$38,90.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Monte no simulador",
+        enunciado:
+          "Abra o Simulador, escolha 'Trava de Alta' e adicione duas pernas: compra call strike 38 a R$1,50 e venda call strike 40 a R$0,60. Confirme visualmente no gráfico: onde está o breakeven, o lucro máximo e a perda máxima?",
+        gabarito:
+          "Breakeven em R$38,90; lucro máximo R$1,10/ação a partir de R$40; perda máxima R$0,90/ação até R$38.",
+      },
+      {
+        titulo: "Ajuste de risco",
+        enunciado:
+          "Você tem R$20.000 de patrimônio e a regra do 1%. Quantos lotes dessa trava (custo R$0,90/ação, lote 100) pode montar sem furar o limite?",
+        dica: "1% do patrimônio ÷ risco por lote.",
+        gabarito: "Risco máx = R$200. Cada lote arrisca R$90. Máximo 2 lotes (2×R$90 = R$180).",
+      },
+    ],
   },
+
   {
     slug: "trava-de-baixa",
     ordem: 11,
@@ -343,7 +387,24 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
         explicacao: "Trava barateia a aposta em queda em troca de tampar o ganho no extremo.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Simule a trava de baixa",
+        enunciado:
+          "No Simulador, monte: compra put strike 38 a R$1,40 e venda put strike 36 a R$0,50. Qual o lucro máximo em reais no lote (100 ações) e a que preço do ativo ele acontece?",
+        gabarito: "Lucro máx = R$110 por lote, atingido a partir de PETR4 ≤ R$36.",
+      },
+      {
+        titulo: "Comparação com put pura",
+        enunciado:
+          "Compare no papel: comprar put strike 38 pura por R$1,40 vs. a trava por R$0,90 líquidos. Se PETR4 cair pra R$30, qual estrutura ganha mais? E se cair só pra R$37?",
+        dica: "Na trava, ganho para depois do strike inferior.",
+        gabarito:
+          "Cair pra R$30: put pura ganha R$8,00 − R$1,40 = R$6,60; trava ganha R$1,10 (teto). Cair pra R$37: put pura ganha R$1,00 − R$1,40 = −R$0,40; trava ganha R$1,00 − R$0,90 = R$0,10.",
+      },
+    ],
   },
+
   {
     slug: "rolagem-defensiva",
     ordem: 12,
@@ -405,7 +466,22 @@ Vendeu call PETRK40 por R$1,00. PETR4 subiu pra R$41.
         explicacao: "Se a tese caiu, o certo é encerrar. Rolar só faz sentido quando o motivo original ainda existe.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Classifique a rolagem",
+        enunciado:
+          "Para cada caso, decida: rolar ou encerrar?\nA) Vendeu call por R$1,00, ativo estourou strike, rolagem gera crédito R$0,20 e é a primeira.\nB) Comprou trava de alta, tese caiu (empresa anunciou prejuízo), rolagem custa débito de R$0,80.\nC) Já rolou uma vez essa mesma operação, agora quer rolar de novo.",
+        gabarito: "A) Rolar. B) Encerrar (tese caiu). C) Encerrar (limite de 1 rolagem).",
+      },
+      {
+        titulo: "Regra pessoal",
+        enunciado:
+          "Vá em Regras e crie a regra: 'Máximo 1 rolagem por operação; se falhar de novo, encerro'. Marque como ativa. Depois, no Diário, ao registrar uma operação, confirme que a regra aparece na lista pra vincular.",
+        gabarito: "Regra criada na categoria 'gestão' e disponível como opção ao registrar entrada no diário.",
+      },
+    ],
   },
+
   {
     slug: "gestao-de-risco-travas",
     ordem: 13,
@@ -465,7 +541,29 @@ Defina no diário **antes de abrir**:
         explicacao: "Expectativa negativa é insustentável — mesmo vitórias esporádicas não compensam a série de perdas.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Calcule position sizing",
+        enunciado:
+          "Patrimônio R$120.000, regra do 1%. Uma trava custa R$1,40/ação (lote 100). Quantos lotes você pode montar? Se aumentar o custo pra R$3,00/ação, quantos lotes cabem?",
+        gabarito: "R$1.200 de risco máx. A R$140/lote → 8 lotes. A R$300/lote → 4 lotes.",
+      },
+      {
+        titulo: "Expectativa matemática",
+        enunciado:
+          "Estratégia com 60% de acerto, ganho médio R$150, perda média R$250. Qual a expectativa por trade? Você deve operar?",
+        dica: "EM = (P_acerto × ganho) − (P_erro × perda).",
+        gabarito: "EM = 0,6×150 − 0,4×250 = 90 − 100 = −R$10. Negativa: não operar.",
+      },
+      {
+        titulo: "Defina seus 3 stops",
+        enunciado:
+          "No Diário, ao registrar sua próxima operação (real ou hipotética), escreva no campo motivo os 3 stops: prêmio, ativo e tempo. Ex: 'Encerro se trava valer 50%, se PETR4 furar R$36, ou 5 dias antes do vencimento.'",
+        gabarito: "Todo trade registrado com os 3 stops explícitos antes de abrir.",
+      },
+    ],
   },
+
   {
     slug: "tributacao-basica",
     ordem: 14,
@@ -520,7 +618,23 @@ Prejuízo de um mês **abate lucro futuro** — sem prazo de validade. Registre 
         explicacao: "Day trade = 20% sobre o lucro líquido mensal.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Apure o mês",
+        enunciado:
+          "Em maio você fez três operações comuns de opções: +R$1.200, +R$800 e −R$600. IRRF retido no mês: R$8. Quanto vai de DARF?",
+        dica: "Lucro líquido × 15% − IRRF.",
+        gabarito: "Lucro líquido = R$1.400. IR = 15%×1400 = R$210. DARF = R$210 − R$8 = R$202.",
+      },
+      {
+        titulo: "Swing vs day trade",
+        enunciado:
+          "No mesmo mês: swing +R$500 e day trade em opções +R$400. Some tudo e calcule o IR devido (ignore IRRF).",
+        gabarito: "Modalidades separadas. Swing: 15%×500 = R$75. Day: 20%×400 = R$80. Total = R$155.",
+      },
+    ],
   },
+
   {
     slug: "darf-e-compensacao",
     ordem: 15,
@@ -578,7 +692,29 @@ Planilha própria ou o **diário do Zero ao Trade** — os campos de resultado a
         explicacao: "Vence sempre no último dia útil do mês seguinte à apuração.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Compensação em cadeia",
+        enunciado:
+          "Jan: −R$1.500 (swing). Fev: +R$400 (swing). Mar: +R$2.000 (swing). Quanto de IR paga em cada mês?",
+        gabarito:
+          "Jan: 0 (prejuízo R$1.500 acumulado). Fev: 0 (compensa R$400, sobra R$1.100 de prejuízo). Mar: 15%×(2000−1100) = R$135.",
+      },
+      {
+        titulo: "Simule seu DARF",
+        enunciado:
+          "Vá em Revisão e some seus resultados registrados no diário no mês corrente. Aplique 15% (swing) ou 20% (day trade). Esse valor é o DARF estimado. Verifique se bate com o que sua corretora envia.",
+        gabarito: "Fluxo: Revisão → total do mês × alíquota da modalidade − IRRF = DARF a pagar.",
+      },
+      {
+        titulo: "Regra de disciplina fiscal",
+        enunciado:
+          "Crie no menu Regras a regra: 'Todo dia 1º do mês, fecho a apuração e gero o DARF antes do dia 20'. Categoria: gestão.",
+        gabarito: "Regra ativa que aparece automaticamente na revisão mensal.",
+      },
+    ],
   },
+
 ];
 
 export function getLesson(slug: string) {
