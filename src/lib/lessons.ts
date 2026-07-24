@@ -286,6 +286,299 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
       },
     ],
   },
+  {
+    slug: "trava-de-baixa",
+    ordem: 11,
+    nivel: 4,
+    titulo: "Lição 11 — Trava de Baixa (Bear Put Spread)",
+    resumo: "Compra put mais cara (ATM/ITM) + vende put mais barata (OTM). Aposta em queda com risco limitado.",
+    analogia:
+      "Guarda-chuva com franja: te protege se chover forte, mas se virar tempestade, a franja não segura tudo. Barato porque abre mão do extremo.",
+    conteudo: `
+## Montagem
+- **Compra** put strike B (maior)
+- **Vende** put strike A (menor)
+- Mesmo vencimento
+
+## Números (PETR4 a R$38)
+- Compra PETRW38 por R$1,40
+- Vende PETRW36 por R$0,50
+- **Custo líquido**: R$0,90 por ação
+
+## Payoff no vencimento
+| Cenário | Resultado |
+|---|---|
+| PETR4 ≥ 38 | Perde os R$90 (prêmio pago) |
+| PETR4 ≤ 36 | Ganha (38 − 36) − 0,90 = R$1,10 → R$110 lucro máx |
+
+**Breakeven** = B − custo = R$37,10.
+    `,
+    quiz: [
+      {
+        pergunta: "Numa trava de baixa, o que garante que o risco é limitado?",
+        alternativas: [
+          "A put comprada de strike maior",
+          "O custo líquido pago no início",
+          "A put vendida",
+          "A volatilidade implícita",
+        ],
+        correta: 1,
+        explicacao: "A perda máxima é o débito pago — nada além disso, mesmo se o ativo disparar pra cima.",
+      },
+      {
+        pergunta: "Compra put 38 e vende put 36, custo R$0,90. Qual o lucro máximo?",
+        alternativas: ["R$0,90", "R$1,10", "R$2,00", "Ilimitado"],
+        correta: 1,
+        explicacao: "Lucro máx = (B − A) − custo = (38 − 36) − 0,90 = R$1,10 por ação.",
+      },
+      {
+        pergunta: "Quando faz sentido montar trava de baixa em vez de comprar put pura?",
+        alternativas: [
+          "Quando espera queda extrema",
+          "Quando espera queda moderada e quer pagar menos prêmio",
+          "Quando não tem opinião de direção",
+          "Nunca — put pura é sempre melhor",
+        ],
+        correta: 1,
+        explicacao: "Trava barateia a aposta em queda em troca de tampar o ganho no extremo.",
+      },
+    ],
+  },
+  {
+    slug: "rolagem-defensiva",
+    ordem: 12,
+    nivel: 4,
+    titulo: "Lição 12 — Rolagem defensiva na prática",
+    resumo: "Quando rolar salva a operação e quando é só empurrar prejuízo com o pé.",
+    analogia:
+      "Renegociar uma dívida: se te dá fôlego real pra pagar, vale. Se é só pra empurrar o boleto com juros maiores, tá cavando um buraco.",
+    conteudo: `
+## Critérios objetivos pra rolar
+
+1. **A tese original ainda vale?** Se o motivo sumiu, encerra — não rola.
+2. **O crédito líquido faz sentido?** Rolar com débito grande é pagar pra continuar errado.
+3. **Você já rolou essa operação?** Se sim, encerra. **Máximo 1 rolagem.**
+
+## Checklist antes de rolar
+- [ ] Tese ainda intacta
+- [ ] Rolagem gera crédito ou débito pequeno (< 30% do prêmio original)
+- [ ] Novo vencimento cabe no seu prazo
+- [ ] Ainda dentro do stop de perda definido nas regras
+
+## Exemplo prático
+Vendeu call PETRK40 por R$1,00. PETR4 subiu pra R$41.
+- **Rolagem boa**: recompra por R$1,80, vende PETRL42 (próximo mês) por R$2,20 → crédito R$0,40 e mais tempo.
+- **Rolagem ruim**: recompra por R$1,80, vende PETRK41 mesma série por R$0,50 → débito R$1,30 e sem tempo extra.
+    `,
+    quiz: [
+      {
+        pergunta: "Qual sinal indica que você NÃO deve rolar?",
+        alternativas: [
+          "A rolagem gera crédito",
+          "Você já rolou essa mesma operação uma vez",
+          "O vencimento ainda tem 20 dias",
+          "O ativo mexeu 1%",
+        ],
+        correta: 1,
+        explicacao: "Regra de ouro: no máximo 1 rolagem. Segunda tentativa é insistência, não estratégia.",
+      },
+      {
+        pergunta: "Rolar com débito grande normalmente significa…",
+        alternativas: [
+          "Estratégia agressiva bem-executada",
+          "Pagar pra continuar errado",
+          "Que a corretora vai te cobrar menos IR",
+          "Que o ativo vai voltar",
+        ],
+        correta: 1,
+        explicacao: "Débito grande na rolagem é o mercado te dizendo que a nova aposta é cara — reavalie encerrar.",
+      },
+      {
+        pergunta: "Antes de rolar, o primeiro item do checklist é:",
+        alternativas: [
+          "Ver se dá pra ganhar mais",
+          "Confirmar se a tese original ainda vale",
+          "Aumentar o tamanho da posição",
+          "Trocar de ativo",
+        ],
+        correta: 1,
+        explicacao: "Se a tese caiu, o certo é encerrar. Rolar só faz sentido quando o motivo original ainda existe.",
+      },
+    ],
+  },
+  {
+    slug: "gestao-de-risco-travas",
+    ordem: 13,
+    nivel: 4,
+    titulo: "Lição 13 — Gestão de risco em travas",
+    resumo: "Position sizing, stop de perda e regra do 1% do patrimônio por operação.",
+    analogia:
+      "Cinto de segurança: você não usa esperando bater, mas quando bate, é ele que decide se você sai andando ou não.",
+    conteudo: `
+## Position sizing
+
+Nunca arrisque mais de **1% do patrimônio líquido** por operação. Numa trava, o risco é o **débito pago** (ou a diferença entre strikes − crédito, se for trava de crédito).
+
+## Exemplo
+Patrimônio: R$50.000 → risco máximo por trade = R$500.
+
+Trava de alta PETRK38/PETRK40 custa R$0,90 por ação = R$90 no lote (100).
+- **Você pode montar até 5 lotes** (5 × R$90 = R$450, dentro do teto).
+
+## Stop de perda
+
+Defina no diário **antes de abrir**:
+- Stop no prêmio (ex: se a trava valer 50% do custo, encerra).
+- Stop no ativo (ex: se PETR4 furar R$36, encerra).
+- Stop de tempo (ex: 5 dias pré-vencimento sem plano, encerra).
+
+## Métrica que importa
+**Expectativa matemática** = (prob acerto × ganho médio) − (prob erro × perda média). Se negativa, a operação é ruim mesmo quando dá certo às vezes.
+    `,
+    quiz: [
+      {
+        pergunta: "Regra do 1%: patrimônio de R$80.000, quanto arrisca no máximo por operação?",
+        alternativas: ["R$80", "R$800", "R$8.000", "R$80.000"],
+        correta: 1,
+        explicacao: "1% de R$80.000 = R$800 de risco máximo por operação.",
+      },
+      {
+        pergunta: "Numa trava de débito, o risco por lote é:",
+        alternativas: [
+          "A diferença entre strikes",
+          "O débito líquido pago",
+          "O valor total do ativo",
+          "Ilimitado",
+        ],
+        correta: 1,
+        explicacao: "Débito pago = perda máxima. Por isso trava de débito tem risco conhecido antes de abrir.",
+      },
+      {
+        pergunta: "Uma operação com expectativa matemática negativa…",
+        alternativas: [
+          "Nunca dá lucro",
+          "Pode dar lucro pontual, mas destrói o capital no longo prazo",
+          "É boa se o setup for bonito",
+          "Depende só da sorte",
+        ],
+        correta: 1,
+        explicacao: "Expectativa negativa é insustentável — mesmo vitórias esporádicas não compensam a série de perdas.",
+      },
+    ],
+  },
+  {
+    slug: "tributacao-basica",
+    ordem: 14,
+    nivel: 5,
+    titulo: "Lição 14 — Tributação de opções (básico)",
+    resumo: "15% sobre lucro líquido mensal (swing) e 20% em day trade. Opções não têm isenção dos R$20 mil.",
+    analogia:
+      "Aluguel de imóvel: todo mês você fecha as contas e paga o carnê. Não tem faixa de isenção como venda de ação — se lucrou, paga.",
+    conteudo: `
+## Alíquotas
+
+| Tipo | Alíquota |
+|---|---|
+| Operação comum (swing) | **15%** sobre lucro líquido do mês |
+| Day trade | **20%** sobre lucro líquido do mês |
+
+## Sem isenção de R$20 mil
+
+Diferente de ação à vista, **opções não têm isenção mensal**. Todo lucro é tributado.
+
+## IRRF (imposto retido na fonte)
+- Comum: **0,005%** sobre valor da venda ("dedo-duro")
+- Day trade: **1%** sobre o lucro do dia
+
+Serve pra Receita cruzar dados, mas você compensa no DARF mensal.
+
+## Prejuízo compensa
+Prejuízo de um mês **abate lucro futuro** — sem prazo de validade. Registre tudo no diário e no controle mensal.
+    `,
+    quiz: [
+      {
+        pergunta: "Lucrou R$3.000 em opções comuns no mês. Quanto de IR (fora IRRF)?",
+        alternativas: ["R$150", "R$300", "R$450", "R$600"],
+        correta: 2,
+        explicacao: "15% × R$3.000 = R$450 de DARF, código 6015.",
+      },
+      {
+        pergunta: "A isenção de R$20 mil/mês vale para opções?",
+        alternativas: [
+          "Sim, igual à venda de ações",
+          "Não — opções são sempre tributadas",
+          "Só em day trade",
+          "Só em put",
+        ],
+        correta: 1,
+        explicacao: "Isenção dos R$20 mil vale só pra ação à vista. Opções pagam a partir do primeiro real de lucro.",
+      },
+      {
+        pergunta: "Alíquota de day trade em opções:",
+        alternativas: ["15%", "17,5%", "20%", "22,5%"],
+        correta: 2,
+        explicacao: "Day trade = 20% sobre o lucro líquido mensal.",
+      },
+    ],
+  },
+  {
+    slug: "darf-e-compensacao",
+    ordem: 15,
+    nivel: 5,
+    titulo: "Lição 15 — DARF, compensação de prejuízo e controle mensal",
+    resumo: "Como apurar, gerar DARF código 6015, e usar prejuízo pra abater lucro futuro sem prazo.",
+    analogia:
+      "Cartão de crédito da Receita: fecha dia último do mês, vence dia último do mês seguinte. Atrasou, pega multa e juros Selic.",
+    conteudo: `
+## Passo a passo mensal
+
+1. **Some** lucros e prejuízos de cada operação encerrada no mês (separando swing de day trade).
+2. **Compense** prejuízos acumulados de meses anteriores (mesma modalidade).
+3. **Desconte** IRRF retido pela corretora.
+4. **Gere DARF** no site da Receita (Sicalc), código **6015**.
+5. **Pague até o último dia útil do mês seguinte.**
+
+## Compensação de prejuízo
+- Swing só compensa swing. Day trade só compensa day trade.
+- **Sem prazo de validade** — prejuízo de 2019 ainda abate lucro de 2026.
+- Precisa constar da declaração anual pra ser aceito.
+
+## Exemplo
+| Mês | Resultado | IRRF | A pagar |
+|---|---|---|---|
+| Jan | +R$1.000 | R$5 | 15%×1000 − 5 = R$145 |
+| Fev | −R$800 | R$2 | Zero (acumula prejuízo R$800) |
+| Mar | +R$1.500 | R$7 | 15%×(1500−800) − 7 = R$98 |
+
+## Onde registrar
+Planilha própria ou o **diário do Zero ao Trade** — os campos de resultado alimentam essa apuração.
+    `,
+    quiz: [
+      {
+        pergunta: "Prejuízo de swing pode compensar lucro de day trade?",
+        alternativas: ["Sim, sempre", "Não — modalidades separadas", "Só no mesmo mês", "Só com autorização da Receita"],
+        correta: 1,
+        explicacao: "Compensação é estanque: swing com swing, day trade com day trade.",
+      },
+      {
+        pergunta: "Qual o código do DARF de opções (swing)?",
+        alternativas: ["6015", "8053", "0190", "4600"],
+        correta: 0,
+        explicacao: "6015 é o código pra ganhos líquidos em renda variável de pessoa física.",
+      },
+      {
+        pergunta: "Prazo pra pagar o DARF do lucro de março:",
+        alternativas: [
+          "Até 31 de março",
+          "Até o último dia útil de abril",
+          "Até 30 de junho",
+          "Só na declaração anual",
+        ],
+        correta: 1,
+        explicacao: "Vence sempre no último dia útil do mês seguinte à apuração.",
+      },
+    ],
+  },
 ];
 
 export function getLesson(slug: string) {
