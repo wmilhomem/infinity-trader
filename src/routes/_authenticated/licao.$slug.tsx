@@ -5,8 +5,33 @@ import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { getLesson, LESSONS } from "@/lib/lessons";
-import { Check, MessageCircle, X } from "lucide-react";
+import { getLesson, LESSONS, type Exercise } from "@/lib/lessons";
+import { Check, ChevronDown, ChevronUp, MessageCircle, X } from "lucide-react";
+
+function ExerciseCard({ index, ex }: { index: number; ex: Exercise }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-lg border border-border bg-card p-4">
+      <div className="text-xs uppercase text-muted-foreground">Exercício {index + 1}</div>
+      <div className="mt-1 font-semibold">{ex.titulo}</div>
+      <p className="mt-2 text-sm whitespace-pre-line text-muted-foreground">{ex.enunciado}</p>
+      {ex.dica && <p className="mt-2 text-xs text-primary">Dica: {ex.dica}</p>}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="mt-3 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+      >
+        {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+        {open ? "Esconder gabarito" : "Ver gabarito"}
+      </button>
+      {open && (
+        <div className="mt-2 rounded-md border border-success/40 bg-success/10 p-3 text-sm whitespace-pre-line">
+          {ex.gabarito}
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 export const Route = createFileRoute("/_authenticated/licao/$slug")({
   head: ({ params }) => {
