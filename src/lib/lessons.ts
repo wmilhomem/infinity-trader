@@ -5,6 +5,13 @@ export type QuizQuestion = {
   explicacao: string;
 };
 
+export type Exercise = {
+  titulo: string;
+  enunciado: string;
+  dica?: string;
+  gabarito: string;
+};
+
 export type Lesson = {
   slug: string;
   ordem: number;
@@ -14,7 +21,9 @@ export type Lesson = {
   analogia: string;
   conteudo: string; // markdown
   quiz: QuizQuestion[];
+  exercicios?: Exercise[];
 };
+
 
 export const LESSONS: Lesson[] = [
   {
