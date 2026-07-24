@@ -466,7 +466,22 @@ Vendeu call PETRK40 por R$1,00. PETR4 subiu pra R$41.
         explicacao: "Se a tese caiu, o certo é encerrar. Rolar só faz sentido quando o motivo original ainda existe.",
       },
     ],
+    exercicios: [
+      {
+        titulo: "Classifique a rolagem",
+        enunciado:
+          "Para cada caso, decida: rolar ou encerrar?\nA) Vendeu call por R$1,00, ativo estourou strike, rolagem gera crédito R$0,20 e é a primeira.\nB) Comprou trava de alta, tese caiu (empresa anunciou prejuízo), rolagem custa débito de R$0,80.\nC) Já rolou uma vez essa mesma operação, agora quer rolar de novo.",
+        gabarito: "A) Rolar. B) Encerrar (tese caiu). C) Encerrar (limite de 1 rolagem).",
+      },
+      {
+        titulo: "Regra pessoal",
+        enunciado:
+          "Vá em Regras e crie a regra: 'Máximo 1 rolagem por operação; se falhar de novo, encerro'. Marque como ativa. Depois, no Diário, ao registrar uma operação, confirme que a regra aparece na lista pra vincular.",
+        gabarito: "Regra criada na categoria 'gestão' e disponível como opção ao registrar entrada no diário.",
+      },
+    ],
   },
+
   {
     slug: "gestao-de-risco-travas",
     ordem: 13,
