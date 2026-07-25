@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { RULE_TEMPLATES } from "@/lib/rule-templates";
+import { RULE_TEMPLATES, STRUCTURED_TEMPLATES } from "@/lib/rule-templates";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
@@ -16,6 +16,7 @@ function Onboarding() {
   const [step, setStep] = useState(1);
   const [jaOperou, setJaOperou] = useState<boolean | null>(null);
   const [selected, setSelected] = useState<Set<number>>(new Set([0, 2, 3]));
+  const [selectedStruct, setSelectedStruct] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(false);
 
   async function finish() {
@@ -28,13 +29,33 @@ function Onboarding() {
         .update({ ja_operou: !!jaOperou, onboarded: true, nivel_atual: jaOperou ? 4 : 1 })
         .eq("id", u.user.id);
 
-      if (selected.size > 0) {
-        const rows = Array.from(selected).map((i) => ({
+      const rows: Array<Record<string, unknown>> = [];
+      for (const i of selected) {
+        rows.push({
           user_id: u.user.id,
           texto: RULE_TEMPLATES[i].texto,
           categoria: RULE_TEMPLATES[i].categoria,
-        }));
-        await supabase.from("personal_rules").insert(rows);
+          tipo: "texto",
+        });
+      }
+      if (jaOperou) {
+        for (const i of selectedStruct) {
+          const t = STRUCTURED_TEMPLATES[i];
+          rows.push({
+            user_id: u.user.id,
+            tipo: t.tipo,
+            nome: t.nome,
+            categoria: t.categoria,
+            texto:
+              t.tipo === "indicador_tecnico"
+                ? `${t.nome}${t.parametros.periodo ? ` · período ${t.parametros.periodo}` : ""}${t.parametros.timeframe ? ` · ${t.parametros.timeframe}` : ""}`
+                : (t.parametros.descricao ?? t.parametros.condicao),
+            parametros_json: t.parametros,
+          });
+        }
+      }
+      if (rows.length > 0) {
+        await supabase.from("personal_rules").insert(rows as never);
       }
       toast.success("Tudo pronto. Bora começar!");
       navigate({ to: "/home", replace: true });
@@ -44,6 +65,7 @@ function Onboarding() {
       setLoading(false);
     }
   }
+
 
   return (
     <div className="min-h-screen grid place-items-center bg-background text-foreground p-6">
