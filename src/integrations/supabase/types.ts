@@ -172,7 +172,10 @@ export type Database = {
           categoria: string
           created_at: string
           id: string
+          nome: string | null
+          parametros_json: Json | null
           texto: string
+          tipo: string
           user_id: string
         }
         Insert: {
@@ -180,7 +183,10 @@ export type Database = {
           categoria?: string
           created_at?: string
           id?: string
+          nome?: string | null
+          parametros_json?: Json | null
           texto: string
+          tipo?: string
           user_id: string
         }
         Update: {
@@ -188,7 +194,10 @@ export type Database = {
           categoria?: string
           created_at?: string
           id?: string
+          nome?: string | null
+          parametros_json?: Json | null
           texto?: string
+          tipo?: string
           user_id?: string
         }
         Relationships: []
