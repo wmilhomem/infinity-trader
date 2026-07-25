@@ -158,7 +158,7 @@ function Regras() {
       categoria: t.categoria,
       texto:
         t.tipo === "indicador_tecnico"
-          ? describeIndicador(t.nome, t.parametros as Record<string, unknown>)
+          ? describeIndicador(t.nome, t.parametros as unknown as Record<string, unknown>)
           : (t.parametros.descricao ?? t.parametros.condicao),
       parametros_json: t.parametros as unknown as Record<string, unknown>,
     }));
