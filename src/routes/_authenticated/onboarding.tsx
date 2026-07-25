@@ -132,6 +132,41 @@ function Onboarding() {
                 </label>
               ))}
             </div>
+            {jaOperou && (
+              <div className="mt-6">
+                <div className="text-sm font-semibold">Seu setup técnico (opcional)</div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Como você já opera, pode já cadastrar indicadores e padrões que usa. O
+                  copilot vai lembrar deles — quem decide o significado é você.
+                </p>
+                <div className="mt-3 grid gap-2 max-h-64 overflow-auto pr-1">
+                  {STRUCTURED_TEMPLATES.map((t, i) => (
+                    <label
+                      key={i}
+                      className={`flex items-start gap-3 rounded-md border p-3 cursor-pointer ${selectedStruct.has(i) ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedStruct.has(i)}
+                        onChange={(e) => {
+                          const s = new Set(selectedStruct);
+                          if (e.target.checked) s.add(i);
+                          else s.delete(i);
+                          setSelectedStruct(s);
+                        }}
+                        className="mt-1"
+                      />
+                      <div>
+                        <div className="text-xs uppercase text-primary">
+                          {t.tipo === "indicador_tecnico" ? "indicador" : "padrão"} · {t.categoria}
+                        </div>
+                        <div className="text-sm">{t.nome}</div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
             <button
               onClick={finish}
               disabled={loading}
