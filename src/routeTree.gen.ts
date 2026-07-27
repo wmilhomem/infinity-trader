@@ -20,7 +20,7 @@ import { Route as AuthenticatedRegrasRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated/diario'
-import { Route as AuthenticatedCopilotRouteImport } from './routes/_authenticated/copilot'
+import { Route as AuthenticatedCopilotIndexRouteImport } from './routes/_authenticated/copilot.index'
 import { Route as AuthenticatedLicaoSlugRouteImport } from './routes/_authenticated/licao.$slug'
 import { Route as AuthenticatedCopilotThreadIdRouteImport } from './routes/_authenticated/copilot.$threadId'
 
@@ -78,11 +78,12 @@ const AuthenticatedDiarioRoute = AuthenticatedDiarioRouteImport.update({
   path: '/diario',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedCopilotRoute = AuthenticatedCopilotRouteImport.update({
-  id: '/copilot',
-  path: '/copilot',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
+const AuthenticatedCopilotIndexRoute =
+  AuthenticatedCopilotIndexRouteImport.update({
+    id: '/copilot/',
+    path: '/copilot/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLicaoSlugRoute = AuthenticatedLicaoSlugRouteImport.update({
   id: '/licao/$slug',
   path: '/licao/$slug',
@@ -90,15 +91,14 @@ const AuthenticatedLicaoSlugRoute = AuthenticatedLicaoSlugRouteImport.update({
 } as any)
 const AuthenticatedCopilotThreadIdRoute =
   AuthenticatedCopilotThreadIdRouteImport.update({
-    id: '/$threadId',
-    path: '/$threadId',
-    getParentRoute: () => AuthenticatedCopilotRoute,
+    id: '/copilot/$threadId',
+    path: '/copilot/$threadId',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/copilot': typeof AuthenticatedCopilotRouteWithChildren
   '/diario': typeof AuthenticatedDiarioRoute
   '/home': typeof AuthenticatedHomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -109,11 +109,11 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/copilot/$threadId': typeof AuthenticatedCopilotThreadIdRoute
   '/licao/$slug': typeof AuthenticatedLicaoSlugRoute
+  '/copilot/': typeof AuthenticatedCopilotIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/copilot': typeof AuthenticatedCopilotRouteWithChildren
   '/diario': typeof AuthenticatedDiarioRoute
   '/home': typeof AuthenticatedHomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -124,13 +124,13 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/copilot/$threadId': typeof AuthenticatedCopilotThreadIdRoute
   '/licao/$slug': typeof AuthenticatedLicaoSlugRoute
+  '/copilot': typeof AuthenticatedCopilotIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/_authenticated/copilot': typeof AuthenticatedCopilotRouteWithChildren
   '/_authenticated/diario': typeof AuthenticatedDiarioRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
@@ -141,13 +141,13 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/_authenticated/copilot/$threadId': typeof AuthenticatedCopilotThreadIdRoute
   '/_authenticated/licao/$slug': typeof AuthenticatedLicaoSlugRoute
+  '/_authenticated/copilot/': typeof AuthenticatedCopilotIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
-    | '/copilot'
     | '/diario'
     | '/home'
     | '/onboarding'
@@ -158,11 +158,11 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/copilot/$threadId'
     | '/licao/$slug'
+    | '/copilot/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
-    | '/copilot'
     | '/diario'
     | '/home'
     | '/onboarding'
@@ -173,12 +173,12 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/copilot/$threadId'
     | '/licao/$slug'
+    | '/copilot'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
-    | '/_authenticated/copilot'
     | '/_authenticated/diario'
     | '/_authenticated/home'
     | '/_authenticated/onboarding'
@@ -189,6 +189,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/_authenticated/copilot/$threadId'
     | '/_authenticated/licao/$slug'
+    | '/_authenticated/copilot/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -277,11 +278,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDiarioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/copilot': {
-      id: '/_authenticated/copilot'
+    '/_authenticated/copilot/': {
+      id: '/_authenticated/copilot/'
       path: '/copilot'
-      fullPath: '/copilot'
-      preLoaderRoute: typeof AuthenticatedCopilotRouteImport
+      fullPath: '/copilot/'
+      preLoaderRoute: typeof AuthenticatedCopilotIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/licao/$slug': {
@@ -293,27 +294,15 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/copilot/$threadId': {
       id: '/_authenticated/copilot/$threadId'
-      path: '/$threadId'
+      path: '/copilot/$threadId'
       fullPath: '/copilot/$threadId'
       preLoaderRoute: typeof AuthenticatedCopilotThreadIdRouteImport
-      parentRoute: typeof AuthenticatedCopilotRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-interface AuthenticatedCopilotRouteChildren {
-  AuthenticatedCopilotThreadIdRoute: typeof AuthenticatedCopilotThreadIdRoute
-}
-
-const AuthenticatedCopilotRouteChildren: AuthenticatedCopilotRouteChildren = {
-  AuthenticatedCopilotThreadIdRoute: AuthenticatedCopilotThreadIdRoute,
-}
-
-const AuthenticatedCopilotRouteWithChildren =
-  AuthenticatedCopilotRoute._addFileChildren(AuthenticatedCopilotRouteChildren)
-
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedCopilotRoute: typeof AuthenticatedCopilotRouteWithChildren
   AuthenticatedDiarioRoute: typeof AuthenticatedDiarioRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
@@ -321,11 +310,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRevisaoRoute: typeof AuthenticatedRevisaoRoute
   AuthenticatedSimuladorRoute: typeof AuthenticatedSimuladorRoute
   AuthenticatedTrilhaRoute: typeof AuthenticatedTrilhaRoute
+  AuthenticatedCopilotThreadIdRoute: typeof AuthenticatedCopilotThreadIdRoute
   AuthenticatedLicaoSlugRoute: typeof AuthenticatedLicaoSlugRoute
+  AuthenticatedCopilotIndexRoute: typeof AuthenticatedCopilotIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedCopilotRoute: AuthenticatedCopilotRouteWithChildren,
   AuthenticatedDiarioRoute: AuthenticatedDiarioRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
@@ -333,7 +323,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRevisaoRoute: AuthenticatedRevisaoRoute,
   AuthenticatedSimuladorRoute: AuthenticatedSimuladorRoute,
   AuthenticatedTrilhaRoute: AuthenticatedTrilhaRoute,
+  AuthenticatedCopilotThreadIdRoute: AuthenticatedCopilotThreadIdRoute,
   AuthenticatedLicaoSlugRoute: AuthenticatedLicaoSlugRoute,
+  AuthenticatedCopilotIndexRoute: AuthenticatedCopilotIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

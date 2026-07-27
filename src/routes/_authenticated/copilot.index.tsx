@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { MessageCircle, Plus } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/copilot")({
+export const Route = createFileRoute("/_authenticated/copilot/")({
   head: () => ({ meta: [{ title: "Copilot · Zero ao Trade" }] }),
   component: CopilotIndex,
 });
