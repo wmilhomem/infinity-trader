@@ -1,0 +1,1 @@
+DELETE FROM public.chat_threads WHERE id IN ('044ebfe3-5074-44af-aac6-d31887a6efd5','a041e497-e4ec-4531-bb76-f8f0f86e4ad6');
