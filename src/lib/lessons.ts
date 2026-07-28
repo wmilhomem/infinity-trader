@@ -133,6 +133,82 @@ Ex: **PETRK38**
     ],
   },
   {
+    slug: "vencimento-e-exercicio",
+    ordem: 3,
+    nivel: 1,
+    titulo: "Lição 3 — Vencimento, exercício e liquidez",
+    resumo: "Como funciona a data de vencimento na B3, exercício automático e o risco de ficar preso.",
+    analogia:
+      "O vale-ingresso tem prazo. Passou a data, virou papel. E se ninguém quiser comprar seu vale antes, você só tem duas saídas: usar ou perder.",
+    conteudo: `
+## Quando vence
+
+Na B3, opções sobre ações vencem na **terceira sexta-feira** do mês (se for feriado, no dia útil seguinte). Depois disso, o contrato deixa de existir.
+
+## Exercício
+
+- **ITM (dentro do dinheiro)** no vencimento → normalmente exercida automaticamente pela corretora.
+- **OTM (fora do dinheiro)** → vira pó. Você perde o prêmio pago.
+
+Se você **vendeu** a opção e ela vira ITM, você pode ser exercido: precisa entregar (call) ou comprar (put) as ações.
+
+## Liquidez: o risco silencioso
+
+Estar certo na direção não basta se não houver contraparte. Antes de entrar, olhe:
+
+- Volume negociado no dia
+- Número de negócios (não só o volume financeiro)
+- Spread entre compra e venda
+
+Regra prática: opções com strike próximo do preço atual e vencimento mais curto costumam ter mais liquidez. Séries distantes viram armadilha.
+    `,
+    quiz: [
+      {
+        pergunta: "Quando vencem as opções sobre ações na B3?",
+        alternativas: [
+          "Último dia útil do mês",
+          "Terceira sexta-feira do mês",
+          "Primeira segunda-feira do mês",
+          "Todo dia 15",
+        ],
+        correta: 1,
+        explicacao: "Vencimento é na terceira sexta-feira (ou no dia útil seguinte, se feriado).",
+      },
+      {
+        pergunta: "Você comprou uma call que terminou OTM no vencimento. O que acontece?",
+        alternativas: [
+          "É exercida automaticamente",
+          "Vira pó e você perde o prêmio",
+          "Rola para o mês seguinte",
+          "Vira ação na sua carteira",
+        ],
+        correta: 1,
+        explicacao: "Opção OTM no vencimento expira sem valor. A perda é o prêmio pago.",
+      },
+      {
+        pergunta: "Por que liquidez importa tanto em opções?",
+        alternativas: [
+          "Porque define o strike",
+          "Porque sem contraparte você não consegue sair da posição a preço justo",
+          "Porque reduz o imposto",
+          "Porque aumenta o valor intrínseco",
+        ],
+        correta: 1,
+        explicacao: "Sem liquidez, o spread engole o lucro e você pode ficar preso na posição.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Checagem de liquidez",
+        enunciado:
+          "Antes da próxima simulação, escolha uma série de opção e anote: volume do dia, número de negócios e spread compra/venda. Decida se você entraria.",
+        dica: "Spread maior que 10% do prêmio já é um sinal amarelo forte.",
+        gabarito:
+          "Não existe número mágico, mas: negócios abaixo de ~50 no dia e spread acima de 10% do prêmio geralmente indicam série ruim para operar. Prefira strikes próximos do preço atual e o vencimento mais líquido do momento.",
+      },
+    ],
+  },
+  {
     slug: "premio-e-strike",
     ordem: 4,
     nivel: 2,
