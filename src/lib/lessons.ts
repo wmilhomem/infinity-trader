@@ -260,6 +260,314 @@ Call PETRK36 (strike 36) sendo negociada a R$2,80:
     ],
   },
   {
+    slug: "moneyness",
+    ordem: 5,
+    nivel: 2,
+    titulo: "Lição 5 — Moneyness: ITM, ATM e OTM",
+    resumo: "Onde o strike está em relação ao preço — e como isso muda risco, custo e probabilidade.",
+    analogia:
+      "Comprar OTM é bilhete de loteria barato: quase sempre vira pó, mas paga muito quando acerta. Comprar ITM é comprar a ação com desconto alavancado: caro, porém com mais chance.",
+    conteudo: `
+## Os três estados
+
+Para uma **call** com o ativo a R$38:
+
+| Strike | Estado | Prêmio | Chance de virar pó |
+|---|---|---|---|
+| 34 | ITM (dentro) | alto | baixa |
+| 38 | ATM (no dinheiro) | médio | média |
+| 44 | OTM (fora) | baixo | alta |
+
+Para uma **put**, é o inverso: strike acima do preço é ITM.
+
+## O trade-off que ninguém conta
+
+- **OTM barata** = alta alavancagem, alta probabilidade de perder 100%.
+- **ITM cara** = menos alavancagem, comportamento mais parecido com a ação.
+- **ATM** = maior valor extrínseco e maior sensibilidade ao tempo.
+
+O erro clássico do iniciante é comprar OTM muito distante porque "está barato". Barato não é o mesmo que ter valor esperado positivo.
+
+## Decisão
+
+Antes de escolher o strike, responda: qual movimento eu espero, de quanto e em quanto tempo? Se o strike exige um movimento que o ativo raramente faz nesse prazo, a operação já nasce perdida.
+    `,
+    quiz: [
+      {
+        pergunta: "Ativo a R$38. Uma call de strike 44 está…",
+        alternativas: ["ITM", "ATM", "OTM", "Exercida"],
+        correta: 2,
+        explicacao: "Call com strike acima do preço está fora do dinheiro (OTM).",
+      },
+      {
+        pergunta: "Por que opções OTM distantes são perigosas para iniciantes?",
+        alternativas: [
+          "Porque têm imposto maior",
+          "Porque são baratas mas exigem movimentos improváveis e viram pó com frequência",
+          "Porque não podem ser vendidas",
+          "Porque não têm valor extrínseco",
+        ],
+        correta: 1,
+        explicacao: "O preço baixo reflete a baixa probabilidade. Barato ≠ bom negócio.",
+      },
+      {
+        pergunta: "Ativo a R$38. Put de strike 42 está…",
+        alternativas: ["OTM", "ITM", "ATM", "Sem valor"],
+        correta: 1,
+        explicacao: "Put com strike acima do preço tem intrínseco: 42 − 38 = R$4,00. É ITM.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Classifique os strikes",
+        enunciado:
+          "Ativo a R$25,00. Classifique como ITM/ATM/OTM: (a) call 22, (b) call 25, (c) call 28, (d) put 22, (e) put 28.",
+        gabarito: "(a) ITM · (b) ATM · (c) OTM · (d) OTM · (e) ITM.",
+      },
+    ],
+  },
+  {
+    slug: "theta-e-tempo",
+    ordem: 6,
+    nivel: 2,
+    titulo: "Lição 6 — Theta: o tempo corrói o comprador",
+    resumo: "Por que a opção perde valor mesmo com o ativo parado — e o que isso muda na sua decisão.",
+    analogia:
+      "Opção é gelo no sol. Todo dia derrete um pouco, e nos últimos dias derrete muito mais rápido.",
+    conteudo: `
+## O que é theta
+
+**Theta** mede quanto de prêmio a opção perde por dia só pela passagem do tempo. É negativo para quem compra e positivo para quem vende.
+
+## A curva não é linear
+
+A perda de valor extrínseco acelera nas últimas semanas antes do vencimento. Uma opção que perde R$0,02/dia a 60 dias do vencimento pode perder R$0,10/dia na última semana.
+
+## Consequências práticas
+
+1. **Comprador precisa de movimento e de prazo.** Estar certo tarde demais é o mesmo que estar errado.
+2. **Vencimento muito curto** é atrativo pelo preço e letal pelo theta.
+3. **Vendedor lucra com o tempo**, mas assume risco assimétrico — por isso venda descoberta não é operação de iniciante.
+
+## Regra de bolso
+
+Se sua tese depende de um evento com data (balanço, decisão de juros), escolha um vencimento com folga depois da data. Comprar a opção que vence antes do evento é pagar para não participar dele.
+    `,
+    quiz: [
+      {
+        pergunta: "O theta é favorável a quem?",
+        alternativas: [
+          "Ao comprador da opção",
+          "Ao vendedor da opção",
+          "A ninguém",
+          "Depende do strike apenas",
+        ],
+        correta: 1,
+        explicacao: "O tempo destrói o extrínseco: prejudica o comprador e beneficia o vendedor.",
+      },
+      {
+        pergunta: "Como se comporta a perda por theta perto do vencimento?",
+        alternativas: [
+          "Constante todos os dias",
+          "Acelera nas últimas semanas",
+          "Desacelera",
+          "Vira positiva",
+        ],
+        correta: 1,
+        explicacao: "A corrosão do extrínseco acelera perto do vencimento.",
+      },
+      {
+        pergunta: "Sua tese depende de um balanço daqui a 20 dias. O que faz sentido?",
+        alternativas: [
+          "Comprar opção que vence em 10 dias porque é mais barata",
+          "Escolher vencimento com folga após o balanço",
+          "Comprar OTM muito distante",
+          "Vender opção descoberta",
+        ],
+        correta: 1,
+        explicacao: "Prazo insuficiente faz você pagar prêmio e não participar do evento que sustenta a tese.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Estime a corrosão",
+        enunciado:
+          "Uma call ATM custa R$1,20 e faltam 30 dias corridos para o vencimento. O ativo fica parado. Estime o prêmio a 15 dias e a 3 dias do vencimento.",
+        dica: "A queda não é linear: pense em cerca de 30% do extrínseco na primeira metade e o restante acelerando.",
+        gabarito:
+          "Ordem de grandeza: ~R$0,80 a 15 dias e ~R$0,25 a 3 dias. O ponto não é o número exato — é perceber que ficar parado já é prejuízo para o comprador.",
+      },
+      {
+        titulo: "Regra pessoal de prazo",
+        enunciado: "Escreva uma regra do tipo: 'Não compro opção com menos de N dias para o vencimento'.",
+        gabarito:
+          "Exemplo de regra válida: 'Só compro opção seca com no mínimo 20 dias corridos até o vencimento, e com folga de pelo menos 5 dias após qualquer evento agendado da minha tese'. Cadastre em Regras.",
+      },
+    ],
+  },
+  {
+    slug: "compra-a-seco",
+    ordem: 7,
+    nivel: 3,
+    titulo: "Lição 7 — Compra a seco (call/put seca)",
+    resumo: "A estratégia mais simples e a que mais quebra iniciante. Como usar com risco definido.",
+    analogia:
+      "É apostar num pênalti: perda limitada ao valor da aposta, mas a maioria dos chutes vai pra fora.",
+    conteudo: `
+## O que é
+
+Comprar uma call (ou put) isolada, sem nenhuma outra perna.
+
+- **Risco máximo:** o prêmio pago (conhecido desde o início).
+- **Ganho máximo:** teoricamente ilimitado na call.
+- **Breakeven da call:** strike + prêmio.
+- **Breakeven da put:** strike − prêmio.
+
+## Por que quebra tanta gente
+
+O risco não está na perda máxima — está na **frequência**. Você pode perder 100% do valor investido em cada operação, várias vezes seguidas. Sem controle de tamanho de posição, dez tentativas erradas zeram a conta.
+
+## Como usar com processo
+
+1. Defina o **tamanho**: no máximo 1% do capital por operação.
+2. Defina a **tese**: qual movimento, de quanto, até quando.
+3. Defina a **saída**: alvo de lucro e stop no prêmio (ex.: sair a −50%).
+4. Registre no diário **antes** de entrar.
+
+Compra a seco só é aceitável quando o prêmio é dinheiro que você aceita perder inteiro.
+    `,
+    quiz: [
+      {
+        pergunta: "Call strike 40 comprada por R$1,50. Qual o breakeven no vencimento?",
+        alternativas: ["R$38,50", "R$40,00", "R$41,50", "R$43,00"],
+        correta: 2,
+        explicacao: "Breakeven da call = strike + prêmio = 40 + 1,50 = R$41,50.",
+      },
+      {
+        pergunta: "Qual o principal risco prático da compra a seco?",
+        alternativas: [
+          "Perda ilimitada",
+          "Chamada de margem",
+          "Alta frequência de perdas totais do prêmio",
+          "Impossibilidade de sair antes do vencimento",
+        ],
+        correta: 2,
+        explicacao: "A perda é limitada, mas acontece com muita frequência — o que destrói contas mal dimensionadas.",
+      },
+      {
+        pergunta: "Qual controle é indispensável na compra a seco?",
+        alternativas: [
+          "Comprar sempre OTM distante",
+          "Tamanho de posição limitado por operação",
+          "Rolar sempre no vencimento",
+          "Operar só no dia do vencimento",
+        ],
+        correta: 1,
+        explicacao: "Position sizing é o que impede que uma sequência normal de perdas vire ruína.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Dimensione a operação",
+        enunciado:
+          "Capital de R$20.000, risco máximo de 1% por operação. A call custa R$0,80 (lote de 100). Quantos lotes cabem?",
+        gabarito:
+          "1% de R$20.000 = R$200. Cada lote custa 100 × R$0,80 = R$80. Cabem 2 lotes (R$160). O terceiro lote estouraria o limite.",
+      },
+      {
+        titulo: "Monte no simulador",
+        enunciado: "Simule uma call seca e escreva a tese no diário antes de considerar a operação real.",
+        gabarito:
+          "Tese completa contém: direção, magnitude esperada, prazo, breakeven calculado, alvo e stop no prêmio. Se faltar algum item, a operação ainda não está pronta.",
+      },
+    ],
+  },
+  {
+    slug: "venda-coberta",
+    ordem: 8,
+    nivel: 3,
+    titulo: "Lição 8 — Venda coberta",
+    resumo: "Gerar renda com ações que você já tem — e entender o que você está vendendo de verdade.",
+    analogia:
+      "É alugar seu imóvel com opção de compra: você recebe o aluguel agora, mas aceita vender pelo preço combinado se o inquilino quiser.",
+    conteudo: `
+## Como funciona
+
+Você tem 100 ações e **vende uma call** sobre elas.
+
+- Recebe o prêmio imediatamente.
+- Se no vencimento o ativo estiver abaixo do strike: fica com as ações e com o prêmio.
+- Se estiver acima: é exercido e vende as ações pelo strike.
+
+## O que você realmente vendeu
+
+Você vendeu a **alta acima do strike**. Em troca, recebeu um prêmio fixo. Isso significa:
+
+- **Ganho limitado**: strike + prêmio − preço de compra da ação.
+- **Proteção parcial na queda**: apenas o valor do prêmio.
+- O risco de queda da ação continua todo com você.
+
+## Escolha do strike
+
+- Strike próximo do preço: prêmio maior, chance alta de ser exercido.
+- Strike distante: prêmio pequeno, mais chance de manter as ações.
+
+## Erro comum
+
+Vender call sobre ação que você não quer vender e depois "rolar para não ser exercido", pagando cada vez mais caro. Só venda coberta em strike onde você **aceitaria** vender de verdade.
+    `,
+    quiz: [
+      {
+        pergunta: "Na venda coberta, o que limita o seu ganho?",
+        alternativas: [
+          "O prêmio recebido apenas",
+          "O strike da call vendida",
+          "O vencimento",
+          "Nada, o ganho é ilimitado",
+        ],
+        correta: 1,
+        explicacao: "Acima do strike você é exercido: o ganho para em strike + prêmio.",
+      },
+      {
+        pergunta: "Qual proteção a venda coberta oferece em uma queda forte do ativo?",
+        alternativas: [
+          "Proteção total",
+          "Proteção equivalente ao prêmio recebido",
+          "Proteção até o strike",
+          "Nenhuma proteção",
+        ],
+        correta: 1,
+        explicacao: "O prêmio amortece a queda apenas no valor recebido. O resto do risco continua seu.",
+      },
+      {
+        pergunta: "Qual critério correto para escolher o strike da venda coberta?",
+        alternativas: [
+          "O que pagar o maior prêmio, sempre",
+          "Um strike no qual você aceitaria vender a ação",
+          "O mais distante possível",
+          "O do vencimento mais curto",
+        ],
+        correta: 1,
+        explicacao: "Se você não aceita vender naquele preço, a operação vira uma armadilha de rolagens caras.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Calcule o resultado",
+        enunciado:
+          "Você comprou a ação a R$30,00 e vendeu call strike 33 por R$0,90. Qual o resultado se no vencimento o ativo estiver a (a) R$28, (b) R$32, (c) R$36?",
+        gabarito:
+          "(a) −R$2,00 na ação + R$0,90 = −R$1,10 por ação. (b) +R$2,00 + R$0,90 = +R$2,90. (c) exercido: +R$3,00 (30→33) + R$0,90 = +R$3,90 — teto do ganho, mesmo com o ativo a R$36.",
+      },
+      {
+        titulo: "Regra de venda coberta",
+        enunciado: "Escreva uma regra pessoal definindo em que strike você aceita ser exercido.",
+        gabarito:
+          "Exemplo: 'Só vendo call coberta em strike pelo menos 8% acima do meu preço médio, e aceito o exercício sem rolar'. Cadastre em Regras.",
+      },
+    ],
+  },
+  {
     slug: "rolagem",
     ordem: 9,
     nivel: 4,
