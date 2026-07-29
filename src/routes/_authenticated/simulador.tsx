@@ -418,14 +418,48 @@ function Simulador() {
           >
             <Plus size={14} /> Nova perna ({pernas.length}/4)
           </button>
+          <div className="rounded-lg border border-border bg-card p-3">
+            <div className="text-xs uppercase text-muted-foreground">Antes de registrar</div>
+            <div className="mt-2 space-y-2">
+              {checklist.map((c) => (
+                <label key={c.k} className="flex cursor-pointer items-start gap-2 text-xs leading-snug">
+                  <input
+                    type="checkbox"
+                    checked={!!check[c.k]}
+                    onChange={(e) => setCheck({ ...check, [c.k]: e.target.checked })}
+                    className="mt-0.5 accent-[oklch(0.78_0.17_65)]"
+                  />
+                  <span className={check[c.k] ? "text-foreground" : "text-muted-foreground"}>
+                    {c.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
           <button
             onClick={salvar}
-            className="w-full rounded-md bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            disabled={!checkOk}
+            className="w-full rounded-md bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
           >
-            Salvar → registrar no diário
+            Levar esta simulação para o Diário
           </button>
+          {!checkOk && (
+            <p className="text-center text-xs text-muted-foreground">
+              Confirme o checklist acima para registrar a decisão.
+            </p>
+          )}
         </div>
       </div>
     </AppShell>
   );
 }
+
+function Campo({ label, valor }: { label: string; valor: string }) {
+  return (
+    <div>
+      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className="font-medium">{valor}</div>
+    </div>
+  );
+}
+
