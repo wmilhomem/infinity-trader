@@ -12,11 +12,19 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Plus, Trash2 } from "lucide-react";
+import {
+  AlertTriangle,
+  BookOpen,
+  Info,
+  MessageCircle,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import type { Perna } from "@/lib/payoff";
 import { payoffCurve, summary } from "@/lib/payoff";
+import { checarRegras, lerEstrategia, type RegraSimples } from "@/lib/strategy-read";
 
 export const Route = createFileRoute("/_authenticated/simulador")({
   head: () => ({ meta: [{ title: "Simulador · Zero ao Trade" }] }),
