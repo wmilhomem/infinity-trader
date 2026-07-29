@@ -86,6 +86,50 @@ function Simulador() {
 
   const curve = useMemo(() => payoffCurve(pernas, centro, 0.3, 61), [pernas, centro]);
   const stats = useMemo(() => summary(pernas, centro), [pernas, centro]);
+  const leitura = useMemo(() => lerEstrategia(pernas, centro, ativo), [pernas, centro, ativo]);
+
+  const regras = useQuery({
+    queryKey: ["rules"],
+    queryFn: async () => {
+      const { data } = await supabase.from("personal_rules").select("id, texto, nome, ativa, tipo");
+      return (data as unknown as RegraSimples[]) ?? [];
+    },
+  });
+
+  const alertas = useMemo(
+    () => checarRegras(pernas, regras.data ?? [], leitura),
+    [pernas, regras.data, leitura],
+  );
+
+  const [explicar, setExplicar] = useState(false);
+  const [check, setCheck] = useState<Record<string, boolean>>({});
+  const checklist = [
+    { k: "simulei", label: "Simulei esta estrutura" },
+    { k: "perda", label: `Entendi a perda máxima (R$ ${leitura.capitalEmRisco.toFixed(2)})` },
+    {
+      k: "be",
+      label: `Entendi o breakeven (${leitura.breakevens.length ? leitura.breakevens.map((b) => b.toFixed(2)).join(" / ") : "—"})`,
+    },
+    { k: "regra", label: "Minha regra permite esta operação" },
+  ];
+  const checkOk = checklist.every((c) => check[c.k]);
+
+  async function perguntarCopilot() {
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) return;
+    const { data, error } = await supabase
+      .from("chat_threads")
+      .insert({
+        user_id: u.user.id,
+        context_type: "simulacao",
+        titulo: `${leitura.nome} · ${ativo}`,
+      })
+      .select()
+      .single();
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["threads"] });
+    navigate({ to: "/copilot/$threadId", params: { threadId: data.id } });
+  }
 
   async function salvar() {
     const { data: u } = await supabase.auth.getUser();
@@ -102,10 +146,11 @@ function Simulador() {
       .select()
       .single();
     if (error) return toast.error(error.message);
-    toast.success("Simulação salva!");
+    toast.success("Decisão registrada — continue no diário.");
     qc.invalidateQueries();
     navigate({ to: "/diario", search: { sim: data.id } as any });
   }
+
 
   return (
     <AppShell title="Simulador de payoff">
