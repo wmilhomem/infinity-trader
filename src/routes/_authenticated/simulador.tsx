@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Area,
@@ -12,11 +12,19 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Plus, Trash2 } from "lucide-react";
+import {
+  AlertTriangle,
+  BookOpen,
+  Info,
+  MessageCircle,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import type { Perna } from "@/lib/payoff";
 import { payoffCurve, summary } from "@/lib/payoff";
+import { checarRegras, lerEstrategia, type RegraSimples } from "@/lib/strategy-read";
 
 export const Route = createFileRoute("/_authenticated/simulador")({
   head: () => ({ meta: [{ title: "Simulador · Zero ao Trade" }] }),
@@ -78,6 +86,50 @@ function Simulador() {
 
   const curve = useMemo(() => payoffCurve(pernas, centro, 0.3, 61), [pernas, centro]);
   const stats = useMemo(() => summary(pernas, centro), [pernas, centro]);
+  const leitura = useMemo(() => lerEstrategia(pernas, centro, ativo), [pernas, centro, ativo]);
+
+  const regras = useQuery({
+    queryKey: ["rules"],
+    queryFn: async () => {
+      const { data } = await supabase.from("personal_rules").select("id, texto, nome, ativa, tipo");
+      return (data as unknown as RegraSimples[]) ?? [];
+    },
+  });
+
+  const alertas = useMemo(
+    () => checarRegras(pernas, regras.data ?? [], leitura),
+    [pernas, regras.data, leitura],
+  );
+
+  const [explicar, setExplicar] = useState(false);
+  const [check, setCheck] = useState<Record<string, boolean>>({});
+  const checklist = [
+    { k: "simulei", label: "Simulei esta estrutura" },
+    { k: "perda", label: `Entendi a perda máxima (R$ ${leitura.capitalEmRisco.toFixed(2)})` },
+    {
+      k: "be",
+      label: `Entendi o breakeven (${leitura.breakevens.length ? leitura.breakevens.map((b) => b.toFixed(2)).join(" / ") : "—"})`,
+    },
+    { k: "regra", label: "Minha regra permite esta operação" },
+  ];
+  const checkOk = checklist.every((c) => check[c.k]);
+
+  async function perguntarCopilot() {
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) return;
+    const { data, error } = await supabase
+      .from("chat_threads")
+      .insert({
+        user_id: u.user.id,
+        context_type: "simulacao",
+        titulo: `${leitura.nome} · ${ativo}`,
+      })
+      .select()
+      .single();
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["threads"] });
+    navigate({ to: "/copilot/$threadId", params: { threadId: data.id } });
+  }
 
   async function salvar() {
     const { data: u } = await supabase.auth.getUser();
@@ -94,10 +146,11 @@ function Simulador() {
       .select()
       .single();
     if (error) return toast.error(error.message);
-    toast.success("Simulação salva!");
+    toast.success("Decisão registrada — continue no diário.");
     qc.invalidateQueries();
     navigate({ to: "/diario", search: { sim: data.id } as any });
   }
+
 
   return (
     <AppShell title="Simulador de payoff">
@@ -167,23 +220,134 @@ function Simulador() {
             </ResponsiveContainer>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
+          <div className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
             <div className="rounded-md border border-border bg-background p-3">
               <div className="text-xs text-muted-foreground">Lucro máximo</div>
               <div className="mt-1 font-mono font-bold text-success">R$ {stats.lucroMax.toFixed(2)}</div>
+              <p className="mt-1 text-xs leading-snug text-muted-foreground">
+                {leitura.breakevens.length
+                  ? `${ativo} precisa fechar acima de R$ ${leitura.breakevens[leitura.breakevens.length - 1].toFixed(2)} para chegar perto disso.`
+                  : "Depende de onde o preço fechar no vencimento."}
+              </p>
             </div>
             <div className="rounded-md border border-border bg-background p-3">
               <div className="text-xs text-muted-foreground">Perda máxima</div>
               <div className="mt-1 font-mono font-bold text-loss">R$ {stats.perdaMax.toFixed(2)}</div>
+              <p className="mt-1 text-xs leading-snug text-muted-foreground">
+                {leitura.perdaLimitada
+                  ? "Você conhece esse risco antes de entrar. Isso é positivo."
+                  : "Risco não limitado: há venda descoberta nesta estrutura."}
+              </p>
             </div>
             <div className="rounded-md border border-border bg-background p-3">
-              <div className="text-xs text-muted-foreground">Breakeven(s)</div>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                Breakeven(s)
+                <span
+                  title="Ponto de equilíbrio: preço em que o resultado da estrutura é zero. Sai da diferença entre os prêmios pagos/recebidos e o strike comprado."
+                  className="cursor-help"
+                >
+                  <Info size={12} />
+                </span>
+              </div>
               <div className="mt-1 font-mono">
                 {stats.breakevens.length ? stats.breakevens.map((b) => b.toFixed(2)).join(" / ") : "—"}
               </div>
+              <p className="mt-1 text-xs leading-snug text-muted-foreground">
+                Abaixo disso, o resultado no vencimento é negativo.
+              </p>
             </div>
           </div>
+
+          {/* Leitura da Estratégia */}
+          <div className="mt-4 rounded-lg border border-primary/30 bg-primary/5 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="text-xs font-semibold uppercase tracking-wider text-primary">
+                Leitura da estratégia
+              </div>
+              <span
+                className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                  leitura.risco === "baixo"
+                    ? "bg-success/15 text-success"
+                    : leitura.risco === "medio"
+                      ? "bg-primary/20 text-primary"
+                      : "bg-loss/15 text-loss"
+                }`}
+              >
+                Risco {leitura.risco === "medio" ? "médio" : leitura.risco}
+              </span>
+            </div>
+
+            <div className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+              <Campo label="Estratégia detectada" valor={leitura.nome} />
+              <Campo label="Perfil" valor={leitura.perfil} />
+              <Campo label="Lucro limitado" valor={leitura.lucroLimitado ? "Sim" : "Não"} />
+              <Campo label="Perda limitada" valor={leitura.perdaLimitada ? "Sim" : "Não"} />
+              <Campo label="Capital em risco" valor={`R$ ${leitura.capitalEmRisco.toFixed(2)}`} />
+              <Campo label="Ponto crítico" valor={leitura.pontoCritico} />
+            </div>
+
+            <div className="mt-4 space-y-2 border-t border-border pt-3 text-sm leading-relaxed text-muted-foreground">
+              {leitura.narrativa.map((n, i) => (
+                <p key={i}>{n}</p>
+              ))}
+            </div>
+
+            <div className="mt-3 border-t border-border pt-3">
+              <div className="text-xs uppercase text-muted-foreground">O que acompanhar</div>
+              <ul className="mt-1 space-y-1 text-sm text-muted-foreground">
+                {leitura.acompanhar.map((a) => (
+                  <li key={a}>• {a}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                onClick={() => setExplicar((v) => !v)}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs hover:bg-accent"
+              >
+                <BookOpen size={13} /> Entenda esta estratégia
+              </button>
+              <button
+                onClick={perguntarCopilot}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs hover:bg-accent"
+              >
+                <MessageCircle size={13} /> Perguntar ao Copilot
+              </button>
+            </div>
+
+            {explicar && (
+              <div className="mt-3 rounded-md border border-border bg-card p-3 text-sm leading-relaxed text-muted-foreground">
+                {leitura.analogia}
+                <div className="mt-2">
+                  <Link to="/trilha" className="text-xs text-primary hover:underline">
+                    Ver a lição correspondente na trilha →
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {alertas.length > 0 && (
+            <div className="mt-4 rounded-lg border border-loss/40 bg-loss/10 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-loss">
+                <AlertTriangle size={15} /> Atenção às suas regras
+              </div>
+              <ul className="mt-2 space-y-2 text-sm">
+                {alertas.map((a, i) => (
+                  <li key={i}>
+                    <div className="italic">“{a.regra}”</div>
+                    <div className="text-xs text-muted-foreground">{a.motivo}</div>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-xs text-muted-foreground">
+                O copilot não decide por você — mas registra que você foi avisado.
+              </p>
+            </div>
+          )}
         </div>
+
 
         <div className="space-y-3">
           {pernas.map((p, i) => (
@@ -254,14 +418,48 @@ function Simulador() {
           >
             <Plus size={14} /> Nova perna ({pernas.length}/4)
           </button>
+          <div className="rounded-lg border border-border bg-card p-3">
+            <div className="text-xs uppercase text-muted-foreground">Antes de registrar</div>
+            <div className="mt-2 space-y-2">
+              {checklist.map((c) => (
+                <label key={c.k} className="flex cursor-pointer items-start gap-2 text-xs leading-snug">
+                  <input
+                    type="checkbox"
+                    checked={!!check[c.k]}
+                    onChange={(e) => setCheck({ ...check, [c.k]: e.target.checked })}
+                    className="mt-0.5 accent-[oklch(0.78_0.17_65)]"
+                  />
+                  <span className={check[c.k] ? "text-foreground" : "text-muted-foreground"}>
+                    {c.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
           <button
             onClick={salvar}
-            className="w-full rounded-md bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            disabled={!checkOk}
+            className="w-full rounded-md bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
           >
-            Salvar → registrar no diário
+            Levar esta simulação para o Diário
           </button>
+          {!checkOk && (
+            <p className="text-center text-xs text-muted-foreground">
+              Confirme o checklist acima para registrar a decisão.
+            </p>
+          )}
         </div>
       </div>
     </AppShell>
   );
 }
+
+function Campo({ label, valor }: { label: string; valor: string }) {
+  return (
+    <div>
+      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className="font-medium">{valor}</div>
+    </div>
+  );
+}
+
