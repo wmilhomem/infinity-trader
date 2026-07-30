@@ -55,7 +55,7 @@ export function validarRegras(
     const push = (motivo: string, severidade: Alerta["severidade"] = "aviso") =>
       alertas.push({ ruleId: r.id, indice, regra: r.texto, motivo, severidade });
 
-    if (compraSeca && has(t, KEYS.trova ?? KEYS.trava))
+    if (compraSeca && has(t, KEYS.trava))
       push("Você está simulando uma opção sozinha, sem trava.");
 
     if (!i.perdaLimitada && has(t, KEYS.riscoLimitado))
