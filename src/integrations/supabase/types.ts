@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          descricao: string | null
+          earned_at: string
+          id: string
+          slug: string
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          descricao?: string | null
+          earned_at?: string
+          id?: string
+          slug: string
+          titulo: string
+          user_id: string
+        }
+        Update: {
+          descricao?: string | null
+          earned_at?: string
+          id?: string
+          slug?: string
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      behavior_patterns: {
+        Row: {
+          descricao: string | null
+          detected_at: string
+          id: string
+          metricas: Json | null
+          pattern_key: string
+          severidade: string
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          descricao?: string | null
+          detected_at?: string
+          id?: string
+          metricas?: Json | null
+          pattern_key: string
+          severidade?: string
+          titulo: string
+          user_id: string
+        }
+        Update: {
+          descricao?: string | null
+          detected_at?: string
+          id?: string
+          metricas?: Json | null
+          pattern_key?: string
+          severidade?: string
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -82,12 +142,157 @@ export type Database = {
         }
         Relationships: []
       }
+      checklists: {
+        Row: {
+          completo: boolean
+          created_at: string
+          diary_entry_id: string | null
+          id: string
+          respostas: Json
+          simulation_id: string | null
+          user_id: string
+        }
+        Insert: {
+          completo?: boolean
+          created_at?: string
+          diary_entry_id?: string | null
+          id?: string
+          respostas?: Json
+          simulation_id?: string | null
+          user_id: string
+        }
+        Update: {
+          completo?: boolean
+          created_at?: string
+          diary_entry_id?: string | null
+          id?: string
+          respostas?: Json
+          simulation_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklists_diary_entry_id_fkey"
+            columns: ["diary_entry_id"]
+            isOneToOne: false
+            referencedRelation: "diary_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklists_simulation_id_fkey"
+            columns: ["simulation_id"]
+            isOneToOne: false
+            referencedRelation: "simulations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      decision_memory: {
+        Row: {
+          contexto: Json | null
+          created_at: string
+          diary_entry_id: string | null
+          emocao: string | null
+          estrategia: string | null
+          id: string
+          licao_aprendida: string | null
+          motivo: string | null
+          resultado: number | null
+          simulation_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contexto?: Json | null
+          created_at?: string
+          diary_entry_id?: string | null
+          emocao?: string | null
+          estrategia?: string | null
+          id?: string
+          licao_aprendida?: string | null
+          motivo?: string | null
+          resultado?: number | null
+          simulation_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contexto?: Json | null
+          created_at?: string
+          diary_entry_id?: string | null
+          emocao?: string | null
+          estrategia?: string | null
+          id?: string
+          licao_aprendida?: string | null
+          motivo?: string | null
+          resultado?: number | null
+          simulation_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decision_memory_diary_entry_id_fkey"
+            columns: ["diary_entry_id"]
+            isOneToOne: false
+            referencedRelation: "diary_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "decision_memory_simulation_id_fkey"
+            columns: ["simulation_id"]
+            isOneToOne: false
+            referencedRelation: "simulations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      decision_scores: {
+        Row: {
+          breakdown: Json
+          created_at: string
+          diary_entry_id: string | null
+          id: string
+          score: number
+          user_id: string
+        }
+        Insert: {
+          breakdown?: Json
+          created_at?: string
+          diary_entry_id?: string | null
+          id?: string
+          score?: number
+          user_id: string
+        }
+        Update: {
+          breakdown?: Json
+          created_at?: string
+          diary_entry_id?: string | null
+          id?: string
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decision_scores_diary_entry_id_fkey"
+            columns: ["diary_entry_id"]
+            isOneToOne: false
+            referencedRelation: "diary_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diary_entries: {
         Row: {
           ativo: string
+          checklist: Json | null
           created_at: string
+          decision_score: number | null
+          emocao: string | null
           estrutura: string
           id: string
+          interpretacao: Json | null
+          licao_aprendida: string | null
           motivo: string | null
           resultado: number | null
           rule_id: string | null
@@ -98,9 +303,14 @@ export type Database = {
         }
         Insert: {
           ativo: string
+          checklist?: Json | null
           created_at?: string
+          decision_score?: number | null
+          emocao?: string | null
           estrutura: string
           id?: string
+          interpretacao?: Json | null
+          licao_aprendida?: string | null
           motivo?: string | null
           resultado?: number | null
           rule_id?: string | null
@@ -111,9 +321,14 @@ export type Database = {
         }
         Update: {
           ativo?: string
+          checklist?: Json | null
           created_at?: string
+          decision_score?: number | null
+          emocao?: string | null
           estrutura?: string
           id?: string
+          interpretacao?: Json | null
+          licao_aprendida?: string | null
           motivo?: string | null
           resultado?: number | null
           rule_id?: string | null
@@ -139,6 +354,33 @@ export type Database = {
           },
         ]
       }
+      learning_recommendations: {
+        Row: {
+          created_at: string
+          id: string
+          lesson_slug: string
+          motivo: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lesson_slug: string
+          motivo?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lesson_slug?: string
+          motivo?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lessons_progress: {
         Row: {
           attempts: number
@@ -162,6 +404,33 @@ export type Database = {
           lesson_slug?: string
           quiz_score?: number | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      monthly_reviews: {
+        Row: {
+          created_at: string
+          id: string
+          metricas: Json
+          period_start: string
+          resumo: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metricas?: Json
+          period_start: string
+          resumo?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metricas?: Json
+          period_start?: string
+          resumo?: string | null
           user_id?: string
         }
         Relationships: []
@@ -270,6 +539,66 @@ export type Database = {
           pernas?: Json
           preco_atual?: number | null
           tipo_estrategia?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      timeline_events: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          meta: Json | null
+          occurred_at: string
+          tipo: string
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          meta?: Json | null
+          occurred_at?: string
+          tipo: string
+          titulo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          meta?: Json | null
+          occurred_at?: string
+          tipo?: string
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_reviews: {
+        Row: {
+          created_at: string
+          id: string
+          metricas: Json
+          period_start: string
+          resumo: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metricas?: Json
+          period_start: string
+          resumo?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metricas?: Json
+          period_start?: string
+          resumo?: string | null
           user_id?: string
         }
         Relationships: []
