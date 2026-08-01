@@ -15,19 +15,39 @@ import {
 import {
   AlertTriangle,
   BookOpen,
-  Info,
   MessageCircle,
   Plus,
   Trash2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { ScorePanel } from "@/components/ScorePanel";
 import { supabase } from "@/integrations/supabase/client";
 import type { Perna } from "@/lib/payoff";
 import { payoffCurve, summary } from "@/lib/payoff";
-import { checarRegras, lerEstrategia, type RegraSimples } from "@/lib/strategy-read";
+import { interpretar } from "@/engines/simulation-interpreter";
+import { explicarRiscos } from "@/engines/risk-explainer";
+import { validarRegras, regrasQuePedemConfirmacao, type Regra } from "@/engines/rule-engine";
+import { calcularDecisionScore, disciplina } from "@/engines/decision-engine";
+import type { DiaryEntry } from "@/engines/types";
 
 export const Route = createFileRoute("/_authenticated/simulador")({
-  head: () => ({ meta: [{ title: "Simulador · Zero ao Trade" }] }),
+  head: () => ({
+    meta: [
+      { title: "Simulador de decisão · Zero ao Trade" },
+      {
+        name: "description",
+        content:
+          "Simule travas e opções da B3, entenda o risco em reais e valide a operação contra as suas próprias regras antes de decidir.",
+      },
+      { property: "og:title", content: "Simulador de decisão · Zero ao Trade" },
+      {
+        property: "og:description",
+        content: "Payoff, risco explicado e checagem de regras antes de você clicar em comprar.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Simulador,
 });
 
@@ -65,6 +85,14 @@ const PRESETS: Record<string, { ativo: string; centro: number; pernas: Perna[] }
   },
 };
 
+const CHECKLIST = [
+  { k: "perda", label: "Sei exatamente quanto posso perder nesta operação" },
+  { k: "tese", label: "Tenho uma tese escrita, não um palpite" },
+  { k: "saida", label: "Sei em que ponto eu saio se der errado" },
+  { k: "tamanho", label: "O tamanho da posição cabe no meu capital" },
+  { k: "regra", label: "Minha regra permite esta operação" },
+];
+
 function Simulador() {
   const qc = useQueryClient();
   const navigate = useNavigate();
@@ -72,6 +100,10 @@ function Simulador() {
   const [ativo, setAtivo] = useState("PETR4");
   const [centro, setCentro] = useState(38);
   const [pernas, setPernas] = useState<Perna[]>(PRESETS["trava-alta"].pernas);
+  const [tese, setTese] = useState("");
+  const [explicar, setExplicar] = useState(false);
+  const [check, setCheck] = useState<Record<string, boolean>>({});
+  const [confirmacoes, setConfirmacoes] = useState<Record<string, boolean>>({});
 
   function loadPreset(k: keyof typeof PRESETS) {
     setPreset(k);
@@ -86,33 +118,59 @@ function Simulador() {
 
   const curve = useMemo(() => payoffCurve(pernas, centro, 0.3, 61), [pernas, centro]);
   const stats = useMemo(() => summary(pernas, centro), [pernas, centro]);
-  const leitura = useMemo(() => lerEstrategia(pernas, centro, ativo), [pernas, centro, ativo]);
+  const leitura = useMemo(() => interpretar(pernas, centro, ativo), [pernas, centro, ativo]);
+  const riscos = useMemo(
+    () => explicarRiscos(pernas, centro, ativo, leitura),
+    [pernas, centro, ativo, leitura],
+  );
 
   const regras = useQuery({
     queryKey: ["rules"],
     queryFn: async () => {
-      const { data } = await supabase.from("personal_rules").select("id, texto, nome, ativa, tipo");
-      return (data as unknown as RegraSimples[]) ?? [];
+      const { data } = await supabase
+        .from("personal_rules")
+        .select("id, texto, nome, categoria, ativa, tipo, parametros_json");
+      return (data as unknown as Regra[]) ?? [];
     },
   });
 
-  const alertas = useMemo(
-    () => checarRegras(pernas, regras.data ?? [], leitura),
-    [pernas, regras.data, leitura],
+  const historico = useQuery({
+    queryKey: ["diary"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("diary_entries")
+        .select("*")
+        .order("created_at", { ascending: false });
+      return (data as unknown as DiaryEntry[]) ?? [];
+    },
+  });
+
+  const pedemConfirmacao = useMemo(
+    () => regrasQuePedemConfirmacao(regras.data ?? []),
+    [regras.data],
   );
 
-  const [explicar, setExplicar] = useState(false);
-  const [check, setCheck] = useState<Record<string, boolean>>({});
-  const checklist = [
-    { k: "simulei", label: "Simulei esta estrutura" },
-    { k: "perda", label: `Entendi a perda máxima (R$ ${leitura.capitalEmRisco.toFixed(2)})` },
-    {
-      k: "be",
-      label: `Entendi o breakeven (${leitura.breakevens.length ? leitura.breakevens.map((b) => b.toFixed(2)).join(" / ") : "—"})`,
-    },
-    { k: "regra", label: "Minha regra permite esta operação" },
-  ];
-  const checkOk = checklist.every((c) => check[c.k]);
+  const alertas = useMemo(
+    () => validarRegras(pernas, regras.data ?? [], leitura, { confirmacoes }),
+    [pernas, regras.data, leitura, confirmacoes],
+  );
+
+  const disciplinaHistorica = useMemo(() => disciplina(historico.data ?? []), [historico.data]);
+
+  const score = useMemo(
+    () =>
+      calcularDecisionScore({
+        simulou: true,
+        tese,
+        checklist: Object.fromEntries(CHECKLIST.map((c) => [c.k, !!check[c.k]])),
+        alertas,
+        interpretacao: leitura,
+        disciplinaHistorica,
+      }),
+    [tese, check, alertas, leitura, disciplinaHistorica],
+  );
+
+  const checkOk = CHECKLIST.every((c) => check[c.k]);
 
   async function perguntarCopilot() {
     const { data: u } = await supabase.auth.getUser();
@@ -138,7 +196,7 @@ function Simulador() {
       .from("simulations")
       .insert({
         user_id: u.user.id,
-        tipo_estrategia: preset,
+        tipo_estrategia: leitura.nome,
         ativo,
         preco_atual: centro,
         pernas: pernas as any,
@@ -146,14 +204,37 @@ function Simulador() {
       .select()
       .single();
     if (error) return toast.error(error.message);
-    toast.success("Decisão registrada — continue no diário.");
+
+    await supabase.from("checklists").insert({
+      user_id: u.user.id,
+      simulation_id: data.id,
+      respostas: Object.fromEntries(CHECKLIST.map((c) => [c.k, !!check[c.k]])) as any,
+      completo: checkOk,
+    });
+    await supabase.from("timeline_events").insert({
+      user_id: u.user.id,
+      tipo: "simulacao",
+      titulo: `Simulou ${leitura.nome} em ${ativo}`,
+      descricao: leitura.resumo,
+      meta: { simulation_id: data.id, score: score.score, risco: leitura.risco } as any,
+    });
+
+    try {
+      sessionStorage.setItem(
+        `sim-tese:${data.id}`,
+        JSON.stringify({ tese, checklist: Object.fromEntries(CHECKLIST.map((c) => [c.k, !!check[c.k]])) }),
+      );
+    } catch {
+      /* sessionStorage indisponível — o diário pede a tese novamente */
+    }
+
+    toast.success("Simulação registrada — feche a decisão no diário.");
     qc.invalidateQueries();
     navigate({ to: "/diario", search: { sim: data.id } as any });
   }
 
-
   return (
-    <AppShell title="Simulador de payoff">
+    <AppShell title="Simulador de decisão">
       <div className="flex flex-wrap gap-2 mb-4">
         {(Object.keys(PRESETS) as (keyof typeof PRESETS)[]).map((k) => (
           <button
@@ -197,10 +278,6 @@ function Simulador() {
                     <stop offset="0%" stopColor="oklch(0.72 0.18 155)" stopOpacity={0.6} />
                     <stop offset="50%" stopColor="oklch(0.72 0.18 155)" stopOpacity={0} />
                   </linearGradient>
-                  <linearGradient id="pl" x1="0" y1="1" x2="0" y2="0">
-                    <stop offset="0%" stopColor="oklch(0.63 0.24 27)" stopOpacity={0.6} />
-                    <stop offset="50%" stopColor="oklch(0.63 0.24 27)" stopOpacity={0} />
-                  </linearGradient>
                 </defs>
                 <CartesianGrid stroke="rgba(255,255,255,0.05)" />
                 <XAxis dataKey="preco" tick={{ fontSize: 11, fill: "rgba(255,255,255,0.6)" }} />
@@ -211,9 +288,20 @@ function Simulador() {
                   labelFormatter={(l) => `Preço: R$ ${l}`}
                 />
                 <ReferenceLine y={0} stroke="rgba(255,255,255,0.3)" />
-                <ReferenceLine x={centro} stroke="oklch(0.78 0.17 65)" strokeDasharray="4 4" label={{ value: "atual", position: "top", fill: "oklch(0.78 0.17 65)", fontSize: 10 }} />
+                <ReferenceLine
+                  x={centro}
+                  stroke="oklch(0.78 0.17 65)"
+                  strokeDasharray="4 4"
+                  label={{ value: "atual", position: "top", fill: "oklch(0.78 0.17 65)", fontSize: 10 }}
+                />
                 {stats.breakevens.map((b) => (
-                  <ReferenceLine key={b} x={b} stroke="rgba(255,255,255,0.35)" strokeDasharray="2 2" label={{ value: `BE ${b}`, position: "insideTopRight", fontSize: 10, fill: "rgba(255,255,255,0.6)" }} />
+                  <ReferenceLine
+                    key={b}
+                    x={b}
+                    stroke="rgba(255,255,255,0.35)"
+                    strokeDasharray="2 2"
+                    label={{ value: `BE ${b}`, position: "insideTopRight", fontSize: 10, fill: "rgba(255,255,255,0.6)" }}
+                  />
                 ))}
                 <Area type="monotone" dataKey="resultado" stroke="oklch(0.72 0.18 155)" fill="url(#pg)" baseValue={0} />
               </AreaChart>
@@ -223,73 +311,76 @@ function Simulador() {
           <div className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
             <div className="rounded-md border border-border bg-background p-3">
               <div className="text-xs text-muted-foreground">Lucro máximo</div>
-              <div className="mt-1 font-mono font-bold text-success">R$ {stats.lucroMax.toFixed(2)}</div>
-              <p className="mt-1 text-xs leading-snug text-muted-foreground">
-                {leitura.breakevens.length
-                  ? `${ativo} precisa fechar acima de R$ ${leitura.breakevens[leitura.breakevens.length - 1].toFixed(2)} para chegar perto disso.`
-                  : "Depende de onde o preço fechar no vencimento."}
-              </p>
+              <div className="mt-1 font-mono font-bold text-success">
+                {leitura.lucroLimitado ? `R$ ${stats.lucroMax.toFixed(2)}` : "ilimitado"}
+              </div>
             </div>
             <div className="rounded-md border border-border bg-background p-3">
-              <div className="text-xs text-muted-foreground">Perda máxima</div>
-              <div className="mt-1 font-mono font-bold text-loss">R$ {stats.perdaMax.toFixed(2)}</div>
-              <p className="mt-1 text-xs leading-snug text-muted-foreground">
-                {leitura.perdaLimitada
-                  ? "Você conhece esse risco antes de entrar. Isso é positivo."
-                  : "Risco não limitado: há venda descoberta nesta estrutura."}
-              </p>
+              <div className="text-xs text-muted-foreground">Capital em risco</div>
+              <div className="mt-1 font-mono font-bold text-loss">
+                {leitura.perdaLimitada ? `R$ ${leitura.capitalEmRisco.toFixed(2)}` : "sem teto"}
+              </div>
             </div>
             <div className="rounded-md border border-border bg-background p-3">
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                Breakeven(s)
-                <span
-                  title="Ponto de equilíbrio: preço em que o resultado da estrutura é zero. Sai da diferença entre os prêmios pagos/recebidos e o strike comprado."
-                  className="cursor-help"
-                >
-                  <Info size={12} />
-                </span>
-              </div>
-              <div className="mt-1 font-mono">
-                {stats.breakevens.length ? stats.breakevens.map((b) => b.toFixed(2)).join(" / ") : "—"}
-              </div>
-              <p className="mt-1 text-xs leading-snug text-muted-foreground">
-                Abaixo disso, o resultado no vencimento é negativo.
-              </p>
+              <div className="text-xs text-muted-foreground">Capital comprometido</div>
+              <div className="mt-1 font-mono font-bold">R$ {leitura.capitalComprometido.toFixed(2)}</div>
             </div>
           </div>
 
-          {/* Leitura da Estratégia */}
+          {/* Leitura da estratégia */}
           <div className="mt-4 rounded-lg border border-primary/30 bg-primary/5 p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="text-xs font-semibold uppercase tracking-wider text-primary">
                 Leitura da estratégia
               </div>
-              <span
-                className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                  leitura.risco === "baixo"
-                    ? "bg-success/15 text-success"
-                    : leitura.risco === "medio"
-                      ? "bg-primary/20 text-primary"
-                      : "bg-loss/15 text-loss"
-                }`}
-              >
-                Risco {leitura.risco === "medio" ? "médio" : leitura.risco}
-              </span>
+              <div className="flex gap-2">
+                <span className="rounded-full bg-accent px-2 py-0.5 text-xs text-muted-foreground">
+                  {leitura.complexidade}
+                </span>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                    leitura.risco === "baixo"
+                      ? "bg-success/15 text-success"
+                      : leitura.risco === "medio"
+                        ? "bg-primary/20 text-primary"
+                        : "bg-loss/15 text-loss"
+                  }`}
+                >
+                  Risco {leitura.risco === "medio" ? "médio" : leitura.risco}
+                </span>
+              </div>
             </div>
 
             <div className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
               <Campo label="Estratégia detectada" valor={leitura.nome} />
               <Campo label="Perfil" valor={leitura.perfil} />
-              <Campo label="Lucro limitado" valor={leitura.lucroLimitado ? "Sim" : "Não"} />
-              <Campo label="Perda limitada" valor={leitura.perdaLimitada ? "Sim" : "Não"} />
-              <Campo label="Capital em risco" valor={`R$ ${leitura.capitalEmRisco.toFixed(2)}`} />
-              <Campo label="Ponto crítico" valor={leitura.pontoCritico} />
+              <Campo label="Objetivo" valor={leitura.objetivoLabel} />
+              <Campo
+                label="Breakeven"
+                valor={leitura.breakevens.length ? leitura.breakevens.map((b) => b.toFixed(2)).join(" / ") : "—"}
+              />
             </div>
 
-            <div className="mt-4 space-y-2 border-t border-border pt-3 text-sm leading-relaxed text-muted-foreground">
-              {leitura.narrativa.map((n, i) => (
-                <p key={i}>{n}</p>
-              ))}
+            <p className="mt-4 border-t border-border pt-3 text-sm leading-relaxed text-muted-foreground">
+              {leitura.resumo}
+            </p>
+
+            <div className="mt-3 border-t border-border pt-3">
+              <div className="text-xs uppercase text-muted-foreground">O que pode acontecer</div>
+              <ul className="mt-2 space-y-2 text-sm">
+                {riscos.map((r, i) => (
+                  <li key={i} className="leading-snug">
+                    <span
+                      className={
+                        r.tom === "ruim" ? "text-loss" : r.tom === "bom" ? "text-success" : "text-muted-foreground"
+                      }
+                    >
+                      {r.cenario}
+                    </span>
+                    <span className="text-muted-foreground"> — {r.consequencia}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <div className="mt-3 border-t border-border pt-3">
@@ -320,13 +411,39 @@ function Simulador() {
               <div className="mt-3 rounded-md border border-border bg-card p-3 text-sm leading-relaxed text-muted-foreground">
                 {leitura.analogia}
                 <div className="mt-2">
-                  <Link to="/trilha" className="text-xs text-primary hover:underline">
+                  <Link
+                    to={leitura.licaoSlug ? "/licao/$slug" : "/trilha"}
+                    params={leitura.licaoSlug ? { slug: leitura.licaoSlug } : undefined}
+                    className="text-xs text-primary hover:underline"
+                  >
                     Ver a lição correspondente na trilha →
                   </Link>
                 </div>
               </div>
             )}
           </div>
+
+          {pedemConfirmacao.length > 0 && (
+            <div className="mt-4 rounded-lg border border-border bg-card p-4">
+              <div className="text-xs uppercase text-muted-foreground">Confirmações técnicas das suas regras</div>
+              <div className="mt-2 space-y-2">
+                {pedemConfirmacao.map((r) => (
+                  <label key={r.id} className="flex cursor-pointer items-start gap-2 text-sm leading-snug">
+                    <input
+                      type="checkbox"
+                      checked={!!confirmacoes[r.id]}
+                      onChange={(e) => setConfirmacoes({ ...confirmacoes, [r.id]: e.target.checked })}
+                      className="mt-0.5 accent-[oklch(0.78_0.17_65)]"
+                    />
+                    <span className={confirmacoes[r.id] ? "text-foreground" : "text-muted-foreground"}>
+                      {r.nome ? `${r.nome} — ` : ""}
+                      {r.texto}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           {alertas.length > 0 && (
             <div className="mt-4 rounded-lg border border-loss/40 bg-loss/10 p-4">
@@ -336,7 +453,14 @@ function Simulador() {
               <ul className="mt-2 space-y-2 text-sm">
                 {alertas.map((a, i) => (
                   <li key={i}>
-                    <div className="italic">“{a.regra}”</div>
+                    <div className="italic">
+                      “{a.regra}”
+                      {a.severidade === "critico" && (
+                        <span className="ml-2 rounded bg-loss/20 px-1.5 py-0.5 text-[10px] uppercase not-italic text-loss">
+                          crítico
+                        </span>
+                      )}
+                    </div>
                     <div className="text-xs text-muted-foreground">{a.motivo}</div>
                   </li>
                 ))}
@@ -347,7 +471,6 @@ function Simulador() {
             </div>
           )}
         </div>
-
 
         <div className="space-y-3">
           {pernas.map((p, i) => (
@@ -418,10 +541,25 @@ function Simulador() {
           >
             <Plus size={14} /> Nova perna ({pernas.length}/4)
           </button>
+
           <div className="rounded-lg border border-border bg-card p-3">
-            <div className="text-xs uppercase text-muted-foreground">Antes de registrar</div>
+            <div className="text-xs uppercase text-muted-foreground">Sua tese</div>
+            <textarea
+              value={tese}
+              onChange={(e) => setTese(e.target.value)}
+              rows={4}
+              placeholder="Por que esta operação faz sentido agora? O que precisa acontecer para você estar certo?"
+              className="mt-2 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
+            />
+            <div className="mt-1 text-right text-[11px] text-muted-foreground">
+              {tese.trim().length} caracteres {tese.trim().length < 40 && "· mínimo 40 para pontuar"}
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-border bg-card p-3">
+            <div className="text-xs uppercase text-muted-foreground">Checklist de decisão</div>
             <div className="mt-2 space-y-2">
-              {checklist.map((c) => (
+              {CHECKLIST.map((c) => (
                 <label key={c.k} className="flex cursor-pointer items-start gap-2 text-xs leading-snug">
                   <input
                     type="checkbox"
@@ -429,23 +567,24 @@ function Simulador() {
                     onChange={(e) => setCheck({ ...check, [c.k]: e.target.checked })}
                     className="mt-0.5 accent-[oklch(0.78_0.17_65)]"
                   />
-                  <span className={check[c.k] ? "text-foreground" : "text-muted-foreground"}>
-                    {c.label}
-                  </span>
+                  <span className={check[c.k] ? "text-foreground" : "text-muted-foreground"}>{c.label}</span>
                 </label>
               ))}
             </div>
           </div>
+
+          <ScorePanel score={score} />
+
           <button
             onClick={salvar}
             disabled={!checkOk}
             className="w-full rounded-md bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
           >
-            Levar esta simulação para o Diário
+            Levar esta decisão para o Diário
           </button>
           {!checkOk && (
             <p className="text-center text-xs text-muted-foreground">
-              Confirme o checklist acima para registrar a decisão.
+              Responda o checklist inteiro para registrar a decisão.
             </p>
           )}
         </div>
@@ -462,4 +601,3 @@ function Campo({ label, valor }: { label: string; valor: string }) {
     </div>
   );
 }
-
