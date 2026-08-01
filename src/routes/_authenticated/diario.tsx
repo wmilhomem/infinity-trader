@@ -12,7 +12,7 @@ import { validarRegras, type Regra } from "@/engines/rule-engine";
 import { calcularDecisionScore, disciplina } from "@/engines/decision-engine";
 import { detectarPadroes } from "@/engines/behavior-engine";
 import type { DiaryEntry } from "@/engines/types";
-import { ScorePanel } from "./simulador";
+import { ScorePanel } from "@/components/ScorePanel";
 
 export const Route = createFileRoute("/_authenticated/diario")({
   head: () => ({
