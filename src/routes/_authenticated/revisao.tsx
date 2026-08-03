@@ -1,33 +1,78 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { gerarReview, type Periodo } from "@/engines/review-engine";
+import type { DiaryEntry } from "@/engines/types";
 
 export const Route = createFileRoute("/_authenticated/revisao")({
-  head: () => ({ meta: [{ title: "Revisão · Zero ao Trade" }] }),
+  head: () => ({
+    meta: [
+      { title: "Revisão cognitiva · Zero ao Trade" },
+      { name: "description", content: "Revisão semanal e mensal das suas decisões: disciplina, Decision Score, padrões de comportamento e o foco do próximo período." },
+      { property: "og:title", content: "Revisão cognitiva · Zero ao Trade" },
+      { property: "og:description", content: "Transforme seu histórico de decisões em aprendizado: evolução, padrões e foco." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Revisao,
 });
 
 function Revisao() {
+  const [periodo, setPeriodo] = useState<Periodo>("semana");
+  const qc = useQueryClient();
+
   const q = useQuery({
     queryKey: ["diary"],
     queryFn: async () => {
-      const { data } = await supabase.from("diary_entries").select("*");
+      const { data } = await supabase.from("diary_entries").select("*").order("created_at", { ascending: false });
+      return (data ?? []) as unknown as DiaryEntry[];
+    },
+  });
+
+  const entries = useMemo(() => q.data ?? [], [q.data]);
+  const review = useMemo(() => gerarReview(entries, periodo), [entries, periodo]);
+
+  const salvas = useQuery({
+    queryKey: ["reviews", periodo],
+    queryFn: async () => {
+      const tabela = periodo === "semana" ? "weekly_reviews" : "monthly_reviews";
+      const { data } = await supabase.from(tabela).select("*").order("period_start", { ascending: false }).limit(6);
       return data ?? [];
     },
   });
 
-  const entries = q.data ?? [];
+  const salvar = useMutation({
+    mutationFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) throw new Error("sem sessão");
+      const tabela = periodo === "semana" ? "weekly_reviews" : "monthly_reviews";
+      const { error } = await supabase.from(tabela).insert({
+        user_id: u.user.id,
+        period_start: review.inicio,
+        resumo: `${review.narrativa}\n\n${review.foco}`,
+        metricas: {
+          ...review.metricas,
+          deltas: review.deltas,
+          licoes: review.licoes,
+          padroes: review.padroes,
+        } as never,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Revisão arquivada no seu histórico.");
+      qc.invalidateQueries({ queryKey: ["reviews", periodo] });
+    },
+    onError: () => toast.error("Não consegui salvar esta revisão."),
+  });
+
   const encerradas = entries.filter((e) => e.status === "encerrada" && e.resultado !== null);
-  const seguiu = encerradas.filter((e) => e.seguiu_regra === true);
-  const furou = encerradas.filter((e) => e.seguiu_regra === false);
-
-  const avg = (arr: typeof encerradas) =>
-    arr.length ? arr.reduce((s, e) => s + Number(e.resultado || 0), 0) / arr.length : 0;
-  const winrate = (arr: typeof encerradas) =>
-    arr.length ? (arr.filter((e) => Number(e.resultado || 0) > 0).length / arr.length) * 100 : 0;
-
   const porEstrategia = Object.entries(
     encerradas.reduce<Record<string, { total: number; ganhos: number; count: number }>>((acc, e) => {
       const k = e.estrutura || "outra";
@@ -37,37 +82,116 @@ function Revisao() {
       if (Number(e.resultado || 0) > 0) acc[k].ganhos++;
       return acc;
     }, {}),
-  ).map(([nome, v]) => ({ nome, resultado: +v.total.toFixed(2), taxa: +((v.ganhos / v.count) * 100).toFixed(0) }));
+  ).map(([nome, v]) => ({ nome, resultado: +v.total.toFixed(2) }));
 
   return (
-    <AppShell title="Revisão do meu histórico">
-      <div className="grid gap-4 md:grid-cols-3 mb-6">
-        <KPI label="Total encerradas" value={encerradas.length} />
-        <KPI label="Taxa de acerto" value={`${winrate(encerradas).toFixed(0)}%`} />
-        <KPI label="Retorno médio" value={`R$ ${avg(encerradas).toFixed(2)}`} accent={avg(encerradas) >= 0 ? "success" : "loss"} />
+    <AppShell title="Revisão do meu processo">
+      <div className="mb-5 flex items-center gap-2">
+        {(["semana", "mes"] as Periodo[]).map((p) => (
+          <button
+            key={p}
+            onClick={() => setPeriodo(p)}
+            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+              periodo === p
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {p === "semana" ? "Esta semana" : "Este mês"}
+          </button>
+        ))}
+        <span className="ml-auto font-mono text-[11px] text-muted-foreground">
+          {review.inicio} → {review.fim}
+        </span>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 mb-6">
-        <div className="rounded-lg border border-success/40 bg-success/5 p-5">
-          <div className="text-xs uppercase text-success">Segui a regra</div>
-          <div className="mt-1 text-3xl font-bold font-mono">{seguiu.length}</div>
-          <div className="mt-2 text-sm">Taxa de acerto: {winrate(seguiu).toFixed(0)}%</div>
-          <div className="text-sm">Retorno médio: R$ {avg(seguiu).toFixed(2)}</div>
-        </div>
-        <div className="rounded-lg border border-loss/40 bg-loss/5 p-5">
-          <div className="text-xs uppercase text-loss">Furei a regra</div>
-          <div className="mt-1 text-3xl font-bold font-mono">{furou.length}</div>
-          <div className="mt-2 text-sm">Taxa de acerto: {winrate(furou).toFixed(0)}%</div>
-          <div className="text-sm">Retorno médio: R$ {avg(furou).toFixed(2)}</div>
-        </div>
-      </div>
+      {/* Narrativa do período */}
+      <section className="mb-6 rounded-lg border border-primary/40 bg-primary/5 p-5">
+        <div className="text-xs uppercase tracking-wide text-primary">Leitura do período</div>
+        <p className="mt-2 text-sm leading-relaxed">{review.narrativa}</p>
+        <p className="mt-3 rounded-md border border-border bg-card px-3 py-2 text-sm font-medium">{review.foco}</p>
+        <Button size="sm" className="mt-4" onClick={() => salvar.mutate()} disabled={salvar.isPending}>
+          {salvar.isPending ? "Arquivando…" : "Arquivar esta revisão"}
+        </Button>
+      </section>
 
-      <div className="rounded-lg border border-border bg-card p-5">
-        <div className="text-xs uppercase text-muted-foreground mb-3">Por estrutura</div>
-        {porEstrategia.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Encerre operações no diário com resultado pra ver o painel.
+      {/* Evolução contra o período anterior */}
+      <section className="mb-6">
+        <div className="mb-2 text-xs uppercase text-muted-foreground">Evolução vs. período anterior</div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {review.deltas.map((d) => {
+            const up = d.diff > 0.5;
+            const down = d.diff < -0.5;
+            return (
+              <div key={d.label} className="rounded-lg border border-border bg-card p-4">
+                <div className="text-xs text-muted-foreground">{d.label}</div>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="font-mono text-2xl font-bold">
+                    {d.unidade === "%" || d.unidade === "pt" ? d.atual.toFixed(0) : d.atual}
+                    <span className="text-sm text-muted-foreground">{d.unidade === "%" ? "%" : ""}</span>
+                  </span>
+                  <span
+                    className={`font-mono text-xs ${up ? "text-success" : down ? "text-loss" : "text-muted-foreground"}`}
+                  >
+                    {d.diff > 0 ? "+" : ""}
+                    {d.unidade === "" ? d.diff : d.diff.toFixed(0)}
+                  </span>
+                </div>
+                <div className="mt-1 text-[11px] text-muted-foreground">
+                  antes: {d.unidade === "" ? d.anterior : d.anterior.toFixed(0)}
+                  {d.unidade === "%" ? "%" : ""}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Padrões de comportamento */}
+      <section className="mb-6">
+        <div className="mb-2 text-xs uppercase text-muted-foreground">Padrões que o sistema enxergou</div>
+        {review.padroes.length === 0 ? (
+          <p className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
+            Ainda não há registros suficientes para afirmar um padrão. A partir de ~3 decisões encerradas eu começo a
+            comparar seus comportamentos.
           </p>
+        ) : (
+          <div className="space-y-3">
+            {review.padroes.map((p) => (
+              <div
+                key={p.key}
+                className={`rounded-lg border p-4 ${
+                  p.severidade === "alerta" ? "border-loss/40 bg-loss/5" : "border-border bg-card"
+                }`}
+              >
+                <div className="text-sm font-semibold">{p.titulo}</div>
+                <p className="mt-1 text-sm text-muted-foreground">{p.descricao}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Lições do período */}
+      {review.licoes.length > 0 && (
+        <section className="mb-6 rounded-lg border border-border bg-card p-5">
+          <div className="text-xs uppercase text-muted-foreground">O que este período te ensinou</div>
+          <ul className="mt-3 space-y-2">
+            {review.licoes.map((l) => (
+              <li key={l} className="flex gap-2 text-sm leading-snug">
+                <span className="text-primary">→</span>
+                <span>{l}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Resultado por estrutura (histórico completo) */}
+      <section className="mb-6 rounded-lg border border-border bg-card p-5">
+        <div className="mb-3 text-xs uppercase text-muted-foreground">Resultado por estrutura (todo o histórico)</div>
+        {porEstrategia.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Encerre operações no diário com resultado pra ver o painel.</p>
         ) : (
           <div className="h-64">
             <ResponsiveContainer>
@@ -85,17 +209,22 @@ function Revisao() {
             </ResponsiveContainer>
           </div>
         )}
-      </div>
-    </AppShell>
-  );
-}
+      </section>
 
-function KPI({ label, value, accent }: { label: string; value: string | number; accent?: "success" | "loss" }) {
-  const color = accent === "success" ? "text-success" : accent === "loss" ? "text-loss" : "text-foreground";
-  return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <div className="text-xs uppercase text-muted-foreground">{label}</div>
-      <div className={`mt-2 text-2xl font-bold font-mono ${color}`}>{value}</div>
-    </div>
+      {/* Revisões arquivadas */}
+      {(salvas.data?.length ?? 0) > 0 && (
+        <section className="rounded-lg border border-border bg-card p-5">
+          <div className="mb-3 text-xs uppercase text-muted-foreground">Revisões arquivadas</div>
+          <ul className="space-y-3">
+            {(salvas.data ?? []).map((r: any) => (
+              <li key={r.id} className="border-l-2 border-border pl-3">
+                <div className="font-mono text-[11px] text-muted-foreground">{r.period_start}</div>
+                <p className="whitespace-pre-line text-sm leading-snug text-muted-foreground">{r.resumo}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </AppShell>
   );
 }
