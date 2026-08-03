@@ -9,63 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiChatRouteImport } from './routes/api/chat'
-import { Route as AuthenticatedTrilhaRouteImport } from './routes/_authenticated/trilha'
-import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated/simulador'
-import { Route as AuthenticatedRevisaoRouteImport } from './routes/_authenticated/revisao'
-import { Route as AuthenticatedRegrasRouteImport } from './routes/_authenticated/regras'
-import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
-import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated/diario'
+import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedRegrasRouteImport } from './routes/_authenticated/regras'
+import { Route as AuthenticatedRevisaoRouteImport } from './routes/_authenticated/revisao'
+import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated/simulador'
+import { Route as AuthenticatedTrilhaRouteImport } from './routes/_authenticated/trilha'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedCopilotIndexRouteImport } from './routes/_authenticated/copilot.index'
-import { Route as AuthenticatedLicaoSlugRouteImport } from './routes/_authenticated/licao.$slug'
 import { Route as AuthenticatedCopilotThreadIdRouteImport } from './routes/_authenticated/copilot.$threadId'
+import { Route as AuthenticatedLicaoSlugRouteImport } from './routes/_authenticated/licao.$slug'
 
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiChatRoute = ApiChatRouteImport.update({
-  id: '/api/chat',
-  path: '/api/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedTrilhaRoute = AuthenticatedTrilhaRouteImport.update({
-  id: '/trilha',
-  path: '/trilha',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedSimuladorRoute = AuthenticatedSimuladorRouteImport.update({
-  id: '/simulador',
-  path: '/simulador',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedRevisaoRoute = AuthenticatedRevisaoRouteImport.update({
-  id: '/revisao',
-  path: '/revisao',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedRegrasRoute = AuthenticatedRegrasRouteImport.update({
-  id: '/regras',
-  path: '/regras',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
+const AuthenticatedDiarioRoute = AuthenticatedDiarioRouteImport.update({
+  id: '/diario',
+  path: '/diario',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
@@ -73,10 +48,35 @@ const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedDiarioRoute = AuthenticatedDiarioRouteImport.update({
-  id: '/diario',
-  path: '/diario',
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRegrasRoute = AuthenticatedRegrasRouteImport.update({
+  id: '/regras',
+  path: '/regras',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRevisaoRoute = AuthenticatedRevisaoRouteImport.update({
+  id: '/revisao',
+  path: '/revisao',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSimuladorRoute = AuthenticatedSimuladorRouteImport.update({
+  id: '/simulador',
+  path: '/simulador',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTrilhaRoute = AuthenticatedTrilhaRouteImport.update({
+  id: '/trilha',
+  path: '/trilha',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCopilotIndexRoute =
   AuthenticatedCopilotIndexRouteImport.update({
@@ -84,17 +84,17 @@ const AuthenticatedCopilotIndexRoute =
     path: '/copilot/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedLicaoSlugRoute = AuthenticatedLicaoSlugRouteImport.update({
-  id: '/licao/$slug',
-  path: '/licao/$slug',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedCopilotThreadIdRoute =
   AuthenticatedCopilotThreadIdRouteImport.update({
     id: '/copilot/$threadId',
     path: '/copilot/$threadId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLicaoSlugRoute = AuthenticatedLicaoSlugRouteImport.update({
+  id: '/licao/$slug',
+  path: '/licao/$slug',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -201,11 +201,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -215,53 +215,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/trilha': {
-      id: '/_authenticated/trilha'
-      path: '/trilha'
-      fullPath: '/trilha'
-      preLoaderRoute: typeof AuthenticatedTrilhaRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/simulador': {
-      id: '/_authenticated/simulador'
-      path: '/simulador'
-      fullPath: '/simulador'
-      preLoaderRoute: typeof AuthenticatedSimuladorRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/revisao': {
-      id: '/_authenticated/revisao'
-      path: '/revisao'
-      fullPath: '/revisao'
-      preLoaderRoute: typeof AuthenticatedRevisaoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/regras': {
-      id: '/_authenticated/regras'
-      path: '/regras'
-      fullPath: '/regras'
-      preLoaderRoute: typeof AuthenticatedRegrasRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/onboarding': {
-      id: '/_authenticated/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+    '/_authenticated/diario': {
+      id: '/_authenticated/diario'
+      path: '/diario'
+      fullPath: '/diario'
+      preLoaderRoute: typeof AuthenticatedDiarioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/home': {
@@ -271,12 +236,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/diario': {
-      id: '/_authenticated/diario'
-      path: '/diario'
-      fullPath: '/diario'
-      preLoaderRoute: typeof AuthenticatedDiarioRouteImport
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/regras': {
+      id: '/_authenticated/regras'
+      path: '/regras'
+      fullPath: '/regras'
+      preLoaderRoute: typeof AuthenticatedRegrasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/revisao': {
+      id: '/_authenticated/revisao'
+      path: '/revisao'
+      fullPath: '/revisao'
+      preLoaderRoute: typeof AuthenticatedRevisaoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/simulador': {
+      id: '/_authenticated/simulador'
+      path: '/simulador'
+      fullPath: '/simulador'
+      preLoaderRoute: typeof AuthenticatedSimuladorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/trilha': {
+      id: '/_authenticated/trilha'
+      path: '/trilha'
+      fullPath: '/trilha'
+      preLoaderRoute: typeof AuthenticatedTrilhaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/copilot/': {
       id: '/_authenticated/copilot/'
@@ -285,18 +285,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCopilotIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/licao/$slug': {
-      id: '/_authenticated/licao/$slug'
-      path: '/licao/$slug'
-      fullPath: '/licao/$slug'
-      preLoaderRoute: typeof AuthenticatedLicaoSlugRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/copilot/$threadId': {
       id: '/_authenticated/copilot/$threadId'
       path: '/copilot/$threadId'
       fullPath: '/copilot/$threadId'
       preLoaderRoute: typeof AuthenticatedCopilotThreadIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/licao/$slug': {
+      id: '/_authenticated/licao/$slug'
+      path: '/licao/$slug'
+      fullPath: '/licao/$slug'
+      preLoaderRoute: typeof AuthenticatedLicaoSlugRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
@@ -340,3 +340,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
