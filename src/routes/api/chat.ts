@@ -65,13 +65,19 @@ export const Route = createFileRoute("/api/chat")({
             .select("ativo,estrutura,motivo,seguiu_regra,resultado,status,created_at")
             .order("created_at", { ascending: false })
             .limit(10),
-          supabaseUser.from("chat_threads").select("id,user_id,context_type").eq("id", body.threadId).maybeSingle(),
+          supabaseUser
+            .from("chat_threads")
+            .select("id,user_id,context_type")
+            .eq("id", body.threadId)
+            .maybeSingle(),
         ]);
 
         if (!threadRes.data) return new Response("Thread not found", { status: 404 });
         const userId = threadRes.data.user_id;
 
-        const rulesText = (rulesRes.data ?? []).map((r) => `- [${r.categoria}] ${r.texto}`).join("\n") || "(nenhuma)";
+        const rulesText =
+          (rulesRes.data ?? []).map((r) => `- [${r.categoria}] ${r.texto}`).join("\n") ||
+          "(nenhuma)";
         const diaryText =
           (diaryRes.data ?? [])
             .map(
@@ -115,13 +121,16 @@ export const Route = createFileRoute("/api/chat")({
           return Response.json({ text: result.text });
         } catch (e) {
           const msg = e instanceof Error ? e.message : String(e);
-          const status = /429/.test(msg) ? 429 : /402/.test(msg) ? 402 : 500;
+          const queueFull = /503/.test(msg) || /request queue is full/i.test(msg);
+          const status = /429/.test(msg) ? 429 : /402/.test(msg) ? 402 : queueFull ? 503 : 500;
           return new Response(
             status === 429
               ? "Muitas requisições. Tente novamente em instantes."
               : status === 402
                 ? "Créditos de IA esgotados. Adicione créditos na sua workspace."
-                : msg,
+                : status === 503
+                  ? "A fila de requisições de IA está cheia no momento. Tente novamente em instantes."
+                  : msg,
             { status },
           );
         }
