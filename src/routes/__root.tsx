@@ -72,21 +72,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Zero ao Trade — Aprenda opções da B3 com disciplina" },
+      { title: "Zero ao Trade — Decisões conscientes em um mercado incerto" },
       {
         name: "description",
         content:
-          "Um Decision OS que ensina opções do zero e organiza suas decisões: aprenda, defina regras, simule, registre e revise. O copilot informa — você decide.",
+          "O mercado não falta informação — falta processo. O Zero ao Trade transforma impulsos em decisões conscientes: o copilot informa, você decide.",
       },
-      { property: "og:title", content: "Zero ao Trade — Aprenda opções da B3 com disciplina" },
+      {
+        property: "og:title",
+        content: "Zero ao Trade — Decisões conscientes em um mercado incerto",
+      },
       {
         property: "og:description",
-        content: "Um Decision OS que ensina opções do zero e organiza suas decisões: aprenda, defina regras, simule, registre e revise. O copilot informa — você decide.",
+        content:
+          "O mercado não falta informação — falta processo. O Zero ao Trade transforma impulsos em decisões conscientes: o copilot informa, você decide.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Zero ao Trade — Aprenda opções da B3 com disciplina" },
-      { name: "twitter:description", content: "Um Decision OS que ensina opções do zero e organiza suas decisões: aprenda, defina regras, simule, registre e revise. O copilot informa — você decide." },
+      {
+        name: "twitter:title",
+        content: "Zero ao Trade — Decisões conscientes em um mercado incerto",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "O mercado não falta informação — falta processo. O Zero ao Trade transforma impulsos em decisões conscientes: o copilot informa, você decide.",
+      },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e32adef6-cd20-4e9f-a3ab-464c15009564/id-preview-6c70d9e7--21570d6c-9578-40a2-b3b4-1b35149e2937.lovable.app-1784900714869.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e32adef6-cd20-4e9f-a3ab-464c15009564/id-preview-6c70d9e7--21570d6c-9578-40a2-b3b4-1b35149e2937.lovable.app-1784900714869.png" },
     ],
