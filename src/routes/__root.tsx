@@ -13,6 +13,7 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
+import { MarketProvider } from "../market/context";
 
 function NotFoundComponent() {
   return (
@@ -144,7 +145,9 @@ function RootComponent() {
   }, [router, queryClient]);
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <MarketProvider>
+        <Outlet />
+      </MarketProvider>
       <Toaster theme="dark" richColors position="top-right" />
     </QueryClientProvider>
   );
