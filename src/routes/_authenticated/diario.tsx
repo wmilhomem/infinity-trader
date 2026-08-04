@@ -11,7 +11,9 @@ import { interpretar } from "@/engines/simulation-interpreter";
 import { validarRegras, type Regra } from "@/engines/rule-engine";
 import { calcularDecisionScore, disciplina } from "@/engines/decision-engine";
 import { detectarPadroes } from "@/engines/behavior-engine";
+import { buildDecisionSnapshot } from "@/engines/decision-snapshot";
 import type { DiaryEntry } from "@/engines/types";
+import type { Json } from "@/integrations/supabase/types";
 import { ScorePanel } from "@/components/ScorePanel";
 
 export const Route = createFileRoute("/_authenticated/diario")({
@@ -26,7 +28,8 @@ export const Route = createFileRoute("/_authenticated/diario")({
       { property: "og:title", content: "Diário de decisões · Zero ao Trade" },
       {
         property: "og:description",
-        content: "Transforme operações em decisões auditáveis: tese, regra, emoção e Decision Score.",
+        content:
+          "Transforme operações em decisões auditáveis: tese, regra, emoção e Decision Score.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -190,7 +193,35 @@ function Diario() {
           simulation_id: sim ?? null,
           estrategia: interpretacao?.nome ?? estrutura,
           motivo,
-          contexto: { ativo, alertas, risco: interpretacao?.risco ?? null } as any,
+          contexto: buildDecisionSnapshot({
+            strategy: pernas
+              ? {
+                  ativo,
+                  estrutura,
+                  precoReferencia: Number(preSim.data?.preco_atual ?? 0) || null,
+                  pernas,
+                  interpretacao,
+                }
+              : null,
+            processo: {
+              simulou: !!sim,
+              tese: motivo,
+              checklist: respostas,
+              score,
+              alertas,
+              regraAplicada: ruleId || null,
+              seguiuRegra: seguiu,
+            },
+            comportamento: {
+              disciplinaHistorica,
+              padroesPresentes: padroes,
+              emocao: emocao || null,
+            },
+            resultado: {
+              status,
+              resultado: resultado ? +resultado : null,
+            },
+          }) as unknown as Json,
           resultado: resultado ? +resultado : null,
           emocao: emocao || null,
           licao_aprendida: licao || null,
@@ -283,7 +314,9 @@ function Diario() {
               </div>
 
               <div>
-                <div className="text-xs uppercase text-muted-foreground">Como você estava ao decidir?</div>
+                <div className="text-xs uppercase text-muted-foreground">
+                  Como você estava ao decidir?
+                </div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {EMOCOES.map((e) => (
                     <button
@@ -301,14 +334,19 @@ function Diario() {
                 <div className="text-xs uppercase text-muted-foreground">Checklist de decisão</div>
                 <div className="mt-2 space-y-2">
                   {CHECKLIST.map((c) => (
-                    <label key={c.k} className="flex cursor-pointer items-start gap-2 text-xs leading-snug">
+                    <label
+                      key={c.k}
+                      className="flex cursor-pointer items-start gap-2 text-xs leading-snug"
+                    >
                       <input
                         type="checkbox"
                         checked={!!check[c.k]}
                         onChange={(e) => setCheck({ ...check, [c.k]: e.target.checked })}
                         className="mt-0.5 accent-[oklch(0.78_0.17_65)]"
                       />
-                      <span className={check[c.k] ? "text-foreground" : "text-muted-foreground"}>{c.label}</span>
+                      <span className={check[c.k] ? "text-foreground" : "text-muted-foreground"}>
+                        {c.label}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -370,11 +408,17 @@ function Diario() {
         <div className="space-y-3">
           {padroes.length > 0 && (
             <div className="rounded-lg border border-border bg-card p-4">
-              <div className="text-xs uppercase text-muted-foreground">O que o seu histórico mostra</div>
+              <div className="text-xs uppercase text-muted-foreground">
+                O que o seu histórico mostra
+              </div>
               <ul className="mt-2 space-y-2 text-sm">
                 {padroes.map((p) => (
                   <li key={p.key}>
-                    <div className={p.severidade === "alerta" ? "font-medium text-loss" : "font-medium"}>
+                    <div
+                      className={
+                        p.severidade === "alerta" ? "font-medium text-loss" : "font-medium"
+                      }
+                    >
                       {p.titulo}
                     </div>
                     <div className="text-xs text-muted-foreground">{p.descricao}</div>
@@ -405,7 +449,9 @@ function Diario() {
                       {e.decision_score}
                     </span>
                   )}
-                  <span className={`text-xs ${e.status === "encerrada" ? "text-muted-foreground" : "text-primary"}`}>
+                  <span
+                    className={`text-xs ${e.status === "encerrada" ? "text-muted-foreground" : "text-primary"}`}
+                  >
                     {e.status}
                   </span>
                 </div>
@@ -416,20 +462,34 @@ function Diario() {
                   [{e.personal_rules.categoria}] {e.personal_rules.texto}
                 </div>
               )}
-              {e.emocao && <div className="mt-1 text-xs text-muted-foreground">Estado: {e.emocao}</div>}
+              {e.emocao && (
+                <div className="mt-1 text-xs text-muted-foreground">Estado: {e.emocao}</div>
+              )}
               {e.licao_aprendida && (
-                <div className="mt-1 text-xs italic text-muted-foreground">“{e.licao_aprendida}”</div>
+                <div className="mt-1 text-xs italic text-muted-foreground">
+                  “{e.licao_aprendida}”
+                </div>
               )}
               <div className="mt-2 flex items-center justify-between text-xs">
                 <span
                   className={
-                    e.seguiu_regra ? "text-success" : e.seguiu_regra === false ? "text-loss" : "text-muted-foreground"
+                    e.seguiu_regra
+                      ? "text-success"
+                      : e.seguiu_regra === false
+                        ? "text-loss"
+                        : "text-muted-foreground"
                   }
                 >
-                  {e.seguiu_regra === true ? "✓ Seguiu" : e.seguiu_regra === false ? "✗ Furou" : "—"}
+                  {e.seguiu_regra === true
+                    ? "✓ Seguiu"
+                    : e.seguiu_regra === false
+                      ? "✗ Furou"
+                      : "—"}
                 </span>
                 {e.resultado !== null && (
-                  <span className={`font-mono font-semibold ${e.resultado >= 0 ? "text-success" : "text-loss"}`}>
+                  <span
+                    className={`font-mono font-semibold ${e.resultado >= 0 ? "text-success" : "text-loss"}`}
+                  >
                     R$ {Number(e.resultado).toFixed(2)}
                   </span>
                 )}
