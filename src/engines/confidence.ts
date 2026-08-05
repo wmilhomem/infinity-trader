@@ -41,7 +41,14 @@ export function computeConfidence(quote: ProviderQuote | null): ConfidenceContex
       ? "Provedor simulado (sandbox didático)"
       : quote.provider === "live"
         ? "Provedor ao vivo"
-        : "Provedor replay";
+        : quote.provider === "modelo"
+          ? "Preços modelados (sem book real)"
+          : "Provedor replay";
+
+  if (quote.provider === "modelo") {
+    score -= 10;
+    diagnostics.push("Chain modelada: prêmios calculados, não negociados");
+  }
 
   if (quote.spot <= 0) {
     score -= 40;
@@ -75,6 +82,7 @@ export function computeConfidence(quote: ProviderQuote | null): ConfidenceContex
   } else {
     let wideSpreads = 0;
     let emptyDepth = 0;
+    let depthOculta = 0;
     for (const o of book) {
       const sp = spreadPct(o.bid, o.ask);
       if (sp === null) {
@@ -82,7 +90,8 @@ export function computeConfidence(quote: ProviderQuote | null): ConfidenceContex
         continue;
       }
       if (sp > 8) wideSpreads++;
-      if (o.depthBid <= 0 || o.depthAsk <= 0) emptyDepth++;
+      if (o.depthBid === 0 || o.depthAsk === 0) emptyDepth++;
+      else if (o.depthBid === undefined || o.depthAsk === undefined) depthOculta++;
     }
     if (wideSpreads > 0) {
       score -= Math.min(30, wideSpreads * 10);
@@ -95,6 +104,10 @@ export function computeConfidence(quote: ProviderQuote | null): ConfidenceContex
       diagnostics.push(
         `Book vazio em ${emptyDepth} ${emptyDepth === 1 ? "contrato" : "contratos"}`,
       );
+    }
+    if (depthOculta === book.length) {
+      score -= 10;
+      diagnostics.push("Profundidade do book não exposta pelo provedor");
     }
   }
 

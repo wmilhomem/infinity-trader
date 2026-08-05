@@ -55,6 +55,7 @@ import { osBus, runSimulationPipeline } from "@/engines/bus";
 import { buildOmniscientContext } from "@/engines/omniscient-context";
 import { MockProvider, LiveProvider, ReplayProvider } from "@/market/providers";
 import type { MarketDataProvider, ProviderQuote } from "@/market/providers";
+import { HttpGateway } from "@/market/http-gateway";
 import type { DiaryEntry } from "@/engines/types";
 import { DecisionCards } from "@/components/simulador/DecisionCards";
 import { CenarioTempo } from "@/components/simulador/CenarioTempo";
@@ -128,10 +129,6 @@ const PRESET_LABEL: Record<string, string> = {
   "put-sozinha": "Compra de put",
   "iron-condor": "Iron condor",
 };
-
-// A UI consome o Mock Provider no sandbox (dados didáticos, auditados pelo
-// Confidence Engine). O Live Provider assume no Eixo 3 sem tocar em nada disso.
-const mercado: MarketDataProvider = new MockProvider();
 
 type Crenca = "subir" | "cair" | "lateral" | "aprender";
 type Forca = "pouco" | "medio" | "muito";
@@ -426,7 +423,15 @@ function Simulador() {
 
   const [contexto, setContexto] = useState<DecisionContext | null>(null);
   const [quote, setQuote] = useState<ProviderQuote | null>(null);
+  const [fonte, setFonte] = useState<"mock" | "live">("mock");
   const inputRef = useRef<DecisionContextInput | null>(null);
+
+  // Sandbox = dados didáticos (mock); B3 ao vivo = mercado real via /api/market.
+  // Qualquer fonte passa pela auditoria do Confidence Engine (sinal DADOS).
+  const mercado = useMemo<MarketDataProvider>(
+    () => (fonte === "mock" ? new MockProvider() : new LiveProvider(new HttpGateway())),
+    [fonte],
+  );
 
   // A UI emite intenções; o Bus orquestra a cascata:
   // Pricing → Greeks → Volatility → Behavior → Decision.
@@ -467,7 +472,20 @@ function Simulador() {
     return () => {
       vivo = false;
     };
-  }, [ativo, centro]);
+  }, [ativo, centro, fonte, mercado]);
+
+  // B3 ao vivo: o simulador ancora no mercado real (spot e IV observados).
+  useEffect(() => {
+    if (fonte !== "live" || !quote) return;
+    const spotAlvo = quote.spot;
+    const ivAlvo = quote.ivAtm;
+    if (spotAlvo > 0)
+      setCentro((prev) =>
+        Math.abs(spotAlvo - prev) > 0.001 ? Math.round(spotAlvo * 100) / 100 : prev,
+      );
+    if (ivAlvo !== null && ivAlvo > 0)
+      setIv((prev) => (Math.abs(ivAlvo - prev) > 0.5 ? Math.round(ivAlvo * 100) / 100 : prev));
+  }, [fonte, quote]);
 
   useEffect(() => {
     inputRef.current = {
@@ -698,6 +716,42 @@ function Simulador() {
                 <GraficoEducativo pernas={pernas} centro={centro} ativo={ativo} leitura={leitura} />
 
                 {contexto && <OsStatusBar contexto={contexto} />}
+
+                <div className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-4">
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                      Fonte de dados
+                    </div>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      {fonte === "mock"
+                        ? "Sandbox didático: cenários estáveis para aprender sem surpresas."
+                        : "B3 ao vivo: spot e volatilidade reais; book real quando a fonte expõe, chain modelada com transparência."}{" "}
+                      O sinal DADOS mostra o veredito da auditoria.
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 rounded-xl border border-border bg-background p-0.5 text-xs font-medium">
+                    <button
+                      onClick={() => setFonte("mock")}
+                      className={`rounded-lg px-3 py-1.5 transition-colors ${
+                        fonte === "mock"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Sandbox
+                    </button>
+                    <button
+                      onClick={() => setFonte("live")}
+                      className={`rounded-lg px-3 py-1.5 transition-colors ${
+                        fonte === "live"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      B3 ao vivo
+                    </button>
+                  </div>
+                </div>
 
                 {contexto && <DecisionCards contexto={contexto} alertas={alertas} />}
 

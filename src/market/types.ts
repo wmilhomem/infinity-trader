@@ -3,6 +3,7 @@ export type Asset = {
   name: string;
   price: number;
   lastUpdate: Date;
+  ivRank?: number; // Percentil 0-100 da volatilidade atual no histórico do ativo
 };
 
 export type OptionGreeks = {

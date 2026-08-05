@@ -1,11 +1,13 @@
-import type { 
-  Asset, 
-  OptionContract, 
-  OptionChain, 
-  CorporateEvent, 
+import type {
+  Asset,
+  OptionContract,
+  OptionChain,
+  CorporateEvent,
   MarketCalendar,
-  YieldCurve
+  YieldCurve,
 } from "./types";
+
+type Raw = Record<string, unknown>;
 
 /**
  * Normalizer
@@ -13,70 +15,85 @@ import type {
  * de dados externos para nossos objetos internos imutáveis.
  */
 export class MarketNormalizer {
-  static normalizeAsset(raw: any): Asset {
+  static normalizeAsset(raw: unknown): Asset {
+    const r = (raw ?? {}) as Raw;
+    const ivRank = Number(r.ivRank ?? null);
     return {
-      ticker: String(raw?.ticker || raw?.symbol || ""),
-      name: String(raw?.name || raw?.companyName || ""),
-      price: Number(raw?.price || raw?.last || 0),
-      lastUpdate: new Date(raw?.timestamp || raw?.lastUpdate || Date.now()),
+      ticker: String(r.ticker || r.symbol || ""),
+      name: String(r.name || r.companyName || ""),
+      price: Number(r.price || r.last || 0),
+      lastUpdate: new Date(Number(r.timestamp || r.lastUpdate) || Date.now()),
+      ivRank: Number.isFinite(ivRank) && ivRank >= 0 ? ivRank : undefined,
     };
   }
 
-  static normalizeOptionContract(raw: any, underlying: string): OptionContract {
-    const rawType = String(raw?.type || raw?.right || "").toLowerCase();
+  static normalizeOptionContract(raw: unknown, underlying: string): OptionContract {
+    const r = (raw ?? {}) as Raw;
+    const rawType = String(r.type || r.right || "").toLowerCase();
     const isCall = rawType === "call" || rawType === "c";
+    const g = (r.greeks ?? undefined) as Raw | undefined;
     return {
-      ticker: String(raw?.ticker || raw?.symbol || ""),
+      ticker: String(r.ticker || r.symbol || ""),
       underlying,
       type: isCall ? "call" : "put",
-      strike: Number(raw?.strike || raw?.strikePrice || 0),
-      expiration: new Date(raw?.expiration || raw?.maturity || Date.now()),
-      bid: Number(raw?.bid || 0),
-      ask: Number(raw?.ask || 0),
-      last: Number(raw?.last || raw?.price || 0),
-      greeks: raw?.greeks ? {
-        delta: Number(raw.greeks.delta || 0),
-        gamma: Number(raw.greeks.gamma || 0),
-        theta: Number(raw.greeks.theta || 0),
-        vega: Number(raw.greeks.vega || 0),
-        rho: Number(raw.greeks.rho || 0),
-        impliedVolatility: Number(raw.greeks.impliedVolatility || raw.greeks.iv || 0),
-      } : undefined
+      strike: Number(r.strike || r.strikePrice || 0),
+      expiration: new Date(Number(r.expiration || r.maturity) || Date.now()),
+      bid: Number(r.bid || 0),
+      ask: Number(r.ask || 0),
+      last: Number(r.last || r.price || 0),
+      greeks: g
+        ? {
+            delta: Number(g.delta || 0),
+            gamma: Number(g.gamma || 0),
+            theta: Number(g.theta || 0),
+            vega: Number(g.vega || 0),
+            rho: Number(g.rho || 0),
+            impliedVolatility: Number(g.impliedVolatility || g.iv || 0),
+          }
+        : undefined,
     };
   }
 
-  static normalizeOptionChain(raw: any): OptionChain {
-    const underlying = String(raw?.underlying || raw?.symbol || "");
-    const rawContracts = Array.isArray(raw?.contracts || raw?.options) 
-      ? (raw.contracts || raw.options) 
-      : [];
-      
+  static normalizeOptionChain(raw: unknown): OptionChain {
+    const r = (raw ?? {}) as Raw;
+    const underlying = String(r.underlying || r.symbol || "");
+    const listaRaw = r.contracts || r.options;
+    const rawContracts: unknown[] = Array.isArray(listaRaw) ? listaRaw : [];
+
     return {
       underlying,
-      contracts: rawContracts.map((c: any) => this.normalizeOptionContract(c, underlying)),
-      lastUpdate: new Date(raw?.timestamp || Date.now())
+      contracts: rawContracts.map((c: unknown) => this.normalizeOptionContract(c, underlying)),
+      lastUpdate: new Date(Number(r.timestamp) || Date.now()),
     };
   }
 
-  static normalizeDICurve(rawArray: any[]): YieldCurve {
+  static normalizeDICurve(rawArray: unknown[]): YieldCurve {
     if (!Array.isArray(rawArray)) return { points: [], baseDate: new Date() };
     return {
       baseDate: new Date(),
-      points: rawArray.map(r => ({
-        days: Number(r?.days || r?.du || 0),
-        rate: Number(r?.rate || r?.taxa || 0)
-      })).sort((a, b) => a.days - b.days)
+      points: rawArray
+        .map((p) => {
+          const r = (p ?? {}) as Raw;
+          return {
+            days: Number(r.days || r.du || 0),
+            rate: Number(r.rate || r.taxa || 0),
+          };
+        })
+        .sort((a, b) => a.days - b.days),
     };
   }
 
-  static normalizeCorporateEvents(rawArray: any[]): CorporateEvent[] {
+  static normalizeCorporateEvents(rawArray: unknown[]): CorporateEvent[] {
     if (!Array.isArray(rawArray)) return [];
-    return rawArray.map(raw => ({
-      ticker: String(raw?.ticker || ""),
-      type: raw?.type === "DIVIDEND" ? "dividendo" : "outro",
-      valueOrRatio: Number(raw?.value || raw?.ratio || 0),
-      exDate: new Date(raw?.exDate || Date.now()),
-      paymentDate: raw?.paymentDate ? new Date(raw.paymentDate) : undefined,
-    }));
+    return rawArray.map((raw) => {
+      const r = (raw ?? {}) as Raw;
+      return {
+        ticker: String(r.ticker || ""),
+        type: r.type === "DIVIDEND" ? "dividendo" : "outro",
+        valueOrRatio: Number(r.value || r.ratio || 0),
+        exDate: new Date(Number(r.exDate) || Date.now()),
+        paymentDate: r.paymentDate ? new Date(Number(r.paymentDate)) : undefined,
+      };
+    });
   }
 }

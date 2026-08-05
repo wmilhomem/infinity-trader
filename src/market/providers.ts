@@ -9,7 +9,7 @@ import { MarketNormalizer } from "./normalizer";
  * Replay (histórico). O Confidence Engine audita o que sair daqui.
  */
 export type ProviderQuote = {
-  provider: "mock" | "live" | "replay";
+  provider: "mock" | "live" | "replay" | "modelo";
   ativo: string;
   spot: number;
   spotAgeMs: number;
@@ -21,8 +21,8 @@ export type ProviderQuote = {
     tipo: "call" | "put";
     bid: number;
     ask: number;
-    depthBid: number;
-    depthAsk: number;
+    depthBid?: number; // undefined = provedor não expõe profundidade
+    depthAsk?: number;
   }[];
   eventsImminent: boolean;
   quoteTime: string;
@@ -86,7 +86,9 @@ export class MockProvider implements MarketDataProvider {
 
 /**
  * LIVE PROVIDER — ponte para o gateway externo (Eixo 3: B3).
- * Hoje apenas normaliza o que o gateway mock devolve — a anatomia já existe.
+ * Normaliza o que o gateway entrega e marca a fonte com honestidade:
+ * book real (yahoo) → "live"; chain modelada sobre spot real → "modelo"
+ * (o Confidence Engine audita qualquer uma delas).
  */
 export class LiveProvider implements MarketDataProvider {
   readonly name = "live";
@@ -111,20 +113,18 @@ export class LiveProvider implements MarketDataProvider {
       const ivAtm = ivs.length ? (ivs.reduce((s, v) => s + v, 0) / ivs.length) * 100 : null;
 
       return {
-        provider: "live",
+        provider: chainRaw?.source === "modelo" ? "modelo" : "live",
         ativo,
         spot: asset.price,
         spotAgeMs: Date.now() - asset.lastUpdate.getTime(),
         ivAtm,
-        ivRank: null, // Exige histórico — Eixo 3
+        ivRank: asset.ivRank ?? null,
         liquidityScore: contracts.length >= 8 ? "alta" : "media",
         optionBook: contracts.map((c) => ({
           strike: c.strike,
           tipo: c.type,
           bid: c.bid,
           ask: c.ask,
-          depthBid: 0, // Gateway atual não expõe profundidade
-          depthAsk: 0,
         })),
         eventsImminent: false,
         quoteTime: chain.lastUpdate.toISOString(),

@@ -20,6 +20,7 @@ import { Route as AuthenticatedRevisaoRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated/simulador'
 import { Route as AuthenticatedTrilhaRouteImport } from './routes/_authenticated/trilha'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as ApiMarketRouteImport } from './routes/api/market'
 import { Route as AuthenticatedCopilotIndexRouteImport } from './routes/_authenticated/copilot.index'
 import { Route as AuthenticatedCopilotThreadIdRouteImport } from './routes/_authenticated/copilot.$threadId'
 import { Route as AuthenticatedLicaoSlugRouteImport } from './routes/_authenticated/licao.$slug'
@@ -78,6 +79,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMarketRoute = ApiMarketRouteImport.update({
+  id: '/api/market',
+  path: '/api/market',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedCopilotIndexRoute =
   AuthenticatedCopilotIndexRouteImport.update({
     id: '/copilot/',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/simulador': typeof AuthenticatedSimuladorRoute
   '/trilha': typeof AuthenticatedTrilhaRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/market': typeof ApiMarketRoute
   '/copilot/$threadId': typeof AuthenticatedCopilotThreadIdRoute
   '/licao/$slug': typeof AuthenticatedLicaoSlugRoute
   '/copilot/': typeof AuthenticatedCopilotIndexRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/simulador': typeof AuthenticatedSimuladorRoute
   '/trilha': typeof AuthenticatedTrilhaRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/market': typeof ApiMarketRoute
   '/copilot/$threadId': typeof AuthenticatedCopilotThreadIdRoute
   '/licao/$slug': typeof AuthenticatedLicaoSlugRoute
   '/copilot': typeof AuthenticatedCopilotIndexRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/_authenticated/simulador': typeof AuthenticatedSimuladorRoute
   '/_authenticated/trilha': typeof AuthenticatedTrilhaRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/market': typeof ApiMarketRoute
   '/_authenticated/copilot/$threadId': typeof AuthenticatedCopilotThreadIdRoute
   '/_authenticated/licao/$slug': typeof AuthenticatedLicaoSlugRoute
   '/_authenticated/copilot/': typeof AuthenticatedCopilotIndexRoute
@@ -156,6 +165,7 @@ export interface FileRouteTypes {
     | '/simulador'
     | '/trilha'
     | '/api/chat'
+    | '/api/market'
     | '/copilot/$threadId'
     | '/licao/$slug'
     | '/copilot/'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/simulador'
     | '/trilha'
     | '/api/chat'
+    | '/api/market'
     | '/copilot/$threadId'
     | '/licao/$slug'
     | '/copilot'
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/_authenticated/simulador'
     | '/_authenticated/trilha'
     | '/api/chat'
+    | '/api/market'
     | '/_authenticated/copilot/$threadId'
     | '/_authenticated/licao/$slug'
     | '/_authenticated/copilot/'
@@ -197,6 +209,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiMarketRoute: typeof ApiMarketRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -278,6 +291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/market': {
+      id: '/api/market'
+      path: '/api/market'
+      fullPath: '/api/market'
+      preLoaderRoute: typeof ApiMarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/copilot/': {
       id: '/_authenticated/copilot/'
       path: '/copilot'
@@ -336,6 +356,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiMarketRoute: ApiMarketRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
