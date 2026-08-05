@@ -1,7 +1,4 @@
-import type { Perna } from "@/lib/payoff";
-import type { Alerta } from "./rule-engine";
-import type { Interpretacao } from "./simulation-interpreter";
-import type { PositionIntelligence } from "./position-intelligence";
+import type { DecisionContext } from "./decision-context";
 
 // ==========================================
 // OMNISCIENT CONTEXT — CONTEXTO ESTRUTURADO DO COPILOT
@@ -9,6 +6,7 @@ import type { PositionIntelligence } from "./position-intelligence";
 // O que o copilot precisa saber sobre a simulação do usuário, em fatos
 // estruturados — NUNCA como síntese em prosa. O modelo lê os números e
 // as respostas das 5 perguntas e explica a mecânica com a voz do tutor.
+// É extraído 1:1 do DecisionContext — o copilot verbaliza a moeda do sistema.
 //
 // Blocos `mercado` e `portfolio` são propositalmente nulos nesta fase
 // (Eixo 3 preenche com dados B3). O que não foi observado é null — nunca chute.
@@ -58,84 +56,58 @@ function brl(v: number) {
   return `R$ ${v.toFixed(2)}`;
 }
 
-/** Monta o contexto estruturado da simulação no instante da thread. */
-export function buildOmniscientContext(params: {
-  pernas: Perna[];
-  centro: number;
-  ativo: string;
-  interpretacao: Interpretacao | null;
-  intel: PositionIntelligence;
-  score: number;
-  leitura: string;
-  alertas: Alerta[];
-  disciplinaHistorica: number;
-}): OmniscientContext {
-  const {
-    pernas,
-    centro,
-    ativo,
-    interpretacao,
-    intel,
-    score,
-    leitura,
-    alertas,
-    disciplinaHistorica,
-  } = params;
-
-  const estrategia = interpretacao
-    ? {
-        ativo,
-        estrutura: interpretacao.nome,
-        precoReferencia: centro,
-        objetivoLabel: interpretacao.objetivoLabel,
-        breakevens: interpretacao.breakevens,
-        lucroMax: interpretacao.lucroMax,
-        perdaMax: interpretacao.perdaMax,
-        capitalEmRisco: interpretacao.capitalEmRisco,
-      }
-    : null;
+/** Extrai o contexto estruturado do copilot a partir do DecisionContext. */
+export function buildOmniscientContext(ctx: DecisionContext): OmniscientContext {
+  const t = ctx.technical;
+  const c = ctx.cognitive;
+  const inter = t.strategy.interpretacao;
 
   return {
     version: 1,
     origem: "simulacao",
-    captured_at: new Date().toISOString(),
-    estrategia,
+    captured_at: ctx.captured_at,
+    estrategia: {
+      ativo: t.ativo,
+      estrutura: inter.nome,
+      precoReferencia: t.pricing.spot,
+      objetivoLabel: inter.objetivoLabel,
+      breakevens: inter.breakevens,
+      lucroMax: inter.lucroMax,
+      perdaMax: inter.perdaMax,
+      capitalEmRisco: inter.capitalEmRisco,
+    },
     gregas: {
-      dias: intel.dias,
-      iv: intel.iv,
-      delta: intel.netDeltaContratos,
-      reagePorR1: intel.netDeltaContratos * 100,
-      gamma: intel.netGammaContratos,
-      thetaPorDia: intel.netThetaPorDia,
-      vegaPorPonto: intel.netVegaPorPonto,
-      rhoPorPonto: intel.netRhoPorPonto,
-      tempoStatus: intel.tempo.status,
-      tempoMecanica: intel.tempo.mechanic,
+      dias: t.time.daysToMaturity,
+      iv: t.volatility.iv,
+      delta: t.greeks.netDelta,
+      reagePorR1: t.greeks.netDelta * 100,
+      gamma: t.greeks.netGamma,
+      thetaPorDia: t.greeks.netTheta,
+      vegaPorPonto: t.greeks.netVega,
+      rhoPorPonto: t.greeks.netRho,
+      tempoStatus: t.greeks.tempo.status,
+      tempoMecanica: t.greeks.tempo.mecanica,
       perguntas: [
-        intel.direcao,
-        intel.gamma,
-        intel.volatilidade,
-        intel.juros,
-        {
-          pergunta: intel.probabilidade.pergunta,
-          resposta: intel.probabilidade.resposta,
-          numerico: `PoP ${Math.round(intel.probabilidade.pop)}%`,
-        },
+        t.greeks.perguntas.direcao,
+        t.greeks.perguntas.gamma,
+        t.greeks.perguntas.volatilidade,
+        t.greeks.perguntas.juros,
+        t.greeks.perguntas.probabilidade,
       ].map((p) => ({ pergunta: p.pergunta, resposta: p.resposta, numerico: p.numerico })),
     },
     probabilidade: {
-      pop: intel.probabilidade.pop,
-      expectedMoveBrl: intel.probabilidade.expectedMoveBrl,
+      pop: t.greeks.perguntas.probabilidade.pop,
+      expectedMoveBrl: t.pricing.expectedMoveBrl,
     },
     processo: {
-      score,
-      leitura,
-      alertas: alertas.map((a) => ({
+      score: c.decisionScore.score,
+      leitura: c.decisionScore.leitura,
+      alertas: c.rules.map((a) => ({
         regra: a.regra,
         motivo: a.motivo,
         severidade: a.severidade,
       })),
-      disciplinaHistorica,
+      disciplinaHistorica: c.disciplinaHistorica,
     },
     mercado: null,
     portfolio: null,

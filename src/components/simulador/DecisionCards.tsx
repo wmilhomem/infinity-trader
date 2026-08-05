@@ -1,4 +1,4 @@
-import type { PositionIntelligence } from "@/engines/position-intelligence";
+import type { DecisionContext } from "@/engines/decision-context";
 import type { Alerta } from "@/engines/rule-engine";
 import { AlarmClock, ArrowLeftRight, Gauge, Percent, Scale, TrendingUp } from "lucide-react";
 
@@ -6,6 +6,7 @@ import { AlarmClock, ArrowLeftRight, Gauge, Percent, Scale, TrendingUp } from "l
  * OS Cards — Cartões de Decisão do Simulador.
  * A tese da plataforma: cada grega responde uma pergunta concreta; o número
  * aparece SÓ depois da resposta, como suporte — nunca como cardápio.
+ * Renderizam o DecisionContext (a moeda do sistema) — a UI nunca recalcula.
  */
 
 type CardDef = {
@@ -52,12 +53,13 @@ function tomAlerta(alerta: Alerta | undefined): CardDef["tom"] {
 }
 
 export function DecisionCards({
-  intel,
+  contexto,
   alertas,
 }: {
-  intel: PositionIntelligence;
+  contexto: DecisionContext;
   alertas: Alerta[];
 }) {
+  const g = contexto.technical.greeks;
   const critico = alertas.find((a) => a.severidade === "critico");
   const aviso = alertas.find((a) => a.severidade === "aviso");
 
@@ -67,48 +69,48 @@ export function DecisionCards({
       titulo: "Tempo",
       pergunta: "Theta — o tempo trabalha a favor ou contra mim?",
       resposta:
-        `${intel.tempo.mechanic} ${intel.tempo.timeContext} ${intel.tempo.ruleAlert ? `(${intel.tempo.ruleAlert})` : ""}`.trim(),
-      numerico: `Status: ${intel.tempo.status} · Θ ${intel.netThetaPorDia.toFixed(2)}/dia`,
-      tom: tomTempo(intel.tempo.status),
+        `${g.tempo.mecanica} ${g.tempo.timeContext} ${g.tempo.ruleAlert ? `(${g.tempo.ruleAlert})` : ""}`.trim(),
+      numerico: `Status: ${g.tempo.status} · Θ ${g.netTheta.toFixed(2)}/dia`,
+      tom: tomTempo(g.tempo.status),
     },
     {
       icone: TrendingUp,
       titulo: "Direção",
-      pergunta: intel.direcao.pergunta,
-      resposta: intel.direcao.resposta,
-      numerico: intel.direcao.numerico,
+      pergunta: g.perguntas.direcao.pergunta,
+      resposta: g.perguntas.direcao.resposta,
+      numerico: g.perguntas.direcao.numerico,
       tom: "neutro",
     },
     {
       icone: Gauge,
       titulo: "Sensibilidade",
-      pergunta: intel.gamma.pergunta,
-      resposta: intel.gamma.resposta,
-      numerico: intel.gamma.numerico,
+      pergunta: g.perguntas.gamma.pergunta,
+      resposta: g.perguntas.gamma.resposta,
+      numerico: g.perguntas.gamma.numerico,
       tom: "neutro",
     },
     {
       icone: Percent,
       titulo: "Volatilidade",
-      pergunta: intel.volatilidade.pergunta,
-      resposta: intel.volatilidade.resposta,
-      numerico: intel.volatilidade.numerico,
+      pergunta: g.perguntas.volatilidade.pergunta,
+      resposta: g.perguntas.volatilidade.resposta,
+      numerico: g.perguntas.volatilidade.numerico,
       tom: "neutro",
     },
     {
       icone: Scale,
       titulo: "Juros",
-      pergunta: intel.juros.pergunta,
-      resposta: intel.juros.resposta,
-      numerico: intel.juros.numerico,
+      pergunta: g.perguntas.juros.pergunta,
+      resposta: g.perguntas.juros.resposta,
+      numerico: g.perguntas.juros.numerico,
       tom: "neutro",
     },
     {
       icone: ArrowLeftRight,
       titulo: "Movimento esperado",
-      pergunta: intel.probabilidade.pergunta,
-      resposta: intel.probabilidade.resposta,
-      numerico: `Expected move ≈ ${intel.probabilidade.expectedMoveBrl.toFixed(2)} · PoP ${intel.probabilidade.pop.toFixed(0)}%`,
+      pergunta: g.perguntas.probabilidade.pergunta,
+      resposta: g.perguntas.probabilidade.resposta,
+      numerico: g.perguntas.probabilidade.numerico,
       tom: "neutro",
     },
   ];

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -46,7 +46,12 @@ import { interpretar } from "@/engines/simulation-interpreter";
 import { explicarRiscos } from "@/engines/risk-explainer";
 import { validarRegras, regrasQuePedemConfirmacao, type Regra } from "@/engines/rule-engine";
 import { calcularDecisionScore, disciplina } from "@/engines/decision-engine";
-import { computePositionIntelligence } from "@/engines/position-intelligence";
+import {
+  buildDecisionContext,
+  type DecisionContext,
+  type DecisionContextInput,
+} from "@/engines/decision-context";
+import { osBus, runSimulationPipeline } from "@/engines/bus";
 import { buildOmniscientContext } from "@/engines/omniscient-context";
 import type { DiaryEntry } from "@/engines/types";
 import { DecisionCards } from "@/components/simulador/DecisionCards";
@@ -412,40 +417,66 @@ function Simulador() {
 
   const checkOk = checklistEmocional.every((c) => check[c.k]);
 
-  const intel = useMemo(
-    () =>
-      computePositionIntelligence({
-        pernas,
-        centro,
-        ativo,
-        dias,
-        iv,
-        entries: (historico.data ?? []) as DiaryEntry[],
-        alertas,
-        userScoreInput: {
-          simulou: true,
-          tese,
-          checklist: Object.fromEntries(checklistEmocional.map((c) => [c.k, !!check[c.k]])),
-          alertas,
-          disciplinaHistorica,
-        },
-      }),
-    [
+  const [contexto, setContexto] = useState<DecisionContext | null>(null);
+  const inputRef = useRef<DecisionContextInput | null>(null);
+
+  // O Bus orquestra a cascata: Pricing → Greeks → Volatility → Behavior → Decision.
+  // A UI apenas escuta CONTEXT_READY e se re-renderiza com a nova moeda.
+  useEffect(() => {
+    const unsubAction = osBus.subscribeToAction((a) => {
+      if (!inputRef.current) return;
+      if (a.type === "TIME_TRAVEL_REQUESTED") {
+        runSimulationPipeline(osBus, { ...inputRef.current, dias: a.payload.targetDTE });
+      } else if (a.type === "IV_LEVEL_REQUESTED") {
+        runSimulationPipeline(osBus, { ...inputRef.current, iv: a.payload.targetIV });
+      }
+    });
+    const unsubEvent = osBus.subscribeToEvent((e) => {
+      if (e.type !== "CONTEXT_READY") return;
+      setContexto(e.payload);
+      setDias(e.payload.technical.time.daysToMaturity);
+      setIv(e.payload.technical.volatility.iv);
+    });
+    return () => {
+      unsubAction();
+      unsubEvent();
+    };
+  }, []);
+
+  useEffect(() => {
+    inputRef.current = {
       pernas,
       centro,
       ativo,
       dias,
       iv,
+      entries: (historico.data ?? []) as DiaryEntry[],
       alertas,
-      tese,
-      check,
-      checklistEmocional,
-      disciplinaHistorica,
-      historico.data,
-    ],
-  );
+      userScoreInput: {
+        simulou: true,
+        tese,
+        checklist: Object.fromEntries(checklistEmocional.map((c) => [c.k, !!check[c.k]])),
+        alertas,
+        disciplinaHistorica,
+      },
+    };
+    runSimulationPipeline(osBus, inputRef.current);
+  }, [
+    pernas,
+    centro,
+    ativo,
+    dias,
+    iv,
+    alertas,
+    tese,
+    check,
+    checklistEmocional,
+    disciplinaHistorica,
+    historico.data,
+  ]);
 
   async function perguntarCopilot() {
+    if (!contexto) return;
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
     const { data, error } = await supabase
@@ -454,17 +485,7 @@ function Simulador() {
         user_id: u.user.id,
         context_type: "simulacao",
         titulo: `${leitura.nome} · ${ativo}`,
-        contexto: buildOmniscientContext({
-          pernas,
-          centro,
-          ativo,
-          interpretacao: leitura,
-          intel,
-          score: score.score,
-          leitura: score.leitura,
-          alertas,
-          disciplinaHistorica,
-        }) as unknown as Json,
+        contexto: buildOmniscientContext(contexto) as unknown as Json,
       })
       .select()
       .single();
@@ -648,7 +669,7 @@ function Simulador() {
 
                 <GraficoEducativo pernas={pernas} centro={centro} ativo={ativo} leitura={leitura} />
 
-                <DecisionCards intel={intel} alertas={alertas} />
+                {contexto && <DecisionCards contexto={contexto} alertas={alertas} />}
 
                 <CenarioTempo
                   pernas={pernas}
@@ -656,8 +677,15 @@ function Simulador() {
                   ativo={ativo}
                   dias={dias}
                   iv={iv}
-                  onDias={setDias}
-                  onIv={setIv}
+                  onDias={(d) =>
+                    osBus.dispatchAction({
+                      type: "TIME_TRAVEL_REQUESTED",
+                      payload: { targetDTE: d },
+                    })
+                  }
+                  onIv={(v) =>
+                    osBus.dispatchAction({ type: "IV_LEVEL_REQUESTED", payload: { targetIV: v } })
+                  }
                 />
 
                 <div className="rounded-2xl border border-border bg-card p-6 md:p-8">

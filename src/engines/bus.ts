@@ -16,6 +16,7 @@ export type OSEvent =
 // ===================================
 export type OSAction =
   | { type: "TIME_TRAVEL_REQUESTED"; payload: { targetDTE: number } } // Slider temporal de simulação
+  | { type: "IV_LEVEL_REQUESTED"; payload: { targetIV: number } } // Slider de volatilidade implícita
   | { type: "LEGS_UPDATED"; payload: { pernas: Perna[] } } // Mudança no Board de pernas do Simulador
   | { type: "CAPITAL_ALLOCATED"; payload: { amount: number } };
 
