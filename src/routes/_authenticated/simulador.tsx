@@ -46,7 +46,10 @@ import { interpretar } from "@/engines/simulation-interpreter";
 import { explicarRiscos } from "@/engines/risk-explainer";
 import { validarRegras, regrasQuePedemConfirmacao, type Regra } from "@/engines/rule-engine";
 import { calcularDecisionScore, disciplina } from "@/engines/decision-engine";
+import { computePositionIntelligence } from "@/engines/position-intelligence";
 import type { DiaryEntry } from "@/engines/types";
+import { DecisionCards } from "@/components/simulador/DecisionCards";
+import { CenarioTempo } from "@/components/simulador/CenarioTempo";
 
 export const Route = createFileRoute("/_authenticated/simulador")({
   head: () => ({
@@ -274,6 +277,8 @@ function Simulador() {
   const [ativo, setAtivo] = useState("PETR4");
   const [centro, setCentro] = useState(38);
   const [pernas, setPernas] = useState<Perna[]>(PRESETS["trava-alta"].pernas);
+  const [dias, setDias] = useState(45);
+  const [iv, setIv] = useState(35);
   const [tecnico, setTecnico] = useState(false);
   const [check, setCheck] = useState<Record<string, boolean>>({});
   const [confirmacoes, setConfirmacoes] = useState<Record<string, boolean>>({});
@@ -405,6 +410,39 @@ function Simulador() {
   );
 
   const checkOk = checklistEmocional.every((c) => check[c.k]);
+
+  const intel = useMemo(
+    () =>
+      computePositionIntelligence({
+        pernas,
+        centro,
+        ativo,
+        dias,
+        iv,
+        entries: (historico.data ?? []) as DiaryEntry[],
+        alertas,
+        userScoreInput: {
+          simulou: true,
+          tese,
+          checklist: Object.fromEntries(checklistEmocional.map((c) => [c.k, !!check[c.k]])),
+          alertas,
+          disciplinaHistorica,
+        },
+      }),
+    [
+      pernas,
+      centro,
+      ativo,
+      dias,
+      iv,
+      alertas,
+      tese,
+      check,
+      checklistEmocional,
+      disciplinaHistorica,
+      historico.data,
+    ],
+  );
 
   async function perguntarCopilot() {
     const { data: u } = await supabase.auth.getUser();
@@ -597,6 +635,18 @@ function Simulador() {
                 <PernasExplicadas pernas={pernas} ativo={ativo} />
 
                 <GraficoEducativo pernas={pernas} centro={centro} ativo={ativo} leitura={leitura} />
+
+                <DecisionCards intel={intel} alertas={alertas} />
+
+                <CenarioTempo
+                  pernas={pernas}
+                  centro={centro}
+                  ativo={ativo}
+                  dias={dias}
+                  iv={iv}
+                  onDias={setDias}
+                  onIv={setIv}
+                />
 
                 <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
                   <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
