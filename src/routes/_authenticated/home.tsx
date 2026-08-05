@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { LESSONS } from "@/lib/lessons";
 import { cn } from "@/lib/utils";
 import { evolucaoInvestidor, linhaDoTempo } from "@/engines/timeline";
+import { preverTamanhoPosicao } from "@/engines/behavior-forecast";
 import type { DiaryEntry } from "@/engines/types";
 import {
   Activity,
@@ -232,6 +233,9 @@ function Home() {
   const prontidaoCor =
     confianca >= 75 ? "text-success" : confianca >= 50 ? "text-primary" : "text-destructive";
 
+  // ---- Previsão de comportamento ----------------------------------------
+  const forecast = preverTamanhoPosicao(diary);
+
   // ---- Timeline ---------------------------------------------------------
   const hora = (iso: string) =>
     new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
@@ -391,6 +395,30 @@ function Home() {
           </>
         )}
       </div>
+
+      {/* Previsão de comportamento — não do mercado */}
+      {forecast && (
+        <div className="mt-4 rounded-xl border border-border bg-card p-6">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            <Radar size={13} /> Behavior Forecast
+          </div>
+          <p className="mt-3 max-w-2xl text-lg font-medium leading-relaxed">{forecast.rotulo}</p>
+          {forecast.fatores.length > 0 && (
+            <ul className="mt-3 space-y-1.5">
+              {forecast.fatores.map((f) => (
+                <li key={f.rotulo} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                  <span>{f.rotulo}</span>
+                  <span className="ml-auto shrink-0 font-mono text-[11px]">+{f.impacto}pts</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
+            {forecast.base}
+          </p>
+        </div>
+      )}
 
       {/* Sua evolução — Decision Timeline */}
       <div className="mt-4 rounded-xl border border-border bg-card p-6">

@@ -20,15 +20,15 @@ export type SnapshotCognitivoView = {
   status: string | null;
 };
 
-function num(v: unknown): number | null {
+export function num(v: unknown): number | null {
   return typeof v === "number" && Number.isFinite(v) ? v : null;
 }
 
-function txt(v: unknown): string | null {
+export function txt(v: unknown): string | null {
   return typeof v === "string" && v.trim() ? v : null;
 }
 
-function obj(v: unknown): Record<string, unknown> | null {
+export function obj(v: unknown): Record<string, unknown> | null {
   return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : null;
 }
 

@@ -617,6 +617,18 @@ function Simulador() {
 
     try {
       sessionStorage.setItem(`sim-tese:${data.id}`, JSON.stringify({ tese, checklist: respostas }));
+      if (quote) {
+        sessionStorage.setItem(
+          `sim-quote:${data.id}`,
+          JSON.stringify({
+            ivAtm: quote.ivAtm,
+            ivRank: quote.ivRank,
+            spot: quote.spot,
+            liquidityScore: quote.liquidityScore,
+            eventsImminent: quote.eventsImminent,
+          }),
+        );
+      }
     } catch {
       /* sessionStorage indisponível — o diário pede a tese novamente */
     }

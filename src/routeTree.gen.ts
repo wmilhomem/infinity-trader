@@ -24,6 +24,8 @@ import { Route as ApiMarketRouteImport } from './routes/api/market'
 import { Route as AuthenticatedCopilotIndexRouteImport } from './routes/_authenticated/copilot.index'
 import { Route as AuthenticatedCopilotThreadIdRouteImport } from './routes/_authenticated/copilot.$threadId'
 import { Route as AuthenticatedLicaoSlugRouteImport } from './routes/_authenticated/licao.$slug'
+import { Route as AuthenticatedReplayIndexRouteImport } from './routes/_authenticated/replay.index'
+import { Route as AuthenticatedReplayIdRouteImport } from './routes/_authenticated/replay.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -101,6 +103,17 @@ const AuthenticatedLicaoSlugRoute = AuthenticatedLicaoSlugRouteImport.update({
   path: '/licao/$slug',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReplayIndexRoute =
+  AuthenticatedReplayIndexRouteImport.update({
+    id: '/replay/',
+    path: '/replay/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReplayIdRoute = AuthenticatedReplayIdRouteImport.update({
+  id: '/replay/$id',
+  path: '/replay/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -116,7 +129,9 @@ export interface FileRoutesByFullPath {
   '/api/market': typeof ApiMarketRoute
   '/copilot/$threadId': typeof AuthenticatedCopilotThreadIdRoute
   '/licao/$slug': typeof AuthenticatedLicaoSlugRoute
+  '/replay/$id': typeof AuthenticatedReplayIdRoute
   '/copilot/': typeof AuthenticatedCopilotIndexRoute
+  '/replay/': typeof AuthenticatedReplayIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -132,7 +147,9 @@ export interface FileRoutesByTo {
   '/api/market': typeof ApiMarketRoute
   '/copilot/$threadId': typeof AuthenticatedCopilotThreadIdRoute
   '/licao/$slug': typeof AuthenticatedLicaoSlugRoute
+  '/replay/$id': typeof AuthenticatedReplayIdRoute
   '/copilot': typeof AuthenticatedCopilotIndexRoute
+  '/replay': typeof AuthenticatedReplayIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,7 +167,9 @@ export interface FileRoutesById {
   '/api/market': typeof ApiMarketRoute
   '/_authenticated/copilot/$threadId': typeof AuthenticatedCopilotThreadIdRoute
   '/_authenticated/licao/$slug': typeof AuthenticatedLicaoSlugRoute
+  '/_authenticated/replay/$id': typeof AuthenticatedReplayIdRoute
   '/_authenticated/copilot/': typeof AuthenticatedCopilotIndexRoute
+  '/_authenticated/replay/': typeof AuthenticatedReplayIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -168,7 +187,9 @@ export interface FileRouteTypes {
     | '/api/market'
     | '/copilot/$threadId'
     | '/licao/$slug'
+    | '/replay/$id'
     | '/copilot/'
+    | '/replay/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -184,7 +205,9 @@ export interface FileRouteTypes {
     | '/api/market'
     | '/copilot/$threadId'
     | '/licao/$slug'
+    | '/replay/$id'
     | '/copilot'
+    | '/replay'
   id:
     | '__root__'
     | '/'
@@ -201,7 +224,9 @@ export interface FileRouteTypes {
     | '/api/market'
     | '/_authenticated/copilot/$threadId'
     | '/_authenticated/licao/$slug'
+    | '/_authenticated/replay/$id'
     | '/_authenticated/copilot/'
+    | '/_authenticated/replay/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -319,6 +344,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLicaoSlugRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/replay/': {
+      id: '/_authenticated/replay/'
+      path: '/replay'
+      fullPath: '/replay/'
+      preLoaderRoute: typeof AuthenticatedReplayIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/replay/$id': {
+      id: '/_authenticated/replay/$id'
+      path: '/replay/$id'
+      fullPath: '/replay/$id'
+      preLoaderRoute: typeof AuthenticatedReplayIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -332,7 +371,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTrilhaRoute: typeof AuthenticatedTrilhaRoute
   AuthenticatedCopilotThreadIdRoute: typeof AuthenticatedCopilotThreadIdRoute
   AuthenticatedLicaoSlugRoute: typeof AuthenticatedLicaoSlugRoute
+  AuthenticatedReplayIdRoute: typeof AuthenticatedReplayIdRoute
   AuthenticatedCopilotIndexRoute: typeof AuthenticatedCopilotIndexRoute
+  AuthenticatedReplayIndexRoute: typeof AuthenticatedReplayIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -345,7 +386,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTrilhaRoute: AuthenticatedTrilhaRoute,
   AuthenticatedCopilotThreadIdRoute: AuthenticatedCopilotThreadIdRoute,
   AuthenticatedLicaoSlugRoute: AuthenticatedLicaoSlugRoute,
+  AuthenticatedReplayIdRoute: AuthenticatedReplayIdRoute,
   AuthenticatedCopilotIndexRoute: AuthenticatedCopilotIndexRoute,
+  AuthenticatedReplayIndexRoute: AuthenticatedReplayIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

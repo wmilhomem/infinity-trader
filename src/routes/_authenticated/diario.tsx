@@ -14,6 +14,7 @@ import { detectarPadroes, detectarPadroesTemporais } from "@/engines/behavior-en
 import { buildDecisionSnapshot } from "@/engines/decision-snapshot";
 import { lerSnapshotCognitivo } from "@/engines/decision-memory-reader";
 import { recomendarMissao } from "@/engines/missoes";
+import { preverTamanhoPosicao } from "@/engines/behavior-forecast";
 import type { DiaryEntry } from "@/engines/types";
 import type { Json } from "@/integrations/supabase/types";
 import { ScorePanel } from "@/components/ScorePanel";
@@ -165,6 +166,7 @@ function Diario() {
     [progresso.data],
   );
   const missao = useMemo(() => recomendarMissao(historico, doneSlugs), [historico, doneSlugs]);
+  const forecast = preverTamanhoPosicao(historico);
 
   const score = useMemo(
     () =>
@@ -256,6 +258,26 @@ function Diario() {
               status,
               resultado: resultado ? +resultado : null,
             },
+            mercado: sim
+              ? (() => {
+                  try {
+                    const raw = sessionStorage.getItem(`sim-quote:${sim}`);
+                    if (!raw) return undefined;
+                    const q = JSON.parse(raw) as Record<string, unknown>;
+                    return {
+                      ivAtm: typeof q.ivAtm === "number" ? q.ivAtm : null,
+                      ivRank: typeof q.ivRank === "number" ? q.ivRank : null,
+                      diCurveState: null,
+                      liquidityScore:
+                        typeof q.liquidityScore === "string" ? q.liquidityScore : null,
+                      eventsImminent:
+                        typeof q.eventsImminent === "boolean" ? q.eventsImminent : null,
+                    };
+                  } catch {
+                    return undefined;
+                  }
+                })()
+              : undefined,
           }) as unknown as Json,
           resultado: resultado ? +resultado : null,
           emocao: emocao || null,
@@ -463,6 +485,26 @@ function Diario() {
             </div>
           )}
 
+          {forecast && (
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+              <div className="text-xs uppercase tracking-wide text-primary">Behavior Forecast</div>
+              <p className="mt-1.5 text-sm font-medium leading-snug">{forecast.rotulo}</p>
+              {forecast.fatores.length > 0 && (
+                <ul className="mt-2 space-y-1">
+                  {forecast.fatores.map((f) => (
+                    <li
+                      key={f.rotulo}
+                      className="flex items-start gap-2 text-xs text-muted-foreground"
+                    >
+                      <span className="mt-1.5 size-1 shrink-0 rounded-full bg-primary" />
+                      <span>{f.rotulo}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
           {padroes.length > 0 && (
             <div className="rounded-lg border border-border bg-card p-4">
               <div className="text-xs uppercase text-muted-foreground">
@@ -505,7 +547,12 @@ function Diario() {
             </div>
           )}
 
-          <div className="text-xs uppercase text-muted-foreground mb-1">Histórico</div>
+          <div className="text-xs uppercase text-muted-foreground mb-1 flex items-center justify-between">
+            <span>Histórico</span>
+            <Link to="/replay" className="text-[11px] uppercase text-primary hover:underline">
+              Decision Replay →
+            </Link>
+          </div>
           {(entries.data ?? []).map((e: EntryLinha) => (
             <div key={e.id} className="rounded-md border border-border bg-card p-3 text-sm">
               <div className="flex items-center justify-between gap-2">
@@ -531,6 +578,15 @@ function Diario() {
                   >
                     {e.status}
                   </span>
+                  {memoriasPorEntrada.has(e.id) && (
+                    <Link
+                      to="/replay/$id"
+                      params={{ id: e.id }}
+                      className="text-[10px] uppercase text-muted-foreground hover:text-primary"
+                    >
+                      replay
+                    </Link>
+                  )}
                 </div>
               </div>
               {e.motivo && <div className="mt-1 text-xs text-muted-foreground">{e.motivo}</div>}
