@@ -53,6 +53,8 @@ import {
 } from "@/engines/decision-context";
 import { osBus, runSimulationPipeline } from "@/engines/bus";
 import { buildOmniscientContext } from "@/engines/omniscient-context";
+import { MockProvider, LiveProvider, ReplayProvider } from "@/market/providers";
+import type { MarketDataProvider, ProviderQuote } from "@/market/providers";
 import type { DiaryEntry } from "@/engines/types";
 import { DecisionCards } from "@/components/simulador/DecisionCards";
 import { CenarioTempo } from "@/components/simulador/CenarioTempo";
@@ -126,6 +128,10 @@ const PRESET_LABEL: Record<string, string> = {
   "put-sozinha": "Compra de put",
   "iron-condor": "Iron condor",
 };
+
+// A UI consome o Mock Provider no sandbox (dados didáticos, auditados pelo
+// Confidence Engine). O Live Provider assume no Eixo 3 sem tocar em nada disso.
+const mercado: MarketDataProvider = new MockProvider();
 
 type Crenca = "subir" | "cair" | "lateral" | "aprender";
 type Forca = "pouco" | "medio" | "muito";
@@ -419,6 +425,7 @@ function Simulador() {
   const checkOk = checklistEmocional.every((c) => check[c.k]);
 
   const [contexto, setContexto] = useState<DecisionContext | null>(null);
+  const [quote, setQuote] = useState<ProviderQuote | null>(null);
   const inputRef = useRef<DecisionContextInput | null>(null);
 
   // A UI emite intenções; o Bus orquestra a cascata:
@@ -451,6 +458,17 @@ function Simulador() {
     };
   }, []);
 
+  // Observação de mercado: o provedor entrega o quote e o pipeline o audita.
+  useEffect(() => {
+    let vivo = true;
+    mercado.fetchQuote(ativo).then((q) => {
+      if (vivo) setQuote(q);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, [ativo, centro]);
+
   useEffect(() => {
     inputRef.current = {
       pernas,
@@ -458,6 +476,7 @@ function Simulador() {
       ativo,
       dias,
       iv,
+      quote,
       entries: (historico.data ?? []) as DiaryEntry[],
       alertas,
       userScoreInput: {
@@ -475,6 +494,7 @@ function Simulador() {
     ativo,
     dias,
     iv,
+    quote,
     alertas,
     tese,
     check,

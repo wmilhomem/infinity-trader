@@ -13,19 +13,11 @@ import type { Perna } from "@/lib/payoff";
 import type { DiaryEntry } from "./types";
 import type { Interpretacao } from "./simulation-interpreter";
 import type { LegGreeks } from "./position-intelligence";
+import type { ProviderQuote } from "@/market/providers";
+import type { ConfidenceContext } from "./confidence";
+import { computeConfidence } from "./confidence";
 import { interpretar } from "./simulation-interpreter";
 import { computePositionIntelligence } from "./position-intelligence";
-
-/**
- * Auditabilidade de Dados (Confidence Engine Outputs)
- * Ex: 97% (Mercado saudável) vs 42% (Volume pífio, Spread largo)
- * Nulo enquanto o Eixo 3 (Gateway B3) não fornecer dados reais de mercado.
- */
-export type ConfidenceContext = {
-  score: number;
-  isReliable: boolean;
-  diagnostics: string[]; // Ex: ["Spread de 12% detectado", "Book de ofertas vazio"]
-};
 
 export type PerguntaResposta = {
   pergunta: string;
@@ -111,12 +103,14 @@ export type DecisionContextInput = {
   entries: DiaryEntry[];
   alertas: Alerta[];
   userScoreInput: Omit<ScoreInput, "interpretacao">;
+  quote?: ProviderQuote | null; // Observação de mercado do provedor (Confidence Engine)
 };
 
 /**
  * Monta o DecisionContext (a moeda do sistema) no instante atual.
  * Tudo flui do Position Intelligence + interpretador — nenhum motor roda solto.
- * `market`, `portfolio` e `confidence` ficam null até o Eixo 3.
+ * `market` e `portfolio` ficam null até o Eixo 3; `confidence` é auditado
+ * pelo Confidence Engine sempre que houver quote de provedor.
  */
 export function buildDecisionContext(input: DecisionContextInput): DecisionContext {
   const intel = computePositionIntelligence(input);
@@ -193,7 +187,7 @@ export function buildDecisionContext(input: DecisionContextInput): DecisionConte
       playbook: inter.acompanhar,
       narrative: intel.synthesis,
       disciplinaHistorica: input.userScoreInput.disciplinaHistorica,
-      confidence: null, // Confidence Engine (sprint posterior, pré-requisito Eixo 3)
+      confidence: computeConfidence(input.quote ?? null),
     },
   };
 }

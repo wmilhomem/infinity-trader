@@ -3,10 +3,11 @@ import { Gauge } from "lucide-react";
 
 /**
  * OS Status Bar — o painel de sinais do Sistema Operacional.
- * Deriva 3 sinais do DecisionContext (a moeda) — a UI não recalcula nada:
+ * Deriva 4 sinais do DecisionContext (a moeda) — a UI não recalcula nada:
  * - ESTRUTURA 🟢/🟡/🔴 — coerência da montagem com o clima de volatilidade
  * - TEMPO 🟢/🟡/🔴 — janela temporal (Theta) da estrutura
  * - RISCO 🟢/🟡/🔴 — alertas de regra + perfil de risco da estrutura
+ * - DADOS 🟢/🟡/🔴 — Confidence Engine: qualidade da observação de mercado
  */
 
 type Sinal = { rotulo: string; status: "🟢" | "🟡" | "🔴"; detalhe: string };
@@ -94,15 +95,41 @@ export function OsStatusBar({ contexto }: { contexto: DecisionContext }) {
           detalhe: `Perfil ${t.strategy.interpretacao.risco} · nenhuma regra quebrada.`,
         };
 
+  const conf = c.confidence;
+  const dados: Sinal = !conf
+    ? {
+        rotulo: "Dados",
+        status: "🔴",
+        detalhe: "Confidence Engine sem observação de mercado.",
+      }
+    : conf.isReliable
+      ? {
+          rotulo: "Dados",
+          status: "🟢",
+          detalhe: `Confiança ${conf.score}% · ${conf.diagnostics[0]?.toLowerCase() ?? "mercado saudável"}.`,
+        }
+      : conf.score >= 30
+        ? {
+            rotulo: "Dados",
+            status: "🟡",
+            detalhe: `Confiança ${conf.score}% · ${conf.diagnostics[0]?.toLowerCase() ?? "dados degradados"}.`,
+          }
+        : {
+            rotulo: "Dados",
+            status: "🔴",
+            detalhe: `Confiança ${conf.score}% · ${conf.diagnostics[0]?.toLowerCase() ?? "dados não confiáveis"}.`,
+          };
+
   return (
     <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
       <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
         <Gauge size={14} className="text-primary" /> Sinais do sistema
       </div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <SinalCard sinal={estrutura} />
         <SinalCard sinal={tempo} />
         <SinalCard sinal={risco} />
+        <SinalCard sinal={dados} />
       </div>
     </div>
   );

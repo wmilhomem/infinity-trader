@@ -90,6 +90,15 @@ export function runSimulationPipeline(
       payload: { dailyBleed: ctx.technical.greeks.netTheta },
     });
   }
+  if (ctx.cognitive.confidence && !ctx.cognitive.confidence.isReliable) {
+    bus.publishEvent({
+      type: "CONFIDENCE_DEGRADED",
+      payload: {
+        score: ctx.cognitive.confidence.score,
+        reason: ctx.cognitive.confidence.diagnostics[0] ?? "Dados de mercado de baixa qualidade",
+      },
+    });
+  }
 
   return ctx;
 }
