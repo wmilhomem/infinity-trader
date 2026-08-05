@@ -116,6 +116,7 @@ export type Database = {
         Row: {
           context_ref: string | null
           context_type: string
+          contexto: Json | null
           created_at: string
           id: string
           titulo: string
@@ -125,6 +126,7 @@ export type Database = {
         Insert: {
           context_ref?: string | null
           context_type?: string
+          contexto?: Json | null
           created_at?: string
           id?: string
           titulo?: string
@@ -134,6 +136,7 @@ export type Database = {
         Update: {
           context_ref?: string | null
           context_type?: string
+          contexto?: Json | null
           created_at?: string
           id?: string
           titulo?: string

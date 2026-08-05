@@ -1,6 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import {
+  formatOmniscientContextForPrompt,
+  type OmniscientContext,
+} from "@/engines/omniscient-context";
 
 type Body = { threadId: string; messages: { role: "user" | "assistant"; content: string }[] };
 
@@ -67,7 +71,7 @@ export const Route = createFileRoute("/api/chat")({
             .limit(10),
           supabaseUser
             .from("chat_threads")
-            .select("id,user_id,context_type")
+            .select("id,user_id,context_type,contexto")
             .eq("id", body.threadId)
             .maybeSingle(),
         ]);
@@ -88,13 +92,23 @@ export const Route = createFileRoute("/api/chat")({
 
         const contextBlock = `\n\n===\nREGRAS PESSOAIS DO USUÁRIO:\n${rulesText}\n\nÚLTIMAS 10 DECISÕES DO DIÁRIO:\n${diaryText}\n===\n`;
 
+        const omniscient = formatOmniscientContextForPrompt(
+          threadRes.data.contexto as unknown as OmniscientContext | null,
+        );
+        const contextualSystem =
+          SYSTEM_PROMPT +
+          contextBlock +
+          (omniscient
+            ? `\n\nQUANDO O USUÁRIO PERGUNTAR SOBRE ESTA SIMULAÇÃO:\n- Use os valores do CONTEXTO abaixo (breakevens, lucro máximo, perda máxima, gregas, PoP) para explicar a mecânica — eles são hipótese didática, não dado real de mercado.\n- Explique POR QUE cada número tem aquele valor usando as analogias do guia (vale-ingresso, seguro de carro, iogurte, plano de celular, carro de corrida).\n- Se a estrutura violar uma regra pessoal do usuário ou gerar alerta, aponte de forma direta e educativa.\n\n${omniscient}\n`
+            : "");
+
         const gateway = createLovableAiGatewayProvider(key);
         const model = gateway("google/gemini-3.6-flash");
 
         try {
           const result = await generateText({
             model,
-            system: SYSTEM_PROMPT + contextBlock,
+            system: contextualSystem,
             messages: body.messages,
           });
 

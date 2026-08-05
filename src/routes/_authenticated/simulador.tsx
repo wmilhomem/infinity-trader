@@ -47,6 +47,7 @@ import { explicarRiscos } from "@/engines/risk-explainer";
 import { validarRegras, regrasQuePedemConfirmacao, type Regra } from "@/engines/rule-engine";
 import { calcularDecisionScore, disciplina } from "@/engines/decision-engine";
 import { computePositionIntelligence } from "@/engines/position-intelligence";
+import { buildOmniscientContext } from "@/engines/omniscient-context";
 import type { DiaryEntry } from "@/engines/types";
 import { DecisionCards } from "@/components/simulador/DecisionCards";
 import { CenarioTempo } from "@/components/simulador/CenarioTempo";
@@ -453,6 +454,17 @@ function Simulador() {
         user_id: u.user.id,
         context_type: "simulacao",
         titulo: `${leitura.nome} · ${ativo}`,
+        contexto: buildOmniscientContext({
+          pernas,
+          centro,
+          ativo,
+          interpretacao: leitura,
+          intel,
+          score: score.score,
+          leitura: score.leitura,
+          alertas,
+          disciplinaHistorica,
+        }) as unknown as Json,
       })
       .select()
       .single();
