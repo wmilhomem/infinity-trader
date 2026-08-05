@@ -15,7 +15,27 @@ export type MetricasPeriodo = {
   checklistCompleto: number;
 };
 
-export type Delta = { label: string; atual: number; anterior: number; diff: number; unidade: "%" | "pt" | "R$" | "" };
+export type Delta = {
+  label: string;
+  atual: number;
+  anterior: number;
+  diff: number;
+  unidade: "%" | "pt" | "R$" | "";
+};
+
+export type AnaliseDisciplina = {
+  total: number;
+  comRegra: number;
+  seguiu: number;
+  furou: number;
+  pctSeguiu: number;
+  resultadoSeguiu: number;
+  resultadoFurou: number;
+  mediaSeguiu: number | null;
+  mediaFurou: number | null;
+  vencedor: "seguiu" | "furou" | "empate" | null;
+  insight: string | null;
+};
 
 export type Review = {
   periodo: Periodo;
@@ -59,7 +79,9 @@ function metricas(entries: DiaryEntry[]): MetricasPeriodo {
   const encerradas = entries.filter((e) => e.status === "encerrada" && e.resultado !== null);
   const comRegra = entries.filter((e) => e.seguiu_regra !== null);
   const comTese = entries.filter((e) => (e.motivo ?? "").trim().length >= 40);
-  const scores = entries.map((e) => e.decision_score).filter((s): s is number => typeof s === "number");
+  const scores = entries
+    .map((e) => e.decision_score)
+    .filter((s): s is number => typeof s === "number");
   const comChecklist = entries.filter((e) => {
     const c = e.checklist;
     if (!c || typeof c !== "object") return false;
@@ -72,12 +94,68 @@ function metricas(entries: DiaryEntry[]): MetricasPeriodo {
     comTese: comTese.length,
     pctTese: entries.length ? (comTese.length / entries.length) * 100 : 0,
     scoreMedio: avg(scores),
-    disciplina: comRegra.length ? (comRegra.filter((e) => e.seguiu_regra).length / comRegra.length) * 100 : 0,
+    disciplina: comRegra.length
+      ? (comRegra.filter((e) => e.seguiu_regra).length / comRegra.length) * 100
+      : 0,
     resultado: encerradas.reduce((s, e) => s + Number(e.resultado ?? 0), 0),
     winrate: encerradas.length
       ? (encerradas.filter((e) => Number(e.resultado ?? 0) > 0).length / encerradas.length) * 100
       : 0,
     checklistCompleto: entries.length ? (comChecklist.length / entries.length) * 100 : 0,
+  };
+}
+
+/**
+ * Analisa disciplina vs. resultado em TODO o histórico:
+ * quantas operações ignoraram a própria regra e o que cada caminho entregou.
+ * Este é o número que muda comportamento — não lucro, disciplina.
+ */
+export function analiseDisciplina(entries: DiaryEntry[]): AnaliseDisciplina {
+  const comRegra = entries.filter((e) => e.seguiu_regra !== null);
+  const seguiu = comRegra.filter((e) => e.seguiu_regra === true);
+  const furou = comRegra.filter((e) => e.seguiu_regra === false);
+
+  const comResultado = (arr: DiaryEntry[]) =>
+    arr.filter((e) => e.resultado !== null) as (DiaryEntry & { resultado: number })[];
+
+  const seguiuCom = comResultado(seguiu);
+  const furouCom = comResultado(furou);
+
+  const soma = (arr: (DiaryEntry & { resultado: number })[]) =>
+    arr.reduce((s, e) => s + Number(e.resultado), 0);
+
+  const resultadoSeguiu = soma(seguiuCom);
+  const resultadoFurou = soma(furouCom);
+  const mediaSeguiu = seguiuCom.length ? resultadoSeguiu / seguiuCom.length : null;
+  const mediaFurou = furouCom.length ? resultadoFurou / furouCom.length : null;
+
+  let vencedor: AnaliseDisciplina["vencedor"] = null;
+  let insight: string | null = null;
+  if (mediaSeguiu !== null && mediaFurou !== null) {
+    const diff = mediaSeguiu - mediaFurou;
+    vencedor = diff > 0.01 ? "seguiu" : diff < -0.01 ? "furou" : "empate";
+    if (vencedor === "seguiu") {
+      insight = `O problema nunca foi escolher ativos — foi quebrar disciplina. Quando você seguiu suas regras, o resultado médio foi R$ ${mediaSeguiu.toFixed(2)}; quando furou, R$ ${mediaFurou.toFixed(2)}.`;
+    } else if (vencedor === "furou") {
+      insight = `Curioso: nas suas operações registradas, furar a regra entregou resultado médio maior (R$ ${mediaFurou.toFixed(2)} contra R$ ${mediaSeguiu.toFixed(2)} seguindo). Isso quase sempre significa que a regra em si está errada — reescreva-a antes de continuar.`;
+    } else {
+      insight =
+        "Seguir ou furar a regra deu o mesmo resultado até aqui — então a regra ainda não está fazendo o trabalho dela. Toda regra precisa proteger você de um erro específico.";
+    }
+  }
+
+  return {
+    total: entries.length,
+    comRegra: comRegra.length,
+    seguiu: seguiu.length,
+    furou: furou.length,
+    pctSeguiu: comRegra.length ? (seguiu.length / comRegra.length) * 100 : 0,
+    resultadoSeguiu,
+    resultadoFurou,
+    mediaSeguiu,
+    mediaFurou,
+    vencedor,
+    insight,
   };
 }
 
@@ -106,11 +184,41 @@ export function gerarReview(entries: DiaryEntry[], periodo: Periodo, ref = new D
   const a = metricas(anteriores);
 
   const deltas: Delta[] = [
-    { label: "Disciplina", atual: m.disciplina, anterior: a.disciplina, diff: m.disciplina - a.disciplina, unidade: "%" },
-    { label: "Decision Score médio", atual: m.scoreMedio, anterior: a.scoreMedio, diff: m.scoreMedio - a.scoreMedio, unidade: "pt" },
-    { label: "Decisões com tese", atual: m.pctTese, anterior: a.pctTese, diff: m.pctTese - a.pctTese, unidade: "%" },
-    { label: "Checklist completo", atual: m.checklistCompleto, anterior: a.checklistCompleto, diff: m.checklistCompleto - a.checklistCompleto, unidade: "%" },
-    { label: "Decisões registradas", atual: m.decisoes, anterior: a.decisoes, diff: m.decisoes - a.decisoes, unidade: "" },
+    {
+      label: "Disciplina",
+      atual: m.disciplina,
+      anterior: a.disciplina,
+      diff: m.disciplina - a.disciplina,
+      unidade: "%",
+    },
+    {
+      label: "Decision Score médio",
+      atual: m.scoreMedio,
+      anterior: a.scoreMedio,
+      diff: m.scoreMedio - a.scoreMedio,
+      unidade: "pt",
+    },
+    {
+      label: "Decisões com tese",
+      atual: m.pctTese,
+      anterior: a.pctTese,
+      diff: m.pctTese - a.pctTese,
+      unidade: "%",
+    },
+    {
+      label: "Checklist completo",
+      atual: m.checklistCompleto,
+      anterior: a.checklistCompleto,
+      diff: m.checklistCompleto - a.checklistCompleto,
+      unidade: "%",
+    },
+    {
+      label: "Decisões registradas",
+      atual: m.decisoes,
+      anterior: a.decisoes,
+      diff: m.decisoes - a.decisoes,
+      unidade: "",
+    },
   ];
 
   const nome = periodo === "semana" ? "semana" : "mês";
@@ -150,15 +258,25 @@ export function gerarReview(entries: DiaryEntry[], periodo: Periodo, ref = new D
 
   const licoes: string[] = [];
   if (m.pctTese < 70 && m.decisoes > 0)
-    licoes.push("Escrever a tese antes de entrar é o que separa decisão de impulso. Você deixou de escrever em parte das operações.");
+    licoes.push(
+      "Escrever a tese antes de entrar é o que separa decisão de impulso. Você deixou de escrever em parte das operações.",
+    );
   if (m.checklistCompleto < 60 && m.decisoes > 0)
-    licoes.push("O checklist existe para pegar o que a empolgação esconde. Complete-o mesmo quando a operação parecer óbvia.");
+    licoes.push(
+      "O checklist existe para pegar o que a empolgação esconde. Complete-o mesmo quando a operação parecer óbvia.",
+    );
   if (m.disciplina < 70 && m.decisoes > 0)
-    licoes.push("Furar a própria regra com frequência significa que a regra está errada ou que você não confia nela. Reescreva ou respeite.");
+    licoes.push(
+      "Furar a própria regra com frequência significa que a regra está errada ou que você não confia nela. Reescreva ou respeite.",
+    );
   if (m.decisoes > 0 && m.encerradas === 0)
-    licoes.push("Nenhuma operação foi encerrada com resultado. Fechar o ciclo é o que gera aprendizado real.");
+    licoes.push(
+      "Nenhuma operação foi encerrada com resultado. Fechar o ciclo é o que gera aprendizado real.",
+    );
   if (m.scoreMedio >= 80 && m.disciplina >= 80)
-    licoes.push("Processo maduro nesta janela: mantenha o mesmo ritual mesmo depois de um prejuízo.");
+    licoes.push(
+      "Processo maduro nesta janela: mantenha o mesmo ritual mesmo depois de um prejuízo.",
+    );
 
   const foco =
     m.decisoes === 0

@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { LESSONS } from "@/lib/lessons";
 import { cn } from "@/lib/utils";
+import { evolucaoInvestidor, linhaDoTempo } from "@/engines/timeline";
+import type { DiaryEntry } from "@/engines/types";
 import {
   Activity,
   ArrowRight,
@@ -20,6 +22,7 @@ import {
   ScrollText,
   Sprout,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({
@@ -33,7 +36,8 @@ export const Route = createFileRoute("/_authenticated/home")({
       { property: "og:title", content: "Hoje · Zero ao Trade" },
       {
         property: "og:description",
-        content: "Uma missão por dia, sua disciplina em evolução e um copilot que pergunta antes de responder.",
+        content:
+          "Uma missão por dia, sua disciplina em evolução e um copilot que pergunta antes de responder.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -51,7 +55,11 @@ function Home() {
     queryFn: async () => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) return null;
-      const { data } = await supabase.from("profiles").select("*").eq("id", user.user.id).maybeSingle();
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.user.id)
+        .maybeSingle();
       return data;
     },
   });
@@ -64,19 +72,32 @@ function Home() {
   const rulesQ = useQuery({
     queryKey: ["rules"],
     queryFn: async () =>
-      (await supabase.from("personal_rules").select("*").eq("ativa", true).order("created_at")).data ?? [],
+      (await supabase.from("personal_rules").select("*").eq("ativa", true).order("created_at"))
+        .data ?? [],
   });
 
   const diaryQ = useQuery({
     queryKey: ["diary-recent"],
     queryFn: async () =>
-      (await supabase.from("diary_entries").select("*").order("created_at", { ascending: false }).limit(200)).data ?? [],
+      (
+        await supabase
+          .from("diary_entries")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(200)
+      ).data ?? [],
   });
 
   const simsQ = useQuery({
     queryKey: ["sims-recent"],
     queryFn: async () =>
-      (await supabase.from("simulations").select("*").order("created_at", { ascending: false }).limit(50)).data ?? [],
+      (
+        await supabase
+          .from("simulations")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(50)
+      ).data ?? [],
   });
 
   useEffect(() => {
@@ -87,7 +108,7 @@ function Home() {
 
   const progress = progressQ.data ?? [];
   const rules = rulesQ.data ?? [];
-  const diary = diaryQ.data ?? [];
+  const diary = (diaryQ.data ?? []) as unknown as DiaryEntry[];
   const sims = simsQ.data ?? [];
 
   const doneSlugs = new Set(progress.filter((p) => p.completed_at).map((p) => p.lesson_slug));
@@ -130,7 +151,12 @@ function Home() {
       min: 8,
     },
     { done: temRegras, label: "Atualizar suas regras", to: "/regras" as const, min: 3 },
-    { done: simHoje, label: "Fazer uma simulação antes de decidir", to: "/simulador" as const, min: 5 },
+    {
+      done: simHoje,
+      label: "Fazer uma simulação antes de decidir",
+      to: "/simulador" as const,
+      min: 5,
+    },
     { done: diarioHoje, label: "Escrever a tese de uma decisão", to: "/diario" as const, min: 2 },
   ];
   const pendentes = missao.filter((m) => !m.done);
@@ -139,9 +165,11 @@ function Home() {
   const tudoFeito = pendentes.length === 0;
 
   // ---- Voz do mentor ----------------------------------------------------
-  const saudacao = hoje.getHours() < 12 ? "Bom dia" : hoje.getHours() < 18 ? "Boa tarde" : "Boa noite";
+  const saudacao =
+    hoje.getHours() < 12 ? "Bom dia" : hoje.getHours() < 18 ? "Boa tarde" : "Boa noite";
   const ultimasTres = avaliadas.slice(0, 3);
-  const furouRecente = ultimasTres.length >= 2 && ultimasTres.filter((d) => !d.seguiu_regra).length >= 2;
+  const furouRecente =
+    ultimasTres.length >= 2 && ultimasTres.filter((d) => !d.seguiu_regra).length >= 2;
 
   const missaoUnica = tudoFeito
     ? "Você já fez o que precisava. O resto é paciência."
@@ -180,7 +208,11 @@ function Home() {
       texto: "Você viu o prejuízo máximo antes do mercado te mostrar.",
     });
   if (doneSlugs.size === 1)
-    marcos.push({ key: "primeira-licao", titulo: "Começou.", texto: "Uma lição vale mais que dez opiniões." });
+    marcos.push({
+      key: "primeira-licao",
+      titulo: "Começou.",
+      texto: "Uma lição vale mais que dez opiniões.",
+    });
   if (janela30.length >= 5 && (disc30 ?? 0) >= 80)
     marcos.push({
       key: "disciplina-alta",
@@ -197,10 +229,12 @@ function Home() {
     { ok: diary.some((d) => d.status === "aberta") || diarioHoje, label: "Hipótese registrada" },
   ];
   const confianca = Math.round((radar.filter((r) => r.ok).length / radar.length) * 100);
-  const prontidaoCor = confianca >= 75 ? "text-success" : confianca >= 50 ? "text-primary" : "text-destructive";
+  const prontidaoCor =
+    confianca >= 75 ? "text-success" : confianca >= 50 ? "text-primary" : "text-destructive";
 
   // ---- Timeline ---------------------------------------------------------
-  const hora = (iso: string) => new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  const hora = (iso: string) =>
+    new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
   const timeline = [
     ...progress
       .filter((p) => p.completed_at && isHoje(p.completed_at))
@@ -210,7 +244,10 @@ function Home() {
       })),
     ...sims
       .filter((s) => isHoje(s.created_at))
-      .map((s) => ({ at: s.created_at, label: `Simulação: ${s.tipo_estrategia}${s.ativo ? ` · ${s.ativo}` : ""}` })),
+      .map((s) => ({
+        at: s.created_at,
+        label: `Simulação: ${s.tipo_estrategia}${s.ativo ? ` · ${s.ativo}` : ""}`,
+      })),
     ...diary
       .filter((d) => isHoje(d.created_at))
       .map((d) => ({
@@ -239,7 +276,9 @@ function Home() {
         <p className="mt-3 max-w-xl text-lg leading-relaxed text-muted-foreground">
           {tudoFeito ? "Hoje não sobrou nenhuma missão." : "Hoje existe apenas uma missão."}
         </p>
-        <p className="mt-1 max-w-xl text-lg font-medium leading-relaxed text-foreground">{missaoUnica}</p>
+        <p className="mt-1 max-w-xl text-lg font-medium leading-relaxed text-foreground">
+          {missaoUnica}
+        </p>
         <p className="mt-3 text-sm text-muted-foreground">{fechamento}</p>
       </section>
 
@@ -279,7 +318,10 @@ function Home() {
                     {i + 1}
                   </span>
                   <span className="text-base">{m.label}</span>
-                  <ArrowRight size={14} className="ml-auto opacity-0 transition-opacity group-hover:opacity-70" />
+                  <ArrowRight
+                    size={14}
+                    className="ml-auto opacity-0 transition-opacity group-hover:opacity-70"
+                  />
                 </Link>
               </li>
             ))}
@@ -301,21 +343,33 @@ function Home() {
 
       {/* Evolução */}
       <div className="mt-4 rounded-xl border border-border bg-card p-6">
-        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Sua disciplina</div>
+        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          Sua disciplina
+        </div>
         {disciplina === null ? (
           <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground">
-            Ainda não dá para medir. No dia em que você registrar uma decisão e disser se seguiu a própria regra,
-            este número começa a existir — e ele vale mais que qualquer XP.
+            Ainda não dá para medir. No dia em que você registrar uma decisão e disser se seguiu a
+            própria regra, este número começa a existir — e ele vale mais que qualquer XP.
           </p>
         ) : evoluiu ? (
           <>
             <div className="mt-4 flex items-end gap-4">
-              <span className="font-mono text-3xl text-muted-foreground line-through decoration-1">{discAntes}%</span>
+              <span className="font-mono text-3xl text-muted-foreground line-through decoration-1">
+                {discAntes}%
+              </span>
               <ArrowUpRight
                 size={26}
-                className={cn("mb-1", (delta ?? 0) >= 0 ? "text-success" : "rotate-90 text-destructive")}
+                className={cn(
+                  "mb-1",
+                  (delta ?? 0) >= 0 ? "text-success" : "rotate-90 text-destructive",
+                )}
               />
-              <span className={cn("font-mono text-5xl font-bold", (delta ?? 0) >= 0 ? "text-success" : "text-destructive")}>
+              <span
+                className={cn(
+                  "font-mono text-5xl font-bold",
+                  (delta ?? 0) >= 0 ? "text-success" : "text-destructive",
+                )}
+              >
                 {disc30}%
               </span>
             </div>
@@ -327,11 +381,108 @@ function Home() {
           </>
         ) : (
           <>
-            <div className="mt-4 font-mono text-5xl font-bold text-primary">{disc30 ?? disciplina}%</div>
+            <div className="mt-4 font-mono text-5xl font-bold text-primary">
+              {disc30 ?? disciplina}%
+            </div>
             <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground">
-              {avaliadas.length} decisões avaliadas até aqui. Em 30 dias você vai ver esse número se mover — para cima
-              ou para baixo — e é isso que importa.
+              {avaliadas.length} decisões avaliadas até aqui. Em 30 dias você vai ver esse número se
+              mover — para cima ou para baixo — e é isso que importa.
             </p>
+          </>
+        )}
+      </div>
+
+      {/* Sua evolução — Decision Timeline */}
+      <div className="mt-4 rounded-xl border border-border bg-card p-6">
+        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <LineChart size={13} /> Seu investidor mudou
+        </div>
+        <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
+          {diary.length === 0
+            ? "A primeira decisão registrada no diário abre esta linha do tempo. É aqui que você vai ver — daqui a meses — que o processo mudou, antes do resultado mudar."
+            : diary.length < 4
+              ? "Aos poucos: são necessárias pelo menos 4 decisões para comparar o seu antes com o seu agora."
+              : "Comparando a primeira metade das suas decisões com a segunda:"}
+        </p>
+
+        {diary.length >= 4 && (
+          <>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {evolucaoInvestidor(diary).map((h) => (
+                <div key={h.chave} className="rounded-lg border border-border bg-background p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      {h.mudou ? (
+                        <Check size={14} className="shrink-0 text-success" />
+                      ) : (
+                        <span className="grid size-3.5 shrink-0 place-items-center rounded-sm border border-muted-foreground/40 text-[9px] text-transparent">
+                          ✓
+                        </span>
+                      )}
+                      <span>{h.rotulo}</span>
+                    </div>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {h.antes} →{" "}
+                      <span
+                        className={cn("font-bold", h.mudou ? "text-success" : "text-foreground")}
+                      >
+                        {h.agora}
+                      </span>
+                    </span>
+                  </div>
+                  <p className="mt-1.5 pl-[1.4rem] text-xs leading-relaxed text-muted-foreground">
+                    {h.descricao}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 border-t border-border pt-4">
+              <div className="mb-3 text-xs uppercase text-muted-foreground">Mês a mês</div>
+              <div className="space-y-2">
+                {linhaDoTempo(diary)
+                  .slice(-6)
+                  .map((m) => (
+                    <div key={m.chave} className="flex items-center gap-3 text-sm">
+                      <span className="w-20 shrink-0 text-muted-foreground">{m.rotulo}</span>
+                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+                        {m.disciplina !== null && (
+                          <div
+                            className={cn(
+                              "h-full rounded-full",
+                              m.disciplina >= 70
+                                ? "bg-success"
+                                : m.disciplina >= 40
+                                  ? "bg-primary"
+                                  : "bg-loss",
+                            )}
+                            style={{ width: `${m.disciplina}%` }}
+                          />
+                        )}
+                      </div>
+                      <span className="w-16 shrink-0 text-right font-mono text-xs">
+                        {m.decisoes} decisão{m.decisoes === 1 ? "" : "es"}
+                      </span>
+                      <span
+                        className={cn(
+                          "w-24 shrink-0 text-right font-mono text-xs",
+                          m.resultado > 0
+                            ? "text-success"
+                            : m.resultado < 0
+                              ? "text-loss"
+                              : "text-muted-foreground",
+                        )}
+                      >
+                        {m.resultado !== 0 ? `R$ ${m.resultado.toFixed(0)}` : "—"}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+              <p className="mt-3 text-[11px] text-muted-foreground">
+                Barra = % das decisões do mês que respeitaram suas próprias regras. Resultado é
+                consequência.
+              </p>
+            </div>
           </>
         )}
       </div>
@@ -380,12 +531,16 @@ function Home() {
                     <span
                       className={cn(
                         "grid size-4 place-items-center rounded-sm border text-[10px]",
-                        r.ok ? "border-success bg-success text-success-foreground" : "border-border text-transparent",
+                        r.ok
+                          ? "border-success bg-success text-success-foreground"
+                          : "border-border text-transparent",
                       )}
                     >
                       ✓
                     </span>
-                    <span className={r.ok ? "text-foreground" : "text-muted-foreground"}>{r.label}</span>
+                    <span className={r.ok ? "text-foreground" : "text-muted-foreground"}>
+                      {r.label}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -417,10 +572,34 @@ function Home() {
           </div>
 
           <div className="grid gap-3 md:grid-cols-5">
-            <Step n={1} icon={BookOpen} label="Aprender" to="/trilha" desc={`${doneSlugs.size}/${LESSONS.length} lições`} />
-            <Step n={2} icon={ScrollText} label="Definir" to="/regras" desc={`${rules.length} regras ativas`} />
-            <Step n={3} icon={Calculator} label="Simular" to="/simulador" desc={`${sims.length} simulações`} />
-            <Step n={4} icon={ClipboardList} label="Registrar" to="/diario" desc={`${diary.length} decisões`} />
+            <Step
+              n={1}
+              icon={BookOpen}
+              label="Aprender"
+              to="/trilha"
+              desc={`${doneSlugs.size}/${LESSONS.length} lições`}
+            />
+            <Step
+              n={2}
+              icon={ScrollText}
+              label="Definir"
+              to="/regras"
+              desc={`${rules.length} regras ativas`}
+            />
+            <Step
+              n={3}
+              icon={Calculator}
+              label="Simular"
+              to="/simulador"
+              desc={`${sims.length} simulações`}
+            />
+            <Step
+              n={4}
+              icon={ClipboardList}
+              label="Registrar"
+              to="/diario"
+              desc={`${diary.length} decisões`}
+            />
             <Step
               n={5}
               icon={LineChart}
@@ -443,7 +622,7 @@ function Step({
   desc,
 }: {
   n: number;
-  icon: any;
+  icon: LucideIcon;
   label: string;
   to: string;
   desc: string;

@@ -2,7 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { MessageCircle, Plus } from "lucide-react";
+import { sugestoesMentor } from "@/engines/mentor";
+import type { DiaryEntry } from "@/engines/types";
+import { ArrowRight, MessageCircle, Plus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/copilot/")({
@@ -23,6 +25,19 @@ function CopilotIndex() {
       return data ?? [];
     },
   });
+  const diary = useQuery({
+    queryKey: ["diary-mentor"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("diary_entries")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      return (data ?? []) as unknown as DiaryEntry[];
+    },
+  });
+
+  const mentor = sugestoesMentor(diary.data ?? []);
 
   async function newThread(context: string, ref?: string, titulo?: string) {
     const { data: u } = await supabase.auth.getUser();
@@ -46,9 +61,31 @@ function CopilotIndex() {
     <AppShell title="Copilot">
       <p className="mb-6 text-sm text-muted-foreground">
         Uma conversa por contexto: dúvidas de lição, análise de simulação, revisão do diário. O
-        copilot só responde com base no que foi ensinado, nas suas regras e no seu histórico —
-        nunca opina sobre uma posição real.
+        copilot só responde com base no que foi ensinado, nas suas regras e no seu histórico — nunca
+        opina sobre uma posição real.
       </p>
+
+      {mentor.length > 0 && (
+        <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-5">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary">
+            <Sparkles size={13} /> O mentor começou a conversa
+          </div>
+          <div className="mt-3 space-y-3">
+            {mentor.map((s) => (
+              <div key={s.id} className="rounded-lg border border-border bg-card p-4">
+                <div className="text-sm font-semibold">{s.titulo}</div>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{s.corpo}</p>
+                <Link
+                  to={s.to}
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+                >
+                  {s.rotulo} <ArrowRight size={12} />
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-3 md:grid-cols-3 mb-6">
         <button
@@ -73,7 +110,9 @@ function CopilotIndex() {
         >
           <MessageCircle className="text-primary" size={18} />
           <div className="mt-2 font-semibold">Revisar diário</div>
-          <div className="text-xs text-muted-foreground mt-1">Padrões do seu próprio histórico.</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            Padrões do seu próprio histórico.
+          </div>
         </button>
       </div>
 

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -10,11 +10,14 @@ import type { Perna } from "@/lib/payoff";
 import { interpretar } from "@/engines/simulation-interpreter";
 import { validarRegras, type Regra } from "@/engines/rule-engine";
 import { calcularDecisionScore, disciplina } from "@/engines/decision-engine";
-import { detectarPadroes } from "@/engines/behavior-engine";
+import { detectarPadroes, detectarPadroesTemporais } from "@/engines/behavior-engine";
 import { buildDecisionSnapshot } from "@/engines/decision-snapshot";
+import { lerSnapshotCognitivo } from "@/engines/decision-memory-reader";
+import { recomendarMissao } from "@/engines/missoes";
 import type { DiaryEntry } from "@/engines/types";
 import type { Json } from "@/integrations/supabase/types";
 import { ScorePanel } from "@/components/ScorePanel";
+import { SnapshotCognitivo } from "@/components/diario/SnapshotCognitivo";
 
 export const Route = createFileRoute("/_authenticated/diario")({
   head: () => ({
@@ -49,6 +52,10 @@ const CHECKLIST = [
 
 const EMOCOES = ["tranquilo", "confiante", "ansioso", "com pressa", "com medo", "eufórico"];
 
+type EntryLinha = DiaryEntry & {
+  personal_rules?: { texto: string; categoria: string | null } | null;
+};
+
 function Diario() {
   const { sim } = Route.useSearch();
   const qc = useQueryClient();
@@ -80,6 +87,23 @@ function Diario() {
       return data;
     },
   });
+  const memorias = useQuery({
+    queryKey: ["memorias"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("decision_memory")
+        .select("diary_entry_id, contexto, estrategia")
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+  const memoriasPorEntrada = useMemo(() => {
+    const mapa = new Map<string, Json | null>();
+    for (const m of memorias.data ?? []) {
+      if (m.diary_entry_id && !mapa.has(m.diary_entry_id)) mapa.set(m.diary_entry_id, m.contexto);
+    }
+    return mapa;
+  }, [memorias.data]);
 
   const [ativo, setAtivo] = useState("");
   const [estrutura, setEstrutura] = useState("");
@@ -130,6 +154,17 @@ function Diario() {
   const historico = (entries.data ?? []) as unknown as DiaryEntry[];
   const disciplinaHistorica = useMemo(() => disciplina(historico), [historico]);
   const padroes = useMemo(() => detectarPadroes(historico), [historico]);
+  const padroesTemporais = useMemo(() => detectarPadroesTemporais(historico), [historico]);
+
+  const progresso = useQuery({
+    queryKey: ["progress"],
+    queryFn: async () => (await supabase.from("lessons_progress").select("*")).data ?? [],
+  });
+  const doneSlugs = useMemo(
+    () => new Set((progresso.data ?? []).filter((p) => p.completed_at).map((p) => p.lesson_slug)),
+    [progresso.data],
+  );
+  const missao = useMemo(() => recomendarMissao(historico, doneSlugs), [historico, doneSlugs]);
 
   const score = useMemo(
     () =>
@@ -165,9 +200,9 @@ function Diario() {
           status,
           emocao: emocao || null,
           licao_aprendida: licao || null,
-          checklist: respostas as any,
+          checklist: respostas as Json,
           decision_score: score.score,
-          interpretacao: interpretacao as any,
+          interpretacao: interpretacao as unknown as Json,
         })
         .select()
         .single();
@@ -178,13 +213,13 @@ function Diario() {
           user_id: u.user.id,
           diary_entry_id: entry.id,
           score: score.score,
-          breakdown: { itens: score.itens, leitura: score.leitura, alertas } as any,
+          breakdown: { itens: score.itens, leitura: score.leitura, alertas } as Json,
         }),
         supabase.from("checklists").insert({
           user_id: u.user.id,
           diary_entry_id: entry.id,
           simulation_id: sim ?? null,
-          respostas: respostas as any,
+          respostas: respostas as Json,
           completo: CHECKLIST.every((c) => check[c.k]),
         }),
         supabase.from("decision_memory").insert({
@@ -231,7 +266,7 @@ function Diario() {
           tipo: "decisao",
           titulo: `Registrou ${estrutura} em ${ativo}`,
           descricao: score.leitura,
-          meta: { diary_entry_id: entry.id, score: score.score, seguiu_regra: seguiu } as any,
+          meta: { diary_entry_id: entry.id, score: score.score, seguiu_regra: seguiu } as Json,
         }),
       ]);
 
@@ -355,7 +390,7 @@ function Diario() {
               <div className="flex gap-2">
                 <select
                   value={status}
-                  onChange={(e) => setStatus(e.target.value as any)}
+                  onChange={(e) => setStatus(e.target.value as "aberta" | "encerrada")}
                   className="rounded-md border border-border bg-input px-3 py-2 text-sm"
                 >
                   <option value="aberta">Aberta</option>
@@ -406,6 +441,28 @@ function Diario() {
         </div>
 
         <div className="space-y-3">
+          {missao && (
+            <div className="rounded-lg border border-primary/40 bg-primary/10 p-4">
+              <div className="text-xs uppercase tracking-wide text-primary">
+                Nova missão disponível
+              </div>
+              <div className="mt-1 font-semibold leading-snug">{missao.titulo}</div>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                {missao.motivo}
+              </p>
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <span className="text-[11px] text-muted-foreground">Duração: {missao.duracao}</span>
+                <Link
+                  to="/licao/$slug"
+                  params={{ slug: missao.slug }}
+                  className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+                >
+                  Fazer a missão
+                </Link>
+              </div>
+            </div>
+          )}
+
           {padroes.length > 0 && (
             <div className="rounded-lg border border-border bg-card p-4">
               <div className="text-xs uppercase text-muted-foreground">
@@ -428,8 +485,28 @@ function Diario() {
             </div>
           )}
 
+          {padroesTemporais.length > 0 && (
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+              <div className="text-xs uppercase text-primary">O que o seu comportamento prevê</div>
+              <ul className="mt-2 space-y-2 text-sm">
+                {padroesTemporais.map((p) => (
+                  <li key={p.key}>
+                    <div
+                      className={
+                        p.severidade === "alerta" ? "font-medium text-loss" : "font-medium"
+                      }
+                    >
+                      {p.titulo}
+                    </div>
+                    <div className="text-xs text-muted-foreground">{p.descricao}</div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="text-xs uppercase text-muted-foreground mb-1">Histórico</div>
-          {(entries.data ?? []).map((e: any) => (
+          {(entries.data ?? []).map((e: EntryLinha) => (
             <div key={e.id} className="rounded-md border border-border bg-card p-3 text-sm">
               <div className="flex items-center justify-between gap-2">
                 <div className="font-mono font-semibold">
@@ -470,6 +547,10 @@ function Diario() {
                   “{e.licao_aprendida}”
                 </div>
               )}
+              {(() => {
+                const snap = lerSnapshotCognitivo(memoriasPorEntrada.get(e.id) ?? null);
+                return snap ? <SnapshotCognitivo snap={snap} /> : null;
+              })()}
               <div className="mt-2 flex items-center justify-between text-xs">
                 <span
                   className={

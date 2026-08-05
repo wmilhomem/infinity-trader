@@ -53,12 +53,19 @@ import {
 } from "@/engines/decision-context";
 import { osBus, runSimulationPipeline } from "@/engines/bus";
 import { buildOmniscientContext } from "@/engines/omniscient-context";
+import {
+  narrarMudanca,
+  narrarRegraQuebrada,
+  narrarThetaCritico,
+  type PassoNarrativa,
+} from "@/engines/narrator";
 import { MockProvider, LiveProvider, ReplayProvider } from "@/market/providers";
 import type { MarketDataProvider, ProviderQuote } from "@/market/providers";
 import { HttpGateway } from "@/market/http-gateway";
 import type { DiaryEntry } from "@/engines/types";
 import { DecisionCards } from "@/components/simulador/DecisionCards";
 import { CenarioTempo } from "@/components/simulador/CenarioTempo";
+import { NarrativaEstrutura } from "@/components/simulador/NarrativaEstrutura";
 import { OsStatusBar } from "@/components/simulador/OsStatusBar";
 
 export const Route = createFileRoute("/_authenticated/simulador")({
@@ -425,6 +432,22 @@ function Simulador() {
   const [quote, setQuote] = useState<ProviderQuote | null>(null);
   const [fonte, setFonte] = useState<"mock" | "live">("mock");
   const inputRef = useRef<DecisionContextInput | null>(null);
+  const [passosNarrativa, setPassosNarrativa] = useState<PassoNarrativa[]>([]);
+  const pernasRef = useRef<Perna[]>(PRESETS["trava-alta"].pernas);
+  const passosRef = useRef<PassoNarrativa[]>([]);
+
+  // O Narrator transforma cada intenção do usuário em um passo da história.
+  function appendPasso(passo: PassoNarrativa) {
+    const ultimo = passosRef.current[passosRef.current.length - 1];
+    const igual =
+      ultimo &&
+      ultimo.titulo === passo.titulo &&
+      ultimo.linhas.join("|") === passo.linhas.join("|");
+    if (igual) return;
+    const novos = [...passosRef.current, passo];
+    passosRef.current = novos;
+    setPassosNarrativa(novos);
+  }
 
   // Sandbox = dados didáticos (mock); B3 ao vivo = mercado real via /api/market.
   // Qualquer fonte passa pela auditoria do Confidence Engine (sinal DADOS).
@@ -447,11 +470,32 @@ function Simulador() {
       } else if (a.type === "IV_LEVEL_REQUESTED") {
         runSimulationPipeline(osBus, { ...inputRef.current, iv: a.payload.targetIV });
       } else if (a.type === "LEGS_UPDATED") {
+        const prev = pernasRef.current;
+        pernasRef.current = a.payload.pernas;
+        const passo = narrarMudanca(
+          prev,
+          a.payload.pernas,
+          inputRef.current.ativo,
+          inputRef.current.centro,
+        );
+        if (passo) appendPasso(passo);
         setPernas(a.payload.pernas);
         runSimulationPipeline(osBus, { ...inputRef.current, pernas: a.payload.pernas });
       }
     });
     const unsubEvent = osBus.subscribeToEvent((e) => {
+      if (e.type === "RULE_BROKEN") {
+        const criticos = (inputRef.current?.alertas ?? []).filter(
+          (al) => al.severidade === "critico",
+        );
+        if (criticos.length > 0) appendPasso(narrarRegraQuebrada(criticos.map((al) => al.regra)));
+        return;
+      }
+      if (e.type === "THETA_CRITICAL") {
+        const dias = inputRef.current?.dias ?? 0;
+        appendPasso(narrarThetaCritico(dias, e.payload.dailyBleed));
+        return;
+      }
       if (e.type !== "CONTEXT_READY") return;
       setContexto(e.payload);
       setDias(e.payload.technical.time.daysToMaturity);
@@ -710,6 +754,8 @@ function Simulador() {
                   riscoReal={riscoReal}
                   aprendizado={aprendizado}
                 />
+
+                <NarrativaEstrutura passos={passosNarrativa} />
 
                 <PernasExplicadas pernas={pernas} ativo={ativo} />
 
