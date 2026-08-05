@@ -8,7 +8,7 @@ import type { Padrao } from "./behavior-engine";
 import type { Alerta } from "./rule-engine";
 import type { DiaryEntry } from "./types";
 import type { VolatilityLanguage, SkewState } from "../volatility/types";
-import type { ScoreInput } from "./decision-engine";
+import type { ScoreInput, DecisionScore } from "./decision-engine";
 
 // Taxa livre de risco usada nos cálculos didáticos (10% a.a. — cenário B3).
 const R_ANUAL = 0.1;
@@ -43,6 +43,10 @@ export type PositionIntelligence = {
   probabilidade: { pergunta: string; resposta: string; expectedMoveBrl: number; pop: number };
   regime: string;
   synthesis: string;
+  // Exposições para o DecisionContext (master object).
+  volatility: { language: VolatilityLanguage; skew: SkewState };
+  padroes: Padrao[];
+  score: DecisionScore;
 };
 
 function brl(v: number) {
@@ -234,6 +238,9 @@ export function computePositionIntelligence(params: {
     probabilidade,
     regime: intel.riskRegime,
     synthesis: intel.synthesis,
+    volatility: { language: volLanguage, skew },
+    padroes,
+    score: intel.decisionScore,
   };
 }
 
