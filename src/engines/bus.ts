@@ -70,6 +70,8 @@ export const osBus = IntelligenceBus.getInstance();
  * CASCATA (Pricing → Greeks → Volatility → Behavior → Decision)
  * O Motor único que consome as entradas do simulador, recalcula o mundo
  * e publica o novo quadro no Bus. A UI apenas escuta CONTEXT_READY.
+ * Sinais derivados (regra quebrada, theta crítico) são publicados como
+ * OSEvents separados para quem quiser reagir a eles sem re-derivar nada.
  */
 export function runSimulationPipeline(
   bus: IntelligenceBus,
@@ -77,5 +79,17 @@ export function runSimulationPipeline(
 ): DecisionContext {
   const ctx = buildDecisionContext(input);
   bus.publishEvent({ type: "CONTEXT_READY", payload: ctx });
+
+  const criticos = ctx.cognitive.rules.filter((a) => a.severidade === "critico").length;
+  if (criticos > 0) {
+    bus.publishEvent({ type: "RULE_BROKEN", payload: { brokenRuleCount: criticos } });
+  }
+  if (ctx.technical.greeks.tempo.status.includes("Crítico")) {
+    bus.publishEvent({
+      type: "THETA_CRITICAL",
+      payload: { dailyBleed: ctx.technical.greeks.netTheta },
+    });
+  }
+
   return ctx;
 }

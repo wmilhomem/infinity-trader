@@ -40,6 +40,7 @@ export type PerguntaResposta = {
  */
 export type TechnicalSnapshot = {
   ativo: string;
+  riskRegime: string; // "tranquilo" | "explosivo" | "incerto" — clima de volatilidade
   market: MarketDimension | null;
   portfolio: PortfolioDimension | null;
   strategy: StrategyDimension & { interpretacao: Interpretacao };
@@ -149,6 +150,7 @@ export function buildDecisionContext(input: DecisionContextInput): DecisionConte
     captured_at: new Date().toISOString(),
     technical: {
       ativo: input.ativo,
+      riskRegime: intel.regime,
       market: null, // Eixo 3 (Gateway B3)
       portfolio: null, // Eixo 3 (Gateway B3)
       strategy: {

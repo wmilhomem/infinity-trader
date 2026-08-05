@@ -56,6 +56,7 @@ import { buildOmniscientContext } from "@/engines/omniscient-context";
 import type { DiaryEntry } from "@/engines/types";
 import { DecisionCards } from "@/components/simulador/DecisionCards";
 import { CenarioTempo } from "@/components/simulador/CenarioTempo";
+import { OsStatusBar } from "@/components/simulador/OsStatusBar";
 
 export const Route = createFileRoute("/_authenticated/simulador")({
   head: () => ({
@@ -308,7 +309,7 @@ function Simulador() {
     setPorque(pq);
     setAtivo(PRESETS[p].ativo);
     setCentro(PRESETS[p].centro);
-    setPernas(escalaParaRisco(PRESETS[p].pernas, PRESETS[p].centro, orcamentoEfetivo));
+    dispatchPernas(escalaParaRisco(PRESETS[p].pernas, PRESETS[p].centro, orcamentoEfetivo));
     setCheck({});
     setConfirmacoes({});
     setTesePartes({ motivo: "", expectativa: "", erro: "", risco: "" });
@@ -319,11 +320,11 @@ function Simulador() {
     setPreset(p);
     setAtivo(PRESETS[p].ativo);
     setCentro(PRESETS[p].centro);
-    setPernas(PRESETS[p].pernas.map((x) => ({ ...x })));
+    dispatchPernas(PRESETS[p].pernas.map((x) => ({ ...x })));
   }
 
   function updatePerna(i: number, patch: Partial<Perna>) {
-    setPernas(pernas.map((p, j) => (i === j ? { ...p, ...patch } : p)));
+    dispatchPernas(pernas.map((p, j) => (i === j ? { ...p, ...patch } : p)));
   }
 
   function recomecar() {
@@ -420,8 +421,12 @@ function Simulador() {
   const [contexto, setContexto] = useState<DecisionContext | null>(null);
   const inputRef = useRef<DecisionContextInput | null>(null);
 
-  // O Bus orquestra a cascata: Pricing → Greeks → Volatility → Behavior → Decision.
-  // A UI apenas escuta CONTEXT_READY e se re-renderiza com a nova moeda.
+  // A UI emite intenções; o Bus orquestra a cascata:
+  // Pricing → Greeks → Volatility → Behavior → Decision.
+  function dispatchPernas(novas: Perna[]) {
+    osBus.dispatchAction({ type: "LEGS_UPDATED", payload: { pernas: novas } });
+  }
+
   useEffect(() => {
     const unsubAction = osBus.subscribeToAction((a) => {
       if (!inputRef.current) return;
@@ -429,6 +434,9 @@ function Simulador() {
         runSimulationPipeline(osBus, { ...inputRef.current, dias: a.payload.targetDTE });
       } else if (a.type === "IV_LEVEL_REQUESTED") {
         runSimulationPipeline(osBus, { ...inputRef.current, iv: a.payload.targetIV });
+      } else if (a.type === "LEGS_UPDATED") {
+        setPernas(a.payload.pernas);
+        runSimulationPipeline(osBus, { ...inputRef.current, pernas: a.payload.pernas });
       }
     });
     const unsubEvent = osBus.subscribeToEvent((e) => {
@@ -669,6 +677,8 @@ function Simulador() {
 
                 <GraficoEducativo pernas={pernas} centro={centro} ativo={ativo} leitura={leitura} />
 
+                {contexto && <OsStatusBar contexto={contexto} />}
+
                 {contexto && <DecisionCards contexto={contexto} alertas={alertas} />}
 
                 <CenarioTempo
@@ -795,7 +805,7 @@ function Simulador() {
                   onPreset={loadPreset}
                   onAtivo={setAtivo}
                   onCentro={setCentro}
-                  onPernas={setPernas}
+                  onPernas={dispatchPernas}
                   updatePerna={updatePerna}
                   pedemConfirmacao={pedemConfirmacao}
                   confirmacoes={confirmacoes}
