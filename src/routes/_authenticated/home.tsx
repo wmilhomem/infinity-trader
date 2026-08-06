@@ -193,7 +193,6 @@ function Home() {
   const pct = (arr: typeof avaliadas) =>
     arr.length ? Math.round((arr.filter((d) => d.seguiu_regra).length / arr.length) * 100) : null;
 
-  const disciplina = pct(avaliadas);
   const janela30 = avaliadas.filter((d) => new Date(d.created_at).getTime() >= diasAtras(30));
   const disc30 = pct(janela30);
 
@@ -574,9 +573,9 @@ function Home() {
             <Step
               n={5}
               icon={LineChart}
-              label="Revisar"
-              to="/revisao"
-              desc={disciplina === null ? "sem dados" : `${disciplina}% disciplina`}
+              label="Sua história"
+              to="/historia"
+              desc="marcos e evolução mês a mês"
             />
           </div>
         </div>
