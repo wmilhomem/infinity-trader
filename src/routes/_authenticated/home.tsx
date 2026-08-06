@@ -14,6 +14,7 @@ import {
   FluxoOperarModal,
   type FluxoRetomada,
 } from "@/components/FluxoOperarModal";
+import { RitualModal } from "@/components/RitualModal";
 import {
   ArrowRight,
   BookOpen,
@@ -23,6 +24,7 @@ import {
   ClipboardList,
   LineChart,
   MessageCircle,
+  Moon,
   Radar,
   ScrollText,
   Sprout,
@@ -55,6 +57,7 @@ function Home() {
   const navigate = useNavigate();
   const [expandido, setExpandido] = useState(false);
   const [checkAberto, setCheckAberto] = useState(false);
+  const [ritualAberto, setRitualAberto] = useState(false);
   const [flowAberto, setFlowAberto] = useState(false);
   const [flowTela, setFlowTela] = useState<"hipotese" | "resumo" | "parou-hoje">("hipotese");
   const [flowSalvo, setFlowSalvo] = useState<FluxoRetomada | null>(() => {
@@ -99,6 +102,18 @@ function Home() {
         .order("created_at", { ascending: false })
         .limit(1);
       return (data ?? [])[0] ?? null;
+    },
+  });
+
+  const reflexaoQ = useQuery({
+    queryKey: ["reflexao-today"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("reflexoes_diarias")
+        .select("*")
+        .eq("data", new Date().toISOString().slice(0, 10))
+        .maybeSingle();
+      return data ?? null;
     },
   });
 
@@ -530,6 +545,26 @@ function Home() {
         </Link>
       </div>
 
+      {/* Ritual de fechamento */}
+      <div className="mt-4 rounded-xl border border-border bg-card p-6">
+        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <Moon size={13} /> Ritual de fechamento
+        </div>
+        <p className="mt-3 max-w-xl text-base leading-relaxed">
+          {reflexaoQ.data
+            ? "Seu dia já está fechado. Amanhã, o check abre e o ritual fecha de novo."
+            : "Feche o dia com uma pergunta: o que você levou dele? O check abre, o ritual fecha."}
+        </p>
+        {!reflexaoQ.data && (
+          <button
+            onClick={() => setRitualAberto(true)}
+            className="mt-4 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+          >
+            Fechar o dia (2 minutos)
+          </button>
+        )}
+      </div>
+
       {/* Progressive disclosure */}
       <button
         onClick={() => setExpandido((v) => !v)}
@@ -594,6 +629,13 @@ function Home() {
         telaInicial={flowTela}
         retomada={flowSalvo ?? undefined}
         onClose={() => setFlowAberto(false)}
+      />
+
+      <RitualModal
+        aberto={ritualAberto}
+        temDecisaoHoje={diarioHoje}
+        checkHoje={painel.checkFeitoHoje}
+        onClose={() => setRitualAberto(false)}
       />
     </AppShell>
   );

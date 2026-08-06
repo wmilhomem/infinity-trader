@@ -554,6 +554,33 @@ export type Database = {
         }
         Relationships: []
       }
+      reflexoes_diarias: {
+        Row: {
+          conteudo: string
+          created_at: string
+          data: string
+          estado: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          conteudo: string
+          created_at?: string
+          data: string
+          estado?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          conteudo?: string
+          created_at?: string
+          data?: string
+          estado?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       simulations: {
         Row: {
           ativo: string | null
