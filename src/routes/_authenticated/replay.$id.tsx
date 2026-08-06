@@ -32,9 +32,9 @@ import {
 export const Route = createFileRoute("/_authenticated/replay/$id")({
   head: ({ params }) => ({
     meta: [
-      { title: `Replay · Zero ao Trade` },
-      { name: "description", content: "Replay completo de uma decisão registrada." },
-      { property: "og:title", content: "Decision Replay · Zero ao Trade" },
+      { title: `Reviver esta decisão · Zero ao Trade` },
+      { name: "description", content: "Volte ao instante exato de uma decisão registrada." },
+      { property: "og:title", content: "Reviver esta decisão · Zero ao Trade" },
       { property: "og:type", content: "website" },
     ],
   }),
@@ -85,7 +85,7 @@ function ReplayPage() {
 
   if (q.isLoading) {
     return (
-      <AppShell title="Replay">
+      <AppShell title="Reviver decisão">
         <p className="text-sm text-muted-foreground">Reconstruindo o instante da decisão…</p>
       </AppShell>
     );
@@ -93,11 +93,11 @@ function ReplayPage() {
 
   if (!replay) {
     return (
-      <AppShell title="Replay">
+      <AppShell title="Reviver decisão">
         <p className="text-sm text-muted-foreground">
-          Não encontrei o snapshot desta decisão.{" "}
+          Não encontrei o registro desta decisão.{" "}
           <Link to="/replay" className="text-primary hover:underline">
-            Voltar ao histórico de replays
+            Voltar ao histórico de decisões
           </Link>
           .
         </p>
@@ -114,12 +114,12 @@ function ReplayPage() {
   });
 
   return (
-    <AppShell title="Replay da decisão">
+    <AppShell title="Reviver esta decisão">
       <Link
         to="/replay"
         className="mb-4 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft size={13} /> Todos os replays
+        <ArrowLeft size={13} /> Todas as decisões
       </Link>
 
       <div className="rounded-xl border border-primary/30 bg-card p-5">
@@ -272,7 +272,7 @@ function ReplayPage() {
 
         <div className="space-y-4">
           {replay.score !== null && (
-            <Cartao titulo="Decision Score — processo">
+            <Cartao titulo="Nota do processo">
               <div className="flex items-baseline gap-2">
                 <span className="font-mono text-3xl font-bold">{replay.score}</span>
                 <span className="text-xs text-muted-foreground">/100</span>

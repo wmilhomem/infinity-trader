@@ -11,13 +11,13 @@ import { History } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/replay/")({
   head: () => ({
     meta: [
-      { title: "Decision Replay · Zero ao Trade" },
+      { title: "Reviver uma decisão · Zero ao Trade" },
       {
         name: "description",
         content:
           "Volte exatamente para cada trade: tela, IV, payoff, emoção, contexto, regras e narrativa do instante da decisão.",
       },
-      { property: "og:title", content: "Decision Replay · Zero ao Trade" },
+      { property: "og:title", content: "Reviver uma decisão · Zero ao Trade" },
       { property: "og:type", content: "website" },
     ],
   }),
@@ -60,7 +60,7 @@ function Replay() {
     });
 
   return (
-    <AppShell title="Decision Replay">
+    <AppShell title="Reviver uma decisão">
       <p className="mb-5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
         Voltar exatamente para um trade. Cada cartão reconstitui o instante da decisão: tela, IV,
         payoff, emoção, contexto, regras e narrativa — como estavam naquele dia.
@@ -68,8 +68,8 @@ function Replay() {
 
       {replays.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          Nenhuma decisão com snapshot disponível ainda. Cada registro no diário cria um replay
-          automaticamente.
+          Nenhuma decisão com registro completo disponível ainda. Cada registro no diário cria um
+          replay automaticamente.
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -126,7 +126,7 @@ function Replay() {
                 )}
               </div>
               <div className="mt-3 text-xs text-muted-foreground group-hover:text-primary">
-                Abrir replay →
+                Reviver →
               </div>
             </Link>
           ))}

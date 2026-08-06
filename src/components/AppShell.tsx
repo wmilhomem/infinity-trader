@@ -37,7 +37,7 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
           </div>
           <div className="leading-tight">
             <div className="font-semibold">Zero ao Trade</div>
-            <div className="text-xs text-muted-foreground">Decision OS</div>
+            <div className="text-xs text-muted-foreground">Seu processo de decisão</div>
           </div>
         </Link>
         <nav className="flex flex-col gap-1">

@@ -15,7 +15,7 @@ export function SnapshotCognitivo({ snap }: { snap: SnapshotCognitivoView }) {
   return (
     <div className="mt-2 rounded-md border border-border bg-background p-3">
       <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-        <BrainCircuit size={12} className="text-primary" /> Snapshot cognitivo
+        <BrainCircuit size={12} className="text-primary" /> Como você decidiu
       </div>
       <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
         {snap.score !== null && (

@@ -166,7 +166,7 @@ export function calcularEvolutionScore(entries: DiaryEntry[]): EvolutionScoreRes
 
   const leitura =
     atual === null
-      ? "Registre suas primeiras decisões para que o Evolution Score comece a existir."
+      ? "Registre suas primeiras decisões para que sua evolução comece a existir."
       : atual >= 80
         ? "Processo maduro: você já decide como um investidor profissional decide — com processo, regras e revisão."
         : atual >= 60

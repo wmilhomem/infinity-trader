@@ -487,7 +487,9 @@ function Diario() {
 
           {forecast && (
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
-              <div className="text-xs uppercase tracking-wide text-primary">Behavior Forecast</div>
+              <div className="text-xs uppercase tracking-wide text-primary">
+                Como você tende a agir hoje
+              </div>
               <p className="mt-1.5 text-sm font-medium leading-snug">{forecast.rotulo}</p>
               {forecast.fatores.length > 0 && (
                 <ul className="mt-2 space-y-1">
@@ -550,7 +552,7 @@ function Diario() {
           <div className="text-xs uppercase text-muted-foreground mb-1 flex items-center justify-between">
             <span>Histórico</span>
             <Link to="/replay" className="text-[11px] uppercase text-primary hover:underline">
-              Decision Replay →
+              Reviver uma decisão →
             </Link>
           </div>
           {(entries.data ?? []).map((e: EntryLinha) => (
@@ -584,7 +586,7 @@ function Diario() {
                       params={{ id: e.id }}
                       className="text-[10px] uppercase text-muted-foreground hover:text-primary"
                     >
-                      replay
+                      reviver
                     </Link>
                   )}
                 </div>

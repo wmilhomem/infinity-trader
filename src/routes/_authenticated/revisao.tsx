@@ -172,7 +172,7 @@ function Revisao() {
       {/* Evolution Score */}
       <section className="mb-6 rounded-lg border border-primary/30 bg-card p-5">
         <div className="mb-3 flex items-center gap-2 text-xs uppercase text-muted-foreground">
-          <Gauge size={13} /> Decision Evolution Score
+          <Gauge size={13} /> Sua evolução
         </div>
         <div className="flex flex-wrap items-center gap-6">
           <div className="text-center">
@@ -229,7 +229,7 @@ function Revisao() {
                 <Line
                   type="monotone"
                   dataKey="score"
-                  name="Evolution Score"
+                  name="Sua evolução"
                   stroke="oklch(0.78 0.17 65)"
                   strokeWidth={2}
                   dot={{ r: 3 }}
@@ -433,7 +433,7 @@ function Revisao() {
       {/* Personal Knowledge Graph */}
       <section className="mb-6 rounded-lg border border-border bg-card p-5">
         <div className="mb-1 flex items-center gap-2 text-xs uppercase text-muted-foreground">
-          <Network size={13} /> Sua rede de conhecimento
+          <Network size={13} /> Mapa dos seus padrões
         </div>
         <p className="mb-3 text-[11px] text-muted-foreground">
           Conceitos, estruturas, emoções e regras conectados pela frequência com que aparecem nas
