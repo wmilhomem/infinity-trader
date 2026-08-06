@@ -40,6 +40,7 @@ import { AppShell } from "@/components/AppShell";
 import { ScorePanel } from "@/components/ScorePanel";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
+import { FLOW_OPERAR_KEY, type FluxoRetomada } from "@/components/FluxoOperarModal";
 import type { Perna } from "@/lib/payoff";
 import { payoffCurve, summary } from "@/lib/payoff";
 import { interpretar } from "@/engines/simulation-interpreter";
@@ -305,6 +306,24 @@ function Simulador() {
     erro: "",
     risco: "",
   });
+
+  const fluxo = useMemo<FluxoRetomada | null>(() => {
+    try {
+      const raw = sessionStorage.getItem(FLOW_OPERAR_KEY);
+      if (!raw) return null;
+      const p = JSON.parse(raw) as Partial<FluxoRetomada>;
+      if (typeof p.tese !== "string" || !p.tese.trim()) return null;
+      return { tese: p.tese, regraId: p.regraId ?? null, regraTexto: p.regraTexto ?? null };
+    } catch {
+      return null;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (fluxo?.tese && !tesePartes.motivo.trim()) {
+      setTesePartes((t) => ({ ...t, motivo: fluxo.tese }));
+    }
+  }, [fluxo, tesePartes.motivo]);
 
   const etapaIdx = ETAPAS.findIndex((e) => e.k === etapa);
   const aprendizado = crenca === "aprender";
@@ -617,6 +636,7 @@ function Simulador() {
 
     try {
       sessionStorage.setItem(`sim-tese:${data.id}`, JSON.stringify({ tese, checklist: respostas }));
+      sessionStorage.removeItem(FLOW_OPERAR_KEY);
       if (quote) {
         sessionStorage.setItem(
           `sim-quote:${data.id}`,
@@ -899,6 +919,20 @@ function Simulador() {
                   <p className="mt-2 text-sm text-muted-foreground">
                     Uma decisão com nome é uma decisão que você entende.
                   </p>
+                  {fluxo && (
+                    <div className="mt-4 rounded-lg border border-primary/30 bg-primary/5 p-4">
+                      <div className="text-[11px] font-semibold uppercase tracking-widest text-primary">
+                        Hipótese vinda da sua conversa
+                      </div>
+                      <p className="mt-1.5 text-sm leading-relaxed italic">“{fluxo.tese}”</p>
+                      {fluxo.regraTexto && (
+                        <p className="mt-2 border-t border-primary/20 pt-2 text-xs leading-relaxed text-muted-foreground">
+                          Regra que você se comprometeu a honrar:{" "}
+                          <span className="font-medium text-foreground">{fluxo.regraTexto}</span>
+                        </p>
+                      )}
+                    </div>
+                  )}
                   <div className="mt-4 space-y-3">
                     <TeseCampo
                       prefixo="Estou fazendo essa operação porque"

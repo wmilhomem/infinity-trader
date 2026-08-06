@@ -10,6 +10,11 @@ import { montarPainelDeVoo, type CheckCognitivo } from "@/engines/readiness";
 import type { DiaryEntry } from "@/engines/types";
 import { CheckCognitivoModal } from "@/components/CheckCognitivoModal";
 import {
+  FLOW_OPERAR_KEY,
+  FluxoOperarModal,
+  type FluxoRetomada,
+} from "@/components/FluxoOperarModal";
+import {
   ArrowRight,
   BookOpen,
   Calculator,
@@ -50,6 +55,37 @@ function Home() {
   const navigate = useNavigate();
   const [expandido, setExpandido] = useState(false);
   const [checkAberto, setCheckAberto] = useState(false);
+  const [flowAberto, setFlowAberto] = useState(false);
+  const [flowTela, setFlowTela] = useState<"hipotese" | "resumo" | "parou-hoje">("hipotese");
+  const [flowSalvo, setFlowSalvo] = useState<FluxoRetomada | null>(() => {
+    try {
+      const raw = sessionStorage.getItem(FLOW_OPERAR_KEY);
+      if (!raw) return null;
+      const p = JSON.parse(raw) as Partial<FluxoRetomada>;
+      if (typeof p.tese !== "string" || !p.tese.trim()) return null;
+      return {
+        tese: p.tese,
+        regraId: p.regraId ?? null,
+        regraTexto: p.regraTexto ?? null,
+      };
+    } catch {
+      return null;
+    }
+  });
+
+  function abrirFluxo(tela: "hipotese" | "resumo" | "parou-hoje") {
+    setFlowTela(tela);
+    setFlowAberto(true);
+  }
+
+  function limparFluxo() {
+    try {
+      sessionStorage.removeItem(FLOW_OPERAR_KEY);
+    } catch {
+      /* storage indisponível */
+    }
+    setFlowSalvo(null);
+  }
 
   const checkQ = useQuery({
     queryKey: ["checks-today"],
@@ -336,6 +372,53 @@ function Home() {
         </div>
       </div>
 
+      {/* Fluxo contínuo — a conversa do dia */}
+      <div className="mt-4 rounded-xl border border-primary/40 bg-card p-6">
+        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-primary">
+          <MessageCircle size={13} /> Fluxo contínuo
+        </div>
+        <h2 className="mt-3 text-2xl font-bold leading-tight tracking-tight">
+          Hoje você pensa em operar?
+        </h2>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
+          Em vez de pular direto para a estrutura, comece pelo “por quê”. Eu caminho com você até o
+          simulador — e posso te impedir de parar na regra.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          {flowSalvo ? (
+            <>
+              <button
+                onClick={() => abrirFluxo("resumo")}
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                Continuar de onde parou <ArrowRight size={15} />
+              </button>
+              <button
+                onClick={limparFluxo}
+                className="rounded-xl border border-border px-5 py-3 text-sm text-muted-foreground hover:bg-accent"
+              >
+                Recomeçar
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => abrirFluxo("hipotese")}
+                className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                Sim, vou operar
+              </button>
+              <button
+                onClick={() => abrirFluxo("parou-hoje")}
+                className="rounded-xl border border-border px-5 py-3 text-sm text-muted-foreground hover:bg-accent"
+              >
+                Ainda não
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
       {/* Voz do mentor */}
       <section className="pb-2 pt-6">
         <p className="text-2xl font-medium leading-snug tracking-tight sm:text-3xl">
@@ -503,6 +586,15 @@ function Home() {
         aberto={checkAberto}
         rules={rules.map((r) => ({ id: r.id, texto: r.texto }))}
         onClose={() => setCheckAberto(false)}
+      />
+
+      <FluxoOperarModal
+        key={`${flowTela}-${flowAberto}`}
+        aberto={flowAberto}
+        rules={rules.map((r) => ({ id: r.id, texto: r.texto }))}
+        telaInicial={flowTela}
+        retomada={flowSalvo ?? undefined}
+        onClose={() => setFlowAberto(false)}
       />
     </AppShell>
   );
