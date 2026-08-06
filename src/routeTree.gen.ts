@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated/diario'
+import { Route as AuthenticatedEspelhoRouteImport } from './routes/_authenticated/espelho'
 import { Route as AuthenticatedHistoriaRouteImport } from './routes/_authenticated/historia'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
@@ -45,6 +46,11 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedDiarioRoute = AuthenticatedDiarioRouteImport.update({
   id: '/diario',
   path: '/diario',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEspelhoRoute = AuthenticatedEspelhoRouteImport.update({
+  id: '/espelho',
+  path: '/espelho',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHistoriaRoute = AuthenticatedHistoriaRouteImport.update({
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/diario': typeof AuthenticatedDiarioRoute
+  '/espelho': typeof AuthenticatedEspelhoRoute
   '/historia': typeof AuthenticatedHistoriaRoute
   '/home': typeof AuthenticatedHomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/diario': typeof AuthenticatedDiarioRoute
+  '/espelho': typeof AuthenticatedEspelhoRoute
   '/historia': typeof AuthenticatedHistoriaRoute
   '/home': typeof AuthenticatedHomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/diario': typeof AuthenticatedDiarioRoute
+  '/_authenticated/espelho': typeof AuthenticatedEspelhoRoute
   '/_authenticated/historia': typeof AuthenticatedHistoriaRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/diario'
+    | '/espelho'
     | '/historia'
     | '/home'
     | '/onboarding'
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/diario'
+    | '/espelho'
     | '/historia'
     | '/home'
     | '/onboarding'
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/diario'
+    | '/_authenticated/espelho'
     | '/_authenticated/historia'
     | '/_authenticated/home'
     | '/_authenticated/onboarding'
@@ -277,6 +289,13 @@ declare module '@tanstack/react-router' {
       path: '/diario'
       fullPath: '/diario'
       preLoaderRoute: typeof AuthenticatedDiarioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/espelho': {
+      id: '/_authenticated/espelho'
+      path: '/espelho'
+      fullPath: '/espelho'
+      preLoaderRoute: typeof AuthenticatedEspelhoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/historia': {
@@ -382,6 +401,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDiarioRoute: typeof AuthenticatedDiarioRoute
+  AuthenticatedEspelhoRoute: typeof AuthenticatedEspelhoRoute
   AuthenticatedHistoriaRoute: typeof AuthenticatedHistoriaRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
@@ -398,6 +418,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDiarioRoute: AuthenticatedDiarioRoute,
+  AuthenticatedEspelhoRoute: AuthenticatedEspelhoRoute,
   AuthenticatedHistoriaRoute: AuthenticatedHistoriaRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,

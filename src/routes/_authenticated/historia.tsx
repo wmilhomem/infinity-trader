@@ -244,6 +244,23 @@ function Historia() {
         </div>
         <ArrowRight size={16} className="shrink-0 text-primary" />
       </Link>
+
+      {/* Quem você está se tornando */}
+      <Link
+        to="/espelho"
+        className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-primary/40 bg-card p-5 transition hover:border-primary/70"
+      >
+        <div>
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-primary">
+            <Sprout size={13} /> Quem você está se tornando
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            O espelho da sua evolução: o que mudou, o que precisa de constância e o caminho que mais
+            se repete.
+          </p>
+        </div>
+        <ArrowRight size={16} className="shrink-0 text-primary" />
+      </Link>
     </AppShell>
   );
 }
