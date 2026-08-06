@@ -190,6 +190,44 @@ export type Database = {
           },
         ]
       }
+      cheques_cognitivos: {
+        Row: {
+          created_at: string
+          emocao: string
+          id: string
+          motivo: string
+          regra_id: string | null
+          sinal: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emocao: string
+          id?: string
+          motivo: string
+          regra_id?: string | null
+          sinal?: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emocao?: string
+          id?: string
+          motivo?: string
+          regra_id?: string | null
+          sinal?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cheques_cognitivos_regra_id_fkey"
+            columns: ["regra_id"]
+            isOneToOne: false
+            referencedRelation: "personal_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       decision_memory: {
         Row: {
           contexto: Json | null

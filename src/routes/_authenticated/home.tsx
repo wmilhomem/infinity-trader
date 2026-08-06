@@ -6,7 +6,9 @@ import { AppShell } from "@/components/AppShell";
 import { LESSONS } from "@/lib/lessons";
 import { cn } from "@/lib/utils";
 import { preverTamanhoPosicao } from "@/engines/behavior-forecast";
+import { montarPainelDeVoo, type CheckCognitivo } from "@/engines/readiness";
 import type { DiaryEntry } from "@/engines/types";
+import { CheckCognitivoModal } from "@/components/CheckCognitivoModal";
 import {
   ArrowRight,
   BookOpen,
@@ -47,6 +49,22 @@ export const Route = createFileRoute("/_authenticated/home")({
 function Home() {
   const navigate = useNavigate();
   const [expandido, setExpandido] = useState(false);
+  const [checkAberto, setCheckAberto] = useState(false);
+
+  const checkQ = useQuery({
+    queryKey: ["checks-today"],
+    queryFn: async () => {
+      const inicioDoDia = new Date();
+      inicioDoDia.setHours(0, 0, 0, 0);
+      const { data } = await supabase
+        .from("cheques_cognitivos")
+        .select("*")
+        .gte("created_at", inicioDoDia.toISOString())
+        .order("created_at", { ascending: false })
+        .limit(1);
+      return (data ?? [])[0] ?? null;
+    },
+  });
 
   const profileQ = useQuery({
     queryKey: ["profile"],
@@ -112,6 +130,22 @@ function Home() {
   const doneSlugs = new Set(progress.filter((p) => p.completed_at).map((p) => p.lesson_slug));
   const proximaLicao = LESSONS.find((l) => !doneSlugs.has(l.slug)) ?? LESSONS[LESSONS.length - 1];
   const primeiroNome = (profileQ.data?.nome ?? "").trim().split(" ")[0];
+
+  // ---- Painel de voo -----------------------------------------------------
+  const forecast = preverTamanhoPosicao(diary);
+  const painel = montarPainelDeVoo({
+    checkHoje: checkQ.data
+      ? {
+          emocao: checkQ.data.emocao as CheckCognitivo["emocao"],
+          motivo: checkQ.data.motivo as CheckCognitivo["motivo"],
+          regraId: checkQ.data.regra_id,
+          criadoEm: checkQ.data.created_at,
+        }
+      : null,
+    forecast,
+    rules: rules.map((r) => ({ id: r.id, texto: r.texto })),
+    diary,
+  });
 
   const hoje = new Date();
   const inicioDoDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()).getTime();
@@ -212,9 +246,6 @@ function Home() {
     });
   const marco = marcos[0];
 
-  // ---- Previsão de comportamento ----------------------------------------
-  const forecast = preverTamanhoPosicao(diary);
-
   // ---- Pergunta do copilot ----------------------------------------------
   const perguntaCopilot = furouRecente
     ? "Você escreveu que seguiria sua regra. O que fez você ignorá-la?"
@@ -226,8 +257,87 @@ function Home() {
 
   return (
     <AppShell title="Hoje">
+      {/* Painel de voo */}
+      <div className="rounded-xl border border-border bg-card p-6">
+        <div className="flex items-baseline justify-between gap-2">
+          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            Como está sua cabeça hoje?
+          </div>
+          {painel.checkFeitoHoje && (
+            <span className="font-mono text-[11px] text-success">check concluído</span>
+          )}
+        </div>
+        <div
+          className={cn(
+            "mt-3 flex items-center gap-2 text-2xl font-bold tracking-tight",
+            painel.estado.cor === "verde" && "text-success",
+            painel.estado.cor === "amarelo" && "text-amber-400",
+            painel.estado.cor === "vermelho" && "text-loss",
+            painel.estado.cor === "cinza" && "text-muted-foreground",
+          )}
+        >
+          <span
+            className={cn(
+              "inline-block size-2.5 rounded-full",
+              painel.estado.cor === "verde" && "bg-success",
+              painel.estado.cor === "amarelo" && "bg-amber-400",
+              painel.estado.cor === "vermelho" && "bg-loss",
+              painel.estado.cor === "cinza" && "bg-muted-foreground/50",
+            )}
+          />
+          {painel.estado.rotulo}
+        </div>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
+          {painel.estado.mensagem}
+        </p>
+
+        {painel.atencao && (
+          <div className="mt-4 rounded-lg border border-amber-400/40 bg-amber-400/10 p-4">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-amber-400">
+              <span className="inline-block size-2 rounded-full bg-amber-400" /> Atenção
+            </div>
+            <p className="mt-1.5 text-sm leading-relaxed">{painel.atencao.mensagem}</p>
+          </div>
+        )}
+
+        {painel.lembrete && (
+          <div className="mt-3 rounded-lg border border-loss/40 bg-loss/5 p-4">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-loss">
+              <span className="inline-block size-2 rounded-full bg-loss" /> Lembre-se
+            </div>
+            <p className="mt-1.5 text-sm leading-relaxed">
+              “{painel.lembrete.texto}”
+              {painel.lembrete.vezes > 1 && (
+                <span className="text-muted-foreground">
+                  {" "}
+                  — quebrada {painel.lembrete.vezes} vezes no seu histórico
+                </span>
+              )}
+            </p>
+          </div>
+        )}
+
+        <div className="mt-4 border-t border-border pt-4">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            <span className="inline-block size-2 rounded-full bg-muted-foreground/50" /> Próximo
+            passo
+          </div>
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-base font-medium">{painel.proximoPasso}</p>
+            <button
+              onClick={() => setCheckAberto(true)}
+              className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              {painel.checkFeitoHoje
+                ? "Refazer meu check (60 segundos)"
+                : "Fazer meu Check (60 segundos)"}
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Voz do mentor */}
-      <section className="pb-2 pt-2">
+      <section className="pb-2 pt-6">
         <p className="text-2xl font-medium leading-snug tracking-tight sm:text-3xl">
           {saudacao}
           {primeiroNome ? `, ${primeiroNome}` : ""}.
@@ -388,6 +498,12 @@ function Home() {
           </div>
         </div>
       )}
+
+      <CheckCognitivoModal
+        aberto={checkAberto}
+        rules={rules.map((r) => ({ id: r.id, texto: r.texto }))}
+        onClose={() => setCheckAberto(false)}
+      />
     </AppShell>
   );
 }

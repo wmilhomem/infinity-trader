@@ -117,6 +117,7 @@ function Diario() {
   const [licao, setLicao] = useState("");
   const [check, setCheck] = useState<Record<string, boolean>>({});
   const [salvando, setSalvando] = useState(false);
+  const [celebraPrimeira, setCelebraPrimeira] = useState(false);
 
   useEffect(() => {
     if (!preSim.data) return;
@@ -183,6 +184,7 @@ function Diario() {
 
   async function save() {
     if (!ativo || !estrutura) return toast.error("Preencha ativo e estrutura");
+    const primeiraDecisao = historico.length === 0;
     setSalvando(true);
     try {
       const { data: u } = await supabase.auth.getUser();
@@ -293,6 +295,7 @@ function Diario() {
       ]);
 
       toast.success(`Decisão registrada — Decision Score ${score.score}/100`);
+      if (primeiraDecisao) setCelebraPrimeira(true);
       setAtivo("");
       setEstrutura("");
       setMotivo("");
@@ -642,6 +645,27 @@ function Diario() {
           )}
         </div>
       </div>
+
+      {celebraPrimeira && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-success/40 bg-card p-8 text-center">
+            <div className="mx-auto grid size-14 place-items-center rounded-full bg-success/15 text-success">
+              <Check size={28} />
+            </div>
+            <h2 className="mt-5 text-2xl font-bold leading-tight tracking-tight">Parabéns.</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Você acabou de fazer algo que a maioria dos investidores nunca faz: registrou por que
+              decidiu. Daqui a meses, isso valerá mais do que lembrar o lucro.
+            </p>
+            <button
+              onClick={() => setCelebraPrimeira(false)}
+              className="mt-6 w-full rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              Continuar
+            </button>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
