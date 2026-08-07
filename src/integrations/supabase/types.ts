@@ -116,7 +116,6 @@ export type Database = {
         Row: {
           context_ref: string | null
           context_type: string
-          contexto: Json | null
           created_at: string
           id: string
           titulo: string
@@ -126,7 +125,6 @@ export type Database = {
         Insert: {
           context_ref?: string | null
           context_type?: string
-          contexto?: Json | null
           created_at?: string
           id?: string
           titulo?: string
@@ -136,7 +134,6 @@ export type Database = {
         Update: {
           context_ref?: string | null
           context_type?: string
-          contexto?: Json | null
           created_at?: string
           id?: string
           titulo?: string
@@ -186,44 +183,6 @@ export type Database = {
             columns: ["simulation_id"]
             isOneToOne: false
             referencedRelation: "simulations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      cheques_cognitivos: {
-        Row: {
-          created_at: string
-          emocao: string
-          id: string
-          motivo: string
-          regra_id: string | null
-          sinal: Json
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          emocao: string
-          id?: string
-          motivo: string
-          regra_id?: string | null
-          sinal?: Json
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          emocao?: string
-          id?: string
-          motivo?: string
-          regra_id?: string | null
-          sinal?: Json
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cheques_cognitivos_regra_id_fkey"
-            columns: ["regra_id"]
-            isOneToOne: false
-            referencedRelation: "personal_rules"
             referencedColumns: ["id"]
           },
         ]
@@ -551,33 +510,6 @@ export type Database = {
           ultima_atividade?: string | null
           updated_at?: string
           xp_total?: number
-        }
-        Relationships: []
-      }
-      reflexoes_diarias: {
-        Row: {
-          conteudo: string
-          created_at: string
-          data: string
-          estado: string | null
-          id: string
-          user_id: string
-        }
-        Insert: {
-          conteudo: string
-          created_at?: string
-          data: string
-          estado?: string | null
-          id?: string
-          user_id: string
-        }
-        Update: {
-          conteudo?: string
-          created_at?: string
-          data?: string
-          estado?: string | null
-          id?: string
-          user_id?: string
         }
         Relationships: []
       }
