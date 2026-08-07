@@ -3,13 +3,7 @@
 // manter src/lib/lessons.ts focado em texto/quiz.
 
 export type LessonVisualKind =
-  | "callput"
-  | "moneyness"
-  | "theta"
-  | "travas"
-  | "fiscal"
-  | "premio"
-  | "none";
+  "callput" | "moneyness" | "theta" | "travas" | "fiscal" | "premio" | "none";
 
 export type LessonMeta = {
   objetivo: string;
@@ -52,7 +46,11 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
       texto:
         "Put também é direito com prazo. Se a queda não vier no tempo certo, o prêmio derrete igual — direção certa e prazo errado ainda é prejuízo.",
     },
-    resumoPontos: ["Call = direito de comprar", "Put = direito de vender", "Direção certa + prazo errado = prejuízo"],
+    resumoPontos: [
+      "Call = direito de comprar",
+      "Put = direito de vender",
+      "Direção certa + prazo errado = prejuízo",
+    ],
     simulador: "Compare uma call e uma put no mesmo strike.",
   },
   "vencimento-e-exercicio": {
@@ -60,7 +58,8 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
     tempoMin: 6,
     erroComum: {
       titulo: "Esquecer a data de vencimento",
-      texto: "Toda posição tem um relógio. Decidir na véspera, sob pressão, é onde nascem os piores trades.",
+      texto:
+        "Toda posição tem um relógio. Decidir na véspera, sob pressão, é onde nascem os piores trades.",
     },
   },
   "premio-e-strike": {
@@ -72,7 +71,11 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
       texto:
         "O extrínseco é a parte do prêmio que evapora com o tempo. Quanto mais você paga por expectativa, mais o relógio joga contra você.",
     },
-    resumoPontos: ["Prêmio = intrínseco + extrínseco", "Intrínseco nunca é negativo", "O extrínseco vira zero no vencimento"],
+    resumoPontos: [
+      "Prêmio = intrínseco + extrínseco",
+      "Intrínseco nunca é negativo",
+      "O extrínseco vira zero no vencimento",
+    ],
   },
   moneyness: {
     objetivo: "Escolher o strike a partir da probabilidade — não do preço da opção.",
@@ -100,14 +103,19 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
       texto:
         "A corrosão acelera na última semana. Esperar mais é pagar aluguel de tempo justamente quando ele está mais caro.",
     },
-    resumoPontos: ["Theta corrói o extrínseco", "A queda acelera perto do vencimento", "Comprador luta contra o tempo"],
+    resumoPontos: [
+      "Theta corrói o extrínseco",
+      "A queda acelera perto do vencimento",
+      "Comprador luta contra o tempo",
+    ],
   },
   "compra-a-seco": {
     objetivo: "Definir quanto do seu capital pode virar pó numa compra a seco.",
     tempoMin: 7,
     erroComum: {
       titulo: "Dobrar a aposta depois de perder",
-      texto: "Compra a seco tem alta taxa de perda total. Dobrar após perder é como tentar recuperar no cassino.",
+      texto:
+        "Compra a seco tem alta taxa de perda total. Dobrar após perder é como tentar recuperar no cassino.",
     },
   },
   "venda-coberta": {
@@ -115,7 +123,8 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
     tempoMin: 7,
     erroComum: {
       titulo: "Vender call em ação que você não quer vender",
-      texto: "Se o ativo disparar, você é chamado a entregar as ações no strike. Aceite esse desfecho antes de montar.",
+      texto:
+        "Se o ativo disparar, você é chamado a entregar as ações no strike. Aceite esse desfecho antes de montar.",
     },
   },
   rolagem: {
@@ -133,15 +142,25 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
     visual: "travas",
     erroComum: {
       titulo: "Montar trava sem olhar a liquidez da ponta vendida",
-      texto: "Perna ilíquida vira prisão: você entra fácil e sai caro. Confira o book das duas pernas.",
+      texto:
+        "Perna ilíquida vira prisão: você entra fácil e sai caro. Confira o book das duas pernas.",
     },
-    resumoPontos: ["Ganho e perda são limitados e conhecidos", "Custo menor que a compra a seco", "Depende de liquidez nas duas pernas"],
+    resumoPontos: [
+      "Ganho e perda são limitados e conhecidos",
+      "Custo menor que a compra a seco",
+      "Depende de liquidez nas duas pernas",
+    ],
     simulador: "Monte a trava de alta e veja o payoff limitado dos dois lados.",
   },
   "trava-de-baixa": {
     objetivo: "Estruturar uma aposta de queda com risco travado.",
     tempoMin: 8,
     visual: "travas",
+    erroComum: {
+      titulo: "Montar trava para esperar queda extrema",
+      texto:
+        "A trava de baixa limita o ganho no strike inferior. Se a sua tese exige uma queda de 20%, a trava não é o instrumento: o ganho para cedo e a queda continua acontecendo sem você.",
+    },
     simulador: "Monte a trava de baixa com puts.",
   },
   "rolagem-defensiva": {
@@ -174,7 +193,16 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
     objetivo: "Fechar o mês sabendo se tem DARF a pagar e quanto.",
     tempoMin: 7,
     visual: "fiscal",
-    resumoPontos: ["Código 6015", "Vence no último dia útil do mês seguinte", "Prejuízo compensa lucro futuro"],
+    erroComum: {
+      titulo: "Achar que prejuízo compensa qualquer coisa",
+      texto:
+        "Compensação é estanque: swing só compensa swing, day trade só compensa day trade. E sem registro no diário e na declaração anual, o prejuízo não é aceito pela Receita.",
+    },
+    resumoPontos: [
+      "Código 6015",
+      "Vence no último dia útil do mês seguinte",
+      "Prejuízo compensa lucro futuro",
+    ],
   },
 };
 
@@ -187,9 +215,39 @@ export const NIVEL_THEME: Record<
   number,
   { accent: string; bg: string; border: string; ring: string; nome: string }
 > = {
-  1: { accent: "text-success", bg: "bg-success/10", border: "border-success/40", ring: "bg-success", nome: "Fundamentos" },
-  2: { accent: "text-chart-2", bg: "bg-chart-2/10", border: "border-chart-2/40", ring: "bg-chart-2", nome: "Mecânica" },
-  3: { accent: "text-primary", bg: "bg-primary/10", border: "border-primary/40", ring: "bg-primary", nome: "Operação" },
-  4: { accent: "text-loss", bg: "bg-loss/10", border: "border-loss/40", ring: "bg-loss", nome: "Estruturas" },
-  5: { accent: "text-primary", bg: "bg-primary/10", border: "border-primary/40", ring: "bg-primary", nome: "Tributação" },
+  1: {
+    accent: "text-success",
+    bg: "bg-success/10",
+    border: "border-success/40",
+    ring: "bg-success",
+    nome: "Fundamentos",
+  },
+  2: {
+    accent: "text-chart-2",
+    bg: "bg-chart-2/10",
+    border: "border-chart-2/40",
+    ring: "bg-chart-2",
+    nome: "Mecânica",
+  },
+  3: {
+    accent: "text-primary",
+    bg: "bg-primary/10",
+    border: "border-primary/40",
+    ring: "bg-primary",
+    nome: "Operação",
+  },
+  4: {
+    accent: "text-loss",
+    bg: "bg-loss/10",
+    border: "border-loss/40",
+    ring: "bg-loss",
+    nome: "Estruturas",
+  },
+  5: {
+    accent: "text-primary",
+    bg: "bg-primary/10",
+    border: "border-primary/40",
+    ring: "bg-primary",
+    nome: "Tributação",
+  },
 };

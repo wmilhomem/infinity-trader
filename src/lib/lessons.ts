@@ -12,18 +12,41 @@ export type Exercise = {
   gabarito: string;
 };
 
+export type LessonProblema = {
+  titulo: string;
+  texto: string;
+  pergunta: string;
+};
+
+export type LessonConceito = {
+  titulo: string;
+  corpo: string;
+};
+
+export type LessonNaPratica = {
+  titulo: string;
+  passos: string[];
+};
+
+export type LessonMissao = {
+  titulo: string;
+  texto: string;
+};
+
 export type Lesson = {
   slug: string;
   ordem: number;
   nivel: 1 | 2 | 3 | 4 | 5;
   titulo: string;
   resumo: string;
+  problema: LessonProblema;
+  conceitos: LessonConceito[];
   analogia: string;
-  conteudo: string; // markdown
+  naPratica: LessonNaPratica;
+  missao: LessonMissao;
   quiz: QuizQuestion[];
   exercicios?: Exercise[];
 };
-
 
 export const LESSONS: Lesson[] = [
   {
@@ -32,21 +55,46 @@ export const LESSONS: Lesson[] = [
     nivel: 1,
     titulo: "Lição 1 — O que é uma opção",
     resumo: "O direito (não a obrigação) de comprar ou vender uma ação a um preço combinado.",
-    analogia:
-      "Pense num vale-ingresso pra um show: você paga um valor pequeno agora pra ter o direito de comprar o ingresso a R$100 no dia. Se o show bombar e o ingresso subir pra R$300, você exerce. Se ninguém quiser ir, você joga o vale fora.",
-    conteudo: `
-## O conceito
-
+    problema: {
+      titulo: "O show que lota em minutos",
+      texto:
+        "Ana quer garantir o direito de comprar o ingresso do show do ano a R$100 — mesmo que ele dispare para R$300. Só que ela não quer obrigação: se ninguém quiser ir, ela prefere perder só o que pagou pelo direito, não o ingresso inteiro.",
+      pergunta: "Como garantir um preço no futuro sem se comprometer a comprar?",
+    },
+    conceitos: [
+      {
+        titulo: "O conceito",
+        corpo: `
 Uma opção é um **contrato** que dá o direito — nunca a obrigação — de comprar ou vender uma ação a um preço combinado até uma data.
 
 - Você paga um **prêmio** pelo direito.
 - Se o mercado for a seu favor, você exerce.
 - Se não for, o máximo que perde é o prêmio pago.
-
-## Americana vs Europeia
-
+        `,
+      },
+      {
+        titulo: "Americana vs Europeia",
+        corpo: `
 Na **B3**, quase todas as opções sobre ações são **americanas** (podem ser exercidas a qualquer momento até o vencimento). As opções de índice (IBOV) são **europeias** (só no vencimento).
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "Pense num vale-ingresso pra um show: você paga um valor pequeno agora pra ter o direito de comprar o ingresso a R$100 no dia. Se o show bombar e o ingresso subir pra R$300, você exerce. Se ninguém quiser ir, você joga o vale fora.",
+    naPratica: {
+      titulo: "Antes de comprar qualquer opção",
+      passos: [
+        "Qual é o preço combinado (strike)?",
+        "Até quando o direito vale (vencimento)?",
+        "Quanto custa o direito (prêmio)?",
+        "Quanto estou disposto a perder inteiro?",
+      ],
+    },
+    missao: {
+      titulo: "Garanta a compra",
+      texto:
+        "Você tem R$1.000 e quer garantir o direito de comprar PETR4 a R$38 em qualquer dia do próximo mês — sem se obrigar a comprar. Em uma frase: o que você precisa comprar e quanto perde no máximo se desistir?",
+    },
     quiz: [
       {
         pergunta: "Qual das afirmações abaixo descreve corretamente uma opção?",
@@ -57,7 +105,8 @@ Na **B3**, quase todas as opções sobre ações são **americanas** (podem ser 
           "Contrato futuro sem prêmio",
         ],
         correta: 1,
-        explicacao: "Opção = direito. Você pode exercer ou não. O prêmio é o que você paga pelo direito.",
+        explicacao:
+          "Opção = direito. Você pode exercer ou não. O prêmio é o que você paga pelo direito.",
       },
       {
         pergunta: "Opções de ações na B3 são majoritariamente…",
@@ -67,14 +116,10 @@ Na **B3**, quase todas as opções sobre ações são **americanas** (podem ser 
       },
       {
         pergunta: "Se você comprar uma opção e o mercado for contra você, sua perda máxima é:",
-        alternativas: [
-          "O valor total da ação",
-          "Ilimitada",
-          "O prêmio pago",
-          "Zero",
-        ],
+        alternativas: ["O valor total da ação", "Ilimitada", "O prêmio pago", "Zero"],
         correta: 2,
-        explicacao: "Comprador de opção tem perda limitada ao prêmio pago. É isso que a torna um seguro.",
+        explicacao:
+          "Comprador de opção tem perda limitada ao prêmio pago. É isso que a torna um seguro.",
       },
     ],
   },
@@ -84,17 +129,30 @@ Na **B3**, quase todas as opções sobre ações são **americanas** (podem ser 
     nivel: 1,
     titulo: "Lição 2 — Call vs Put",
     resumo: "Call = direito de comprar. Put = direito de vender. Aprenda a decifrar o código B3.",
-    analogia:
-      "Call é o vale-ingresso (direito de comprar por preço fixo). Put é o seguro do carro (direito de vender por preço fixo mesmo se despencar).",
-    conteudo: `
-## Call
+    problema: {
+      titulo: "Duas amigas, duas apostas",
+      texto:
+        "PETR4 está a R$38. Você lê que o petróleo vai subir e acha que a ação vai atrás. Sua amiga acha que o preço já subiu demais e vai corrigir. As duas querem operar opções para apostar na própria direção.",
+      pergunta: "Qual instrumento cada uma usa — e o que cada direito permite fazer?",
+    },
+    conceitos: [
+      {
+        titulo: "Call",
+        corpo: `
 Direito de **comprar** a ação pelo strike. Você compra call quando **acredita que vai subir**.
-
-## Put
+        `,
+      },
+      {
+        titulo: "Put",
+        corpo: `
 Direito de **vender** a ação pelo strike. Você compra put quando **acredita que vai cair** — ou quer proteger uma posição comprada.
-
-## Código B3
+        `,
+      },
+      {
+        titulo: "Código B3",
+        corpo: `
 Ex: **PETRK38**
+
 - **PETR** — ativo (Petrobras PN)
 - **K** — mês e tipo (K = novembro Call; W = novembro Put)
 - **38** — strike
@@ -105,7 +163,25 @@ Ex: **PETRK38**
 | B / N | Fev | Fev |
 | K / W | Nov | Nov |
 | L / X | Dez | Dez |
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "Call é o vale-ingresso (direito de comprar por preço fixo). Put é o seguro do carro (direito de vender por preço fixo mesmo se despencar).",
+    naPratica: {
+      titulo: "Da direção ao instrumento",
+      passos: [
+        "Espera alta → compra call.",
+        "Espera queda → compra put.",
+        "Tem ações e teme queda → put de proteção (não vende as ações).",
+        "Confere o código B3: ativo + letra (mês/tipo) + strike.",
+      ],
+    },
+    missao: {
+      titulo: "Escolha a perna certa",
+      texto:
+        "PETR4 a R$38. Você espera que o preço suba. Em uma frase: qual série você compra (K38 ou W38) e o que essa opção te dá o direito de fazer?",
+    },
     quiz: [
       {
         pergunta: "Você acha que PETR4 vai subir. Qual opção compra?",
@@ -128,7 +204,8 @@ Ex: **PETRK38**
           "Emprestar ações",
         ],
         correta: 0,
-        explicacao: "Put dá direito de vender pelo strike — protege quem tem a ação e lucra em queda.",
+        explicacao:
+          "Put dá direito de vender pelo strike — protege quem tem a ação e lucra em queda.",
       },
     ],
   },
@@ -137,23 +214,34 @@ Ex: **PETRK38**
     ordem: 3,
     nivel: 1,
     titulo: "Lição 3 — Vencimento, exercício e liquidez",
-    resumo: "Como funciona a data de vencimento na B3, exercício automático e o risco de ficar preso.",
-    analogia:
-      "O vale-ingresso tem prazo. Passou a data, virou papel. E se ninguém quiser comprar seu vale antes, você só tem duas saídas: usar ou perder.",
-    conteudo: `
-## Quando vence
-
+    resumo:
+      "Como funciona a data de vencimento na B3, exercício automático e o risco de ficar preso.",
+    problema: {
+      titulo: "O relógio que não avisa",
+      texto:
+        "Você comprou uma call, o ativo subiu exatamente como você previu — mas o vencimento chegou e passou. O direito que valia ouro na sexta virou pó na segunda. E na hora de sair, ninguém queria comprar sua opção a preço justo.",
+      pergunta:
+        "O que exatamente acontece na data de vencimento — e por que a liquidez pode te prender antes dela?",
+    },
+    conceitos: [
+      {
+        titulo: "Quando vence",
+        corpo: `
 Na B3, opções sobre ações vencem na **terceira sexta-feira** do mês (se for feriado, no dia útil seguinte). Depois disso, o contrato deixa de existir.
-
-## Exercício
-
+        `,
+      },
+      {
+        titulo: "Exercício",
+        corpo: `
 - **ITM (dentro do dinheiro)** no vencimento → normalmente exercida automaticamente pela corretora.
 - **OTM (fora do dinheiro)** → vira pó. Você perde o prêmio pago.
 
 Se você **vendeu** a opção e ela vira ITM, você pode ser exercido: precisa entregar (call) ou comprar (put) as ações.
-
-## Liquidez: o risco silencioso
-
+        `,
+      },
+      {
+        titulo: "Liquidez: o risco silencioso",
+        corpo: `
 Estar certo na direção não basta se não houver contraparte. Antes de entrar, olhe:
 
 - Volume negociado no dia
@@ -161,7 +249,25 @@ Estar certo na direção não basta se não houver contraparte. Antes de entrar,
 - Spread entre compra e venda
 
 Regra prática: opções com strike próximo do preço atual e vencimento mais curto costumam ter mais liquidez. Séries distantes viram armadilha.
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "O vale-ingresso tem prazo. Passou a data, virou papel. E se ninguém quiser comprar seu vale antes, você só tem duas saídas: usar ou perder.",
+    naPratica: {
+      titulo: "Check de 30 segundos antes de entrar",
+      passos: [
+        "Volume do dia na série (existe negócio?).",
+        "Número de negócios — não só o volume financeiro.",
+        "Spread menor que ~10% do prêmio.",
+        "Strike próximo do preço e vencimento líquido.",
+      ],
+    },
+    missao: {
+      titulo: "Saia quando quiser",
+      texto:
+        "Você quer operar a série PETRK38. Em 3 passos, como você confirma, antes de entrar, que vai conseguir sair dela a preço justo?",
+    },
     quiz: [
       {
         pergunta: "Quando vencem as opções sobre ações na B3?",
@@ -214,31 +320,59 @@ Regra prática: opções com strike próximo do preço atual e vencimento mais c
     nivel: 2,
     titulo: "Lição 4 — Prêmio & Strike",
     resumo: "Valor intrínseco vs. extrínseco: onde mora o preço da opção.",
-    analogia:
-      "Iogurte: parte do preço é o iogurte em si (intrínseco), parte é o quanto falta pra vencer (extrínseco). Perto do vencimento, só sobra o iogurte.",
-    conteudo: `
-## Prêmio = intrínseco + extrínseco
-
+    problema: {
+      titulo: "Por que a K36 custa o dobro?",
+      texto:
+        "PETR4 está a R$38. A call K38 custa R$1,50 e a call K36 custa R$2,80. Quase o dobro pelo mesmo ativo, mesmo vencimento. Você vai pagar a mais sem saber o que está comprando?",
+      pergunta: "De onde vem essa diferença de R$1,30 no prêmio?",
+    },
+    conceitos: [
+      {
+        titulo: "Prêmio = intrínseco + extrínseco",
+        corpo: `
 - **Intrínseco**: quanto a opção já vale se exercida hoje.
   - Call: max(0, preço_ativo − strike)
   - Put:  max(0, strike − preço_ativo)
 - **Extrínseco** (valor tempo + volatilidade): tudo o mais.
-
-## Exemplo (PETR4 a R$38)
+        `,
+      },
+      {
+        titulo: "Exemplo (PETR4 a R$38)",
+        corpo: `
 Call PETRK38 (strike 38) sendo negociada a R$1,50:
+
 - Intrínseco: 0 (ATM)
 - Extrínseco: R$1,50
 
 Call PETRK36 (strike 36) sendo negociada a R$2,80:
+
 - Intrínseco: 2,00
 - Extrínseco: 0,80
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "Iogurte: parte do preço é o iogurte em si (intrínseco), parte é o quanto falta pra vencer (extrínseco). Perto do vencimento, só sobra o iogurte.",
+    naPratica: {
+      titulo: "Antes de pagar qualquer prêmio",
+      passos: [
+        "Calcule o intrínseco com a fórmula (o que a opção já vale hoje).",
+        "O restante é extrínseco — expectativa de tempo e volatilidade.",
+        "Pergunte: estou pagando pelo que já existe ou pelo que pode acontecer?",
+      ],
+    },
+    missao: {
+      titulo: "Separe o preço",
+      texto:
+        "PETR4 a R$38. Call K36 a R$2,80. Em uma frase: quanto desse prêmio é o que a opção já vale hoje, e quanto é expectativa?",
+    },
     quiz: [
       {
         pergunta: "PETR4 = R$38. Call strike 35 cotada a R$3,50. Qual o valor intrínseco?",
         alternativas: ["R$0,00", "R$3,00", "R$3,50", "R$0,50"],
         correta: 1,
-        explicacao: "Intrínseco de call = max(0, 38 − 35) = R$3,00. O restante (R$0,50) é extrínseco.",
+        explicacao:
+          "Intrínseco de call = max(0, 38 − 35) = R$3,00. O restante (R$0,50) é extrínseco.",
       },
       {
         pergunta: "O que acontece com o valor extrínseco perto do vencimento?",
@@ -264,12 +398,18 @@ Call PETRK36 (strike 36) sendo negociada a R$2,80:
     ordem: 5,
     nivel: 2,
     titulo: "Lição 5 — Moneyness: ITM, ATM e OTM",
-    resumo: "Onde o strike está em relação ao preço — e como isso muda risco, custo e probabilidade.",
-    analogia:
-      "Comprar OTM é bilhete de loteria barato: quase sempre vira pó, mas paga muito quando acerta. Comprar ITM é comprar a ação com desconto alavancado: caro, porém com mais chance.",
-    conteudo: `
-## Os três estados
-
+    resumo:
+      "Onde o strike está em relação ao preço — e como isso muda risco, custo e probabilidade.",
+    problema: {
+      titulo: "O strike que parece um achado",
+      texto:
+        "Você quer apostar que PETR4 sobe. A call K44 custa R$0,30 — parece um achado comparado aos R$4,50 da K34. 'Se subir um pouquinho, multiplico.' Será que o mercado está te dando dinheiro?",
+      pergunta: "Por que a barata é barata — e o que ela te obriga a acertar?",
+    },
+    conceitos: [
+      {
+        titulo: "Os três estados",
+        corpo: `
 Para uma **call** com o ativo a R$38:
 
 | Strike | Estado | Prêmio | Chance de virar pó |
@@ -279,19 +419,35 @@ Para uma **call** com o ativo a R$38:
 | 44 | OTM (fora) | baixo | alta |
 
 Para uma **put**, é o inverso: strike acima do preço é ITM.
-
-## O trade-off que ninguém conta
-
+        `,
+      },
+      {
+        titulo: "O trade-off que ninguém conta",
+        corpo: `
 - **OTM barata** = alta alavancagem, alta probabilidade de perder 100%.
 - **ITM cara** = menos alavancagem, comportamento mais parecido com a ação.
 - **ATM** = maior valor extrínseco e maior sensibilidade ao tempo.
 
 O erro clássico do iniciante é comprar OTM muito distante porque "está barato". Barato não é o mesmo que ter valor esperado positivo.
-
-## Decisão
-
-Antes de escolher o strike, responda: qual movimento eu espero, de quanto e em quanto tempo? Se o strike exige um movimento que o ativo raramente faz nesse prazo, a operação já nasce perdida.
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "Comprar OTM é bilhete de loteria barato: quase sempre vira pó, mas paga muito quando acerta. Comprar ITM é comprar a ação com desconto alavancado: caro, porém com mais chance.",
+    naPratica: {
+      titulo: "Escolha o strike pela probabilidade",
+      passos: [
+        "Qual movimento eu espero (direção)?",
+        "De quanto (magnitude)?",
+        "Em quanto tempo (prazo)?",
+        "Esse movimento acontece com frequência nesse prazo? Se não, a operação já nasce perdida.",
+      ],
+    },
+    missao: {
+      titulo: "Elimine um strike",
+      texto:
+        "PETR4 a R$38. Você espera +5% em 30 dias. Entre a K34 (ITM), a K38 (ATM) e a K44 (OTM), qual strike você descarta na hora — e por quê (uma frase)?",
+    },
     quiz: [
       {
         pergunta: "Ativo a R$38. Uma call de strike 44 está…",
@@ -331,28 +487,58 @@ Antes de escolher o strike, responda: qual movimento eu espero, de quanto e em q
     ordem: 6,
     nivel: 2,
     titulo: "Lição 6 — Theta: o tempo corrói o comprador",
-    resumo: "Por que a opção perde valor mesmo com o ativo parado — e o que isso muda na sua decisão.",
-    analogia:
-      "Opção é gelo no sol. Todo dia derrete um pouco, e nos últimos dias derrete muito mais rápido.",
-    conteudo: `
-## O que é theta
-
+    resumo:
+      "Por que a opção perde valor mesmo com o ativo parado — e o que isso muda na sua decisão.",
+    problema: {
+      titulo: "O dinheiro que sumiu no fim de semana",
+      texto:
+        "Você comprou uma call na sexta-feira. Na segunda, o ativo não mexeu nada — mas sua opção vale menos. Ninguém vendeu nada, nenhuma notícia, só o calendário virou a página.",
+      pergunta: "Para onde foi o dinheiro?",
+    },
+    conceitos: [
+      {
+        titulo: "O que é theta",
+        corpo: `
 **Theta** mede quanto de prêmio a opção perde por dia só pela passagem do tempo. É negativo para quem compra e positivo para quem vende.
-
-## A curva não é linear
-
+        `,
+      },
+      {
+        titulo: "A curva não é linear",
+        corpo: `
 A perda de valor extrínseco acelera nas últimas semanas antes do vencimento. Uma opção que perde R$0,02/dia a 60 dias do vencimento pode perder R$0,10/dia na última semana.
-
-## Consequências práticas
-
+        `,
+      },
+      {
+        titulo: "Consequências práticas",
+        corpo: `
 1. **Comprador precisa de movimento e de prazo.** Estar certo tarde demais é o mesmo que estar errado.
 2. **Vencimento muito curto** é atrativo pelo preço e letal pelo theta.
 3. **Vendedor lucra com o tempo**, mas assume risco assimétrico — por isso venda descoberta não é operação de iniciante.
-
-## Regra de bolso
-
+        `,
+      },
+      {
+        titulo: "Regra de bolso",
+        corpo: `
 Se sua tese depende de um evento com data (balanço, decisão de juros), escolha um vencimento com folga depois da data. Comprar a opção que vence antes do evento é pagar para não participar dele.
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "Opção é gelo no sol. Todo dia derrete um pouco, e nos últimos dias derrete muito mais rápido.",
+    naPratica: {
+      titulo: "Antes de comprar, responda",
+      passos: [
+        "Quanto o theta tira da minha opção por dia?",
+        "Meu vencimento tem folga depois do evento da minha tese?",
+        "Se o ativo ficar parado, eu aguento a corrosão?",
+        "Se 'estar certo tarde demais é estar errado', qual é a minha data-limite?",
+      ],
+    },
+    missao: {
+      titulo: "Escolha o prazo com folga",
+      texto:
+        "O balanço da PETR4 sai em 20 dias. A call de 10 dias custa metade da de 30 dias. Qual você compra — e qual é o motivo em uma frase?",
+    },
     quiz: [
       {
         pergunta: "O theta é favorável a quem?",
@@ -385,7 +571,8 @@ Se sua tese depende de um evento com data (balanço, decisão de juros), escolha
           "Vender opção descoberta",
         ],
         correta: 1,
-        explicacao: "Prazo insuficiente faz você pagar prêmio e não participar do evento que sustenta a tese.",
+        explicacao:
+          "Prazo insuficiente faz você pagar prêmio e não participar do evento que sustenta a tese.",
       },
     ],
     exercicios: [
@@ -399,7 +586,8 @@ Se sua tese depende de um evento com data (balanço, decisão de juros), escolha
       },
       {
         titulo: "Regra pessoal de prazo",
-        enunciado: "Escreva uma regra do tipo: 'Não compro opção com menos de N dias para o vencimento'.",
+        enunciado:
+          "Escreva uma regra do tipo: 'Não compro opção com menos de N dias para o vencimento'.",
         gabarito:
           "Exemplo de regra válida: 'Só compro opção seca com no mínimo 20 dias corridos até o vencimento, e com folga de pelo menos 5 dias após qualquer evento agendado da minha tese'. Cadastre em Regras.",
       },
@@ -410,32 +598,49 @@ Se sua tese depende de um evento com data (balanço, decisão de juros), escolha
     ordem: 7,
     nivel: 3,
     titulo: "Lição 7 — Compra a seco (call/put seca)",
-    resumo: "A estratégia mais simples e a que mais quebra iniciante. Como usar com risco definido.",
-    analogia:
-      "É apostar num pênalti: perda limitada ao valor da aposta, mas a maioria dos chutes vai pra fora.",
-    conteudo: `
-## O que é
-
+    resumo:
+      "A estratégia mais simples e a que mais quebra iniciante. Como usar com risco definido.",
+    problema: {
+      titulo: "Nenhuma perda era grande",
+      texto:
+        "R$500 na conta. A call custa R$1,20. 'Aposta pequena, perda pequena.' A primeira vira pó. A segunda também. Dezoito operações depois — nenhuma perda individual era grande — a conta está vazia.",
+      pergunta: "Se cada perda era pequena, onde foi parar o dinheiro?",
+    },
+    conceitos: [
+      {
+        titulo: "O que é",
+        corpo: `
 Comprar uma call (ou put) isolada, sem nenhuma outra perna.
 
 - **Risco máximo:** o prêmio pago (conhecido desde o início).
 - **Ganho máximo:** teoricamente ilimitado na call.
 - **Breakeven da call:** strike + prêmio.
 - **Breakeven da put:** strike − prêmio.
-
-## Por que quebra tanta gente
-
+        `,
+      },
+      {
+        titulo: "Por que quebra tanta gente",
+        corpo: `
 O risco não está na perda máxima — está na **frequência**. Você pode perder 100% do valor investido em cada operação, várias vezes seguidas. Sem controle de tamanho de posição, dez tentativas erradas zeram a conta.
-
-## Como usar com processo
-
-1. Defina o **tamanho**: no máximo 1% do capital por operação.
-2. Defina a **tese**: qual movimento, de quanto, até quando.
-3. Defina a **saída**: alvo de lucro e stop no prêmio (ex.: sair a −50%).
-4. Registre no diário **antes** de entrar.
-
-Compra a seco só é aceitável quando o prêmio é dinheiro que você aceita perder inteiro.
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "É apostar num pênalti: perda limitada ao valor da aposta, mas a maioria dos chutes vai pra fora.",
+    naPratica: {
+      titulo: "Como usar com processo",
+      passos: [
+        "Defina o tamanho: no máximo 1% do capital por operação.",
+        "Defina a tese: qual movimento, de quanto, até quando.",
+        "Defina a saída: alvo de lucro e stop no prêmio (ex.: sair a −50%).",
+        "Registre no diário antes de entrar.",
+      ],
+    },
+    missao: {
+      titulo: "Dimensione antes de entrar",
+      texto:
+        "Capital de R$20.000, regra do 1%, call a R$0,80 (lote de 100). Em uma frase: quantos lotes cabem — e qual é a sua saída combinada antes de enviar a ordem?",
+    },
     quiz: [
       {
         pergunta: "Call strike 40 comprada por R$1,50. Qual o breakeven no vencimento?",
@@ -452,7 +657,8 @@ Compra a seco só é aceitável quando o prêmio é dinheiro que você aceita pe
           "Impossibilidade de sair antes do vencimento",
         ],
         correta: 2,
-        explicacao: "A perda é limitada, mas acontece com muita frequência — o que destrói contas mal dimensionadas.",
+        explicacao:
+          "A perda é limitada, mas acontece com muita frequência — o que destrói contas mal dimensionadas.",
       },
       {
         pergunta: "Qual controle é indispensável na compra a seco?",
@@ -476,7 +682,8 @@ Compra a seco só é aceitável quando o prêmio é dinheiro que você aceita pe
       },
       {
         titulo: "Monte no simulador",
-        enunciado: "Simule uma call seca e escreva a tese no diário antes de considerar a operação real.",
+        enunciado:
+          "Simule uma call seca e escreva a tese no diário antes de considerar a operação real.",
         gabarito:
           "Tese completa contém: direção, magnitude esperada, prazo, breakeven calculado, alvo e stop no prêmio. Se faltar algum item, a operação ainda não está pronta.",
       },
@@ -487,35 +694,59 @@ Compra a seco só é aceitável quando o prêmio é dinheiro que você aceita pe
     ordem: 8,
     nivel: 3,
     titulo: "Lição 8 — Venda coberta",
-    resumo: "Gerar renda com ações que você já tem — e entender o que você está vendendo de verdade.",
-    analogia:
-      "É alugar seu imóvel com opção de compra: você recebe o aluguel agora, mas aceita vender pelo preço combinado se o inquilino quiser.",
-    conteudo: `
-## Como funciona
-
+    resumo:
+      "Gerar renda com ações que você já tem — e entender o que você está vendendo de verdade.",
+    problema: {
+      titulo: "O aluguel que pode virar venda",
+      texto:
+        "Você tem 100 ações da Petrobras e quer ganhar algo com elas. Alguém te oferece R$90 agora — em troca, você aceita vender suas ações por R$33 se o preço subir até lá. Parece aluguel. Mas é?",
+      pergunta: "O que você está vendendo de verdade quando recebe esse dinheiro?",
+    },
+    conceitos: [
+      {
+        titulo: "Como funciona",
+        corpo: `
 Você tem 100 ações e **vende uma call** sobre elas.
 
 - Recebe o prêmio imediatamente.
 - Se no vencimento o ativo estiver abaixo do strike: fica com as ações e com o prêmio.
 - Se estiver acima: é exercido e vende as ações pelo strike.
-
-## O que você realmente vendeu
-
+        `,
+      },
+      {
+        titulo: "O que você realmente vendeu",
+        corpo: `
 Você vendeu a **alta acima do strike**. Em troca, recebeu um prêmio fixo. Isso significa:
 
 - **Ganho limitado**: strike + prêmio − preço de compra da ação.
 - **Proteção parcial na queda**: apenas o valor do prêmio.
 - O risco de queda da ação continua todo com você.
-
-## Escolha do strike
-
+        `,
+      },
+      {
+        titulo: "Escolha do strike",
+        corpo: `
 - Strike próximo do preço: prêmio maior, chance alta de ser exercido.
 - Strike distante: prêmio pequeno, mais chance de manter as ações.
-
-## Erro comum
-
-Vender call sobre ação que você não quer vender e depois "rolar para não ser exercido", pagando cada vez mais caro. Só venda coberta em strike onde você **aceitaria** vender de verdade.
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "É alugar seu imóvel com opção de compra: você recebe o aluguel agora, mas aceita vender pelo preço combinado se o inquilino quiser.",
+    naPratica: {
+      titulo: "Antes de vender a call",
+      passos: [
+        "Você aceitaria vender a ação nesse strike? Se não, não venda a call.",
+        "Quanto o prêmio protege da queda? (Só o prêmio — o resto é seu.)",
+        "Se o ativo disparar, qual é o desfecho aceito por você?",
+        "Nada de 'rolar para não ser exercido' — isso vira ralo.",
+      ],
+    },
+    missao: {
+      titulo: "Escolha o strike",
+      texto:
+        "Você comprou a ação a R$30 e quer prêmio. A call K33 paga R$0,90; a K36 paga R$0,30. Em uma frase: qual strike você vende — e em que preço você aceita vender a ação de verdade?",
+    },
     quiz: [
       {
         pergunta: "Na venda coberta, o que limita o seu ganho?",
@@ -537,7 +768,8 @@ Vender call sobre ação que você não quer vender e depois "rolar para não se
           "Nenhuma proteção",
         ],
         correta: 1,
-        explicacao: "O prêmio amortece a queda apenas no valor recebido. O resto do risco continua seu.",
+        explicacao:
+          "O prêmio amortece a queda apenas no valor recebido. O resto do risco continua seu.",
       },
       {
         pergunta: "Qual critério correto para escolher o strike da venda coberta?",
@@ -548,7 +780,8 @@ Vender call sobre ação que você não quer vender e depois "rolar para não se
           "O do vencimento mais curto",
         ],
         correta: 1,
-        explicacao: "Se você não aceita vender naquele preço, a operação vira uma armadilha de rolagens caras.",
+        explicacao:
+          "Se você não aceita vender naquele preço, a operação vira uma armadilha de rolagens caras.",
       },
     ],
     exercicios: [
@@ -573,11 +806,16 @@ Vender call sobre ação que você não quer vender e depois "rolar para não se
     nivel: 4,
     titulo: "Lição 9 — Rolagem (Roll)",
     resumo: "Roll Out, Roll Up, Roll Down, Roll Up and Out — e a armadilha do rolar demais.",
-    analogia:
-      "Plano de celular com teto de dados: quando estoura, você paga pra prolongar (Roll Out) ou pra subir de plano (Roll Up). Fazer isso todo mês vira ralo.",
-    conteudo: `
-## O que é rolar
-
+    problema: {
+      titulo: "A call que ficou contra você",
+      texto:
+        "Você vendeu uma call K40 por R$1,20. O ativo subiu para R$41,50 e o vencimento está a 8 dias. Se não fizer nada, você é exercido e entrega as ações. A mesa de opções da sua corretora sugere: 'rola pro próximo mês que resolve'.",
+      pergunta: "Rolar resolve — ou só adia?",
+    },
+    conceitos: [
+      {
+        titulo: "O que é rolar",
+        corpo: `
 Encerrar uma opção que você já tem e **abrir outra** em seu lugar — com novo strike, novo vencimento, ou ambos.
 
 | Tipo | O que muda |
@@ -586,17 +824,43 @@ Encerrar uma opção que você já tem e **abrir outra** em seu lugar — com no
 | **Roll Up** | Strike maior, mesmo vencimento |
 | **Roll Down** | Strike menor, mesmo vencimento |
 | **Roll Up and Out** | Strike maior + vencimento mais longe |
-
-## A armadilha
-
+        `,
+      },
+      {
+        titulo: "A armadilha",
+        corpo: `
 Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo com custo. Fazer isso repetidamente empilha prejuízo.
 
 **Regra de ouro do guia:** no máximo **1 rolagem por operação**. Se falhou de novo, encerra.
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "Plano de celular com teto de dados: quando estoura, você paga pra prolongar (Roll Out) ou pra subir de plano (Roll Up). Fazer isso todo mês vira ralo.",
+    naPratica: {
+      titulo: "Antes de rolar, responda",
+      passos: [
+        "A tese original ainda vale? Se o motivo sumiu, encerra — não rola.",
+        "Já rolei essa operação? Se sim, encerra. Máximo 1 rolagem.",
+        "A rolagem sai a crédito ou a débito pequeno (< 30% do prêmio original)?",
+        "Se falhar de novo, eu encerro mesmo?",
+      ],
+    },
+    missao: {
+      titulo: "O limite é uma regra",
+      texto:
+        "Sua call já foi rolada uma vez e estourou de novo. Em uma frase: o que você faz agora — e qual regra do guia te dá essa resposta?",
+    },
     quiz: [
       {
-        pergunta: "Você vendeu uma call strike 40. O ativo subiu pra 42 e você quer continuar posicionado. Qual roll faz sentido?",
-        alternativas: ["Roll Down", "Roll Up (ou Up and Out)", "Encerrar sem rolar", "Roll Out sem mudar strike"],
+        pergunta:
+          "Você vendeu uma call strike 40. O ativo subiu pra 42 e você quer continuar posicionado. Qual roll faz sentido?",
+        alternativas: [
+          "Roll Down",
+          "Roll Up (ou Up and Out)",
+          "Encerrar sem rolar",
+          "Roll Out sem mudar strike",
+        ],
         correta: 1,
         explicacao: "Subir o strike alivia o risco de exercício; mover o vencimento dá tempo.",
       },
@@ -609,7 +873,8 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
           "Ser tributado em dobro",
         ],
         correta: 1,
-        explicacao: "Rolar demais é insistir num erro. O guia recomenda no máximo 1 roll por operação.",
+        explicacao:
+          "Rolar demais é insistir num erro. O guia recomenda no máximo 1 roll por operação.",
       },
       {
         pergunta: "Roll Out significa:",
@@ -636,22 +901,28 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
         titulo: "Registro no diário",
         enunciado:
           "Abra o Diário e registre uma operação hipotética com estrutura 'venda coberta', ativo VALE3, marque 'seguiu a regra' e escreva no motivo: 'rolei uma vez, dentro do limite'. Depois vá em Revisão e confira se a linha aparece.",
-        gabarito: "Fluxo esperado: Diário → nova entrada → Revisão mostra a operação na coluna 'seguiu regra'.",
+        gabarito:
+          "Fluxo esperado: Diário → nova entrada → Revisão mostra a operação na coluna 'seguiu regra'.",
       },
     ],
   },
   {
-
-
     slug: "trava-de-alta",
     ordem: 10,
     nivel: 4,
     titulo: "Lição 10 — Trava de Alta (Bull Call Spread)",
-    resumo: "Compra uma call mais barata (ITM/ATM) + vende uma call mais cara (OTM). Risco e ganho limitados.",
-    analogia:
-      "Carro de corrida com limitador de velocidade: você ganha se andar rápido, mas o motor não passa de X. Em troca, o combustível (custo) é menor.",
-    conteudo: `
-## Montagem
+    resumo:
+      "Compra uma call mais barata (ITM/ATM) + vende uma call mais cara (OTM). Risco e ganho limitados.",
+    problema: {
+      titulo: "Custo de R$150 é demais",
+      texto:
+        "Você quer a alta da PETR4, mas a call K38 custa R$1,50 — R$150 inteiros de risco no lote. Para ganhar, o ativo precisa andar. E se der para pagar só R$90 pela mesma aposta? Aí vem a letra miúda.",
+      pergunta: "O que a segunda perna tira de você em troca do desconto?",
+    },
+    conceitos: [
+      {
+        titulo: "Montagem",
+        corpo: `
 - **Compra** call strike A (menor)
 - **Vende** call strike B (maior)
 - Mesmo vencimento
@@ -660,8 +931,11 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
 - Compra PETRK38 por R$1,50
 - Vende PETRK40 por R$0,60
 - **Custo líquido**: R$0,90 por ação = R$90 no lote
-
-## Payoff no vencimento
+        `,
+      },
+      {
+        titulo: "Payoff no vencimento",
+        corpo: `
 | Cenário | Resultado |
 |---|---|
 | PETR4 ≤ 38 | Perde os R$90 (prêmio líquido) |
@@ -670,7 +944,25 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
 **Lucro máximo** = (B − A) − custo = (40 − 38) − 0,90 = R$1,10.
 **Perda máxima** = custo = R$0,90.
 **Breakeven** = A + custo = R$38,90.
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "Carro de corrida com limitador de velocidade: você ganha se andar rápido, mas o motor não passa de X. Em troca, o combustível (custo) é menor.",
+    naPratica: {
+      titulo: "Antes de montar a trava",
+      passos: [
+        "Perda máxima = custo líquido. Cabe no seu 1%?",
+        "As DUAS pernas têm liquidez? (Perna ilíquida vira prisão.)",
+        "Breakeven = strike comprado + custo. O ativo chega lá no prazo?",
+        "Conheça o ganho máximo antes de enviar — e aceite-o.",
+      ],
+    },
+    missao: {
+      titulo: "Leia a trava",
+      texto:
+        "Trava de alta K38/K40 por R$0,90 com PETR4 a R$38. Em uma frase: em que preço você para de ganhar, e qual é a sua perda máxima?",
+    },
     quiz: [
       {
         pergunta: "Numa trava de alta, o que limita o ganho?",
@@ -681,7 +973,8 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
           "A volatilidade",
         ],
         correta: 1,
-        explicacao: "A call vendida no strike superior tampona o ganho — o preço de ter a estrutura mais barata.",
+        explicacao:
+          "A call vendida no strike superior tampona o ganho — o preço de ter a estrutura mais barata.",
       },
       {
         pergunta: "Qual a perda máxima de uma trava de alta com custo líquido de R$0,90?",
@@ -713,17 +1006,23 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
       },
     ],
   },
-
   {
     slug: "trava-de-baixa",
     ordem: 11,
     nivel: 4,
     titulo: "Lição 11 — Trava de Baixa (Bear Put Spread)",
-    resumo: "Compra put mais cara (ATM/ITM) + vende put mais barata (OTM). Aposta em queda com risco limitado.",
-    analogia:
-      "Guarda-chuva com franja: te protege se chover forte, mas se virar tempestade, a franja não segura tudo. Barato porque abre mão do extremo.",
-    conteudo: `
-## Montagem
+    resumo:
+      "Compra put mais cara (ATM/ITM) + vende put mais barata (OTM). Aposta em queda com risco limitado.",
+    problema: {
+      titulo: "A queda que pode ser só 5%",
+      texto:
+        "Você espera que a PETR4 corrija, mas a put K38 custa R$1,40 — e o mercado já descontou muita coisa. Se a queda for moderada, a put pura engole seu prêmio. Existe um jeito de apostar na queda pagando menos?",
+      pergunta: "O que você abre mão para pagar R$0,90 em vez de R$1,40?",
+    },
+    conceitos: [
+      {
+        titulo: "Montagem",
+        corpo: `
 - **Compra** put strike B (maior)
 - **Vende** put strike A (menor)
 - Mesmo vencimento
@@ -732,15 +1031,36 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
 - Compra PETRW38 por R$1,40
 - Vende PETRW36 por R$0,50
 - **Custo líquido**: R$0,90 por ação
-
-## Payoff no vencimento
+        `,
+      },
+      {
+        titulo: "Payoff no vencimento",
+        corpo: `
 | Cenário | Resultado |
 |---|---|
 | PETR4 ≥ 38 | Perde os R$90 (prêmio pago) |
 | PETR4 ≤ 36 | Ganha (38 − 36) − 0,90 = R$1,10 → R$110 lucro máx |
 
 **Breakeven** = B − custo = R$37,10.
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "Guarda-chuva com franja: te protege se chover forte, mas se virar tempestade, a franja não segura tudo. Barato porque abre mão do extremo.",
+    naPratica: {
+      titulo: "Antes de montar a trava de baixa",
+      passos: [
+        "Perda máxima = débito pago. Cabe no 1%?",
+        "A queda que você espera cobre o breakeven (B − custo)?",
+        "As duas pernas têm liquidez?",
+        "Se a queda for extrema, a trava para de ganhar — aceite o teto.",
+      ],
+    },
+    missao: {
+      titulo: "Leia a trava de baixa",
+      texto:
+        "Trava K38/K36 por R$0,90 com PETR4 a R$38. Em uma frase: a partir de que preço do ativo você começa a lucrar, e onde o lucro para?",
+    },
     quiz: [
       {
         pergunta: "Numa trava de baixa, o que garante que o risco é limitado?",
@@ -751,7 +1071,8 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
           "A volatilidade implícita",
         ],
         correta: 1,
-        explicacao: "A perda máxima é o débito pago — nada além disso, mesmo se o ativo disparar pra cima.",
+        explicacao:
+          "A perda máxima é o débito pago — nada além disso, mesmo se o ativo disparar pra cima.",
       },
       {
         pergunta: "Compra put 38 e vende put 36, custo R$0,90. Qual o lucro máximo?",
@@ -788,33 +1109,53 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
       },
     ],
   },
-
   {
     slug: "rolagem-defensiva",
     ordem: 12,
     nivel: 4,
     titulo: "Lição 12 — Rolagem defensiva na prática",
     resumo: "Quando rolar salva a operação e quando é só empurrar prejuízo com o pé.",
-    analogia:
-      "Renegociar uma dívida: se te dá fôlego real pra pagar, vale. Se é só pra empurrar o boleto com juros maiores, tá cavando um buraco.",
-    conteudo: `
-## Critérios objetivos pra rolar
-
+    problema: {
+      titulo: "O vendedor que só queria comissão",
+      texto:
+        "Você vendeu a call K40 por R$1,00 e PETR4 está a R$41, subindo. O atendente da corretora te liga: 'rola pro próximo mês que a gente resolve'. Você já rolou uma vez esse mês. Ele não mencionou nada disso.",
+      pergunta: "Como decidir, em 30 segundos, se essa rolagem é gestão ou fuga?",
+    },
+    conceitos: [
+      {
+        titulo: "Critérios objetivos pra rolar",
+        corpo: `
 1. **A tese original ainda vale?** Se o motivo sumiu, encerra — não rola.
 2. **O crédito líquido faz sentido?** Rolar com débito grande é pagar pra continuar errado.
 3. **Você já rolou essa operação?** Se sim, encerra. **Máximo 1 rolagem.**
-
-## Checklist antes de rolar
-- [ ] Tese ainda intacta
-- [ ] Rolagem gera crédito ou débito pequeno (< 30% do prêmio original)
-- [ ] Novo vencimento cabe no seu prazo
-- [ ] Ainda dentro do stop de perda definido nas regras
-
-## Exemplo prático
+        `,
+      },
+      {
+        titulo: "Exemplo prático",
+        corpo: `
 Vendeu call PETRK40 por R$1,00. PETR4 subiu pra R$41.
+
 - **Rolagem boa**: recompra por R$1,80, vende PETRL42 (próximo mês) por R$2,20 → crédito R$0,40 e mais tempo.
 - **Rolagem ruim**: recompra por R$1,80, vende PETRK41 mesma série por R$0,50 → débito R$1,30 e sem tempo extra.
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "Renegociar uma dívida: se te dá fôlego real pra pagar, vale. Se é só pra empurrar o boleto com juros maiores, tá cavando um buraco.",
+    naPratica: {
+      titulo: "Checklist antes de rolar",
+      passos: [
+        "Tese ainda intacta.",
+        "Rolagem gera crédito ou débito pequeno (< 30% do prêmio original).",
+        "Novo vencimento cabe no seu prazo.",
+        "Ainda dentro do stop de perda definido nas regras.",
+      ],
+    },
+    missao: {
+      titulo: "Reconheça a fuga",
+      texto:
+        "Rolar a mesma call pela segunda vez, com débito de R$1,30 e sem tempo extra. Em uma frase: por que isso é quase sempre erro — e o que a regra do guia manda fazer?",
+    },
     quiz: [
       {
         pergunta: "Qual sinal indica que você NÃO deve rolar?",
@@ -825,7 +1166,8 @@ Vendeu call PETRK40 por R$1,00. PETR4 subiu pra R$41.
           "O ativo mexeu 1%",
         ],
         correta: 1,
-        explicacao: "Regra de ouro: no máximo 1 rolagem. Segunda tentativa é insistência, não estratégia.",
+        explicacao:
+          "Regra de ouro: no máximo 1 rolagem. Segunda tentativa é insistência, não estratégia.",
       },
       {
         pergunta: "Rolar com débito grande normalmente significa…",
@@ -836,7 +1178,8 @@ Vendeu call PETRK40 por R$1,00. PETR4 subiu pra R$41.
           "Que o ativo vai voltar",
         ],
         correta: 1,
-        explicacao: "Débito grande na rolagem é o mercado te dizendo que a nova aposta é cara — reavalie encerrar.",
+        explicacao:
+          "Débito grande na rolagem é o mercado te dizendo que a nova aposta é cara — reavalie encerrar.",
       },
       {
         pergunta: "Antes de rolar, o primeiro item do checklist é:",
@@ -847,7 +1190,8 @@ Vendeu call PETRK40 por R$1,00. PETR4 subiu pra R$41.
           "Trocar de ativo",
         ],
         correta: 1,
-        explicacao: "Se a tese caiu, o certo é encerrar. Rolar só faz sentido quando o motivo original ainda existe.",
+        explicacao:
+          "Se a tese caiu, o certo é encerrar. Rolar só faz sentido quando o motivo original ainda existe.",
       },
     ],
     exercicios: [
@@ -861,40 +1205,70 @@ Vendeu call PETRK40 por R$1,00. PETR4 subiu pra R$41.
         titulo: "Regra pessoal",
         enunciado:
           "Vá em Regras e crie a regra: 'Máximo 1 rolagem por operação; se falhar de novo, encerro'. Marque como ativa. Depois, no Diário, ao registrar uma operação, confirme que a regra aparece na lista pra vincular.",
-        gabarito: "Regra criada na categoria 'gestão' e disponível como opção ao registrar entrada no diário.",
+        gabarito:
+          "Regra criada na categoria 'gestão' e disponível como opção ao registrar entrada no diário.",
       },
     ],
   },
-
   {
     slug: "gestao-de-risco-travas",
     ordem: 13,
     nivel: 4,
     titulo: "Lição 13 — Gestão de risco em travas",
     resumo: "Position sizing, stop de perda e regra do 1% do patrimônio por operação.",
-    analogia:
-      "Cinto de segurança: você não usa esperando bater, mas quando bate, é ele que decide se você sai andando ou não.",
-    conteudo: `
-## Position sizing
-
+    problema: {
+      titulo: "O setup perfeito que quebrou o mês",
+      texto:
+        "A trava deu certo três vezes seguidas. Na quarta, você monta 10 lotes 'porque o setup está perfeito'. O ativo não anda, o theta corrói e o mês inteiro de lucro foi embora numa única operação.",
+      pergunta: "O que define o tamanho de uma operação: a chance de lucro ou o tamanho da perda?",
+    },
+    conceitos: [
+      {
+        titulo: "Position sizing",
+        corpo: `
 Nunca arrisque mais de **1% do patrimônio líquido** por operação. Numa trava, o risco é o **débito pago** (ou a diferença entre strikes − crédito, se for trava de crédito).
 
 ## Exemplo
 Patrimônio: R$50.000 → risco máximo por trade = R$500.
 
 Trava de alta PETRK38/PETRK40 custa R$0,90 por ação = R$90 no lote (100).
+
 - **Você pode montar até 5 lotes** (5 × R$90 = R$450, dentro do teto).
-
-## Stop de perda
-
+        `,
+      },
+      {
+        titulo: "Stop de perda",
+        corpo: `
 Defina no diário **antes de abrir**:
+
 - Stop no prêmio (ex: se a trava valer 50% do custo, encerra).
 - Stop no ativo (ex: se PETR4 furar R$36, encerra).
 - Stop de tempo (ex: 5 dias pré-vencimento sem plano, encerra).
-
-## Métrica que importa
+        `,
+      },
+      {
+        titulo: "Métrica que importa",
+        corpo: `
 **Expectativa matemática** = (prob acerto × ganho médio) − (prob erro × perda média). Se negativa, a operação é ruim mesmo quando dá certo às vezes.
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "Cinto de segurança: você não usa esperando bater, mas quando bate, é ele que decide se você sai andando ou não.",
+    naPratica: {
+      titulo: "O ritual antes de qualquer operação",
+      passos: [
+        "Risco por lote = débito (ou diferença de strikes − crédito).",
+        "Lotagem = (1% do patrimônio) ÷ risco por lote.",
+        "Os 3 stops escritos no diário ANTES de abrir: prêmio, ativo, tempo.",
+        "Expectativa negativa? Não opero, mesmo com setup bonito.",
+      ],
+    },
+    missao: {
+      titulo: "Dimensione a operação",
+      texto:
+        "Patrimônio de R$80.000, trava a R$2,00/ação (lote de 100). Em uma frase: quantos lotes você monta no máximo — e qual número você verifica antes de enviar a ordem?",
+    },
     quiz: [
       {
         pergunta: "Regra do 1%: patrimônio de R$80.000, quanto arrisca no máximo por operação?",
@@ -911,7 +1285,8 @@ Defina no diário **antes de abrir**:
           "Ilimitado",
         ],
         correta: 1,
-        explicacao: "Débito pago = perda máxima. Por isso trava de débito tem risco conhecido antes de abrir.",
+        explicacao:
+          "Débito pago = perda máxima. Por isso trava de débito tem risco conhecido antes de abrir.",
       },
       {
         pergunta: "Uma operação com expectativa matemática negativa…",
@@ -922,7 +1297,8 @@ Defina no diário **antes de abrir**:
           "Depende só da sorte",
         ],
         correta: 1,
-        explicacao: "Expectativa negativa é insustentável — mesmo vitórias esporádicas não compensam a série de perdas.",
+        explicacao:
+          "Expectativa negativa é insustentável — mesmo vitórias esporádicas não compensam a série de perdas.",
       },
     ],
     exercicios: [
@@ -947,36 +1323,67 @@ Defina no diário **antes de abrir**:
       },
     ],
   },
-
   {
     slug: "tributacao-basica",
     ordem: 14,
     nivel: 5,
     titulo: "Lição 14 — Tributação de opções (básico)",
-    resumo: "15% sobre lucro líquido mensal (swing) e 20% em day trade. Opções não têm isenção dos R$20 mil.",
-    analogia:
-      "Aluguel de imóvel: todo mês você fecha as contas e paga o carnê. Não tem faixa de isenção como venda de ação — se lucrou, paga.",
-    conteudo: `
-## Alíquotas
-
+    resumo:
+      "15% sobre lucro líquido mensal (swing) e 20% em day trade. Opções não têm isenção dos R$20 mil.",
+    problema: {
+      titulo: "O lucro que não era todo seu",
+      texto:
+        "Seu mês fechou com R$3.000 de lucro em opções. A corretora reteve R$8 de IRRF. Você já contou os R$3.000 como 'seus'. O governo tem outra visão — e ela é maior do que os R$8.",
+      pergunta: "Quanto desse lucro realmente sobra depois do imposto?",
+    },
+    conceitos: [
+      {
+        titulo: "Alíquotas",
+        corpo: `
 | Tipo | Alíquota |
 |---|---|
 | Operação comum (swing) | **15%** sobre lucro líquido do mês |
 | Day trade | **20%** sobre lucro líquido do mês |
-
-## Sem isenção de R$20 mil
-
+        `,
+      },
+      {
+        titulo: "Sem isenção de R$20 mil",
+        corpo: `
 Diferente de ação à vista, **opções não têm isenção mensal**. Todo lucro é tributado.
-
-## IRRF (imposto retido na fonte)
+        `,
+      },
+      {
+        titulo: "IRRF (imposto retido na fonte)",
+        corpo: `
 - Comum: **0,005%** sobre valor da venda ("dedo-duro")
 - Day trade: **1%** sobre o lucro do dia
 
 Serve pra Receita cruzar dados, mas você compensa no DARF mensal.
-
-## Prejuízo compensa
+        `,
+      },
+      {
+        titulo: "Prejuízo compensa",
+        corpo: `
 Prejuízo de um mês **abate lucro futuro** — sem prazo de validade. Registre tudo no diário e no controle mensal.
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "Aluguel de imóvel: todo mês você fecha as contas e paga o carnê. Não tem faixa de isenção como venda de ação — se lucrou, paga.",
+    naPratica: {
+      titulo: "Apuração em 4 passos",
+      passos: [
+        "Some os resultados por modalidade: swing separado de day trade.",
+        "Compense prejuízos acumulados (mesma modalidade, sem prazo).",
+        "Desconte o IRRF retido pela corretora.",
+        "Gere DARF código 6015 e pague até o último dia útil do mês seguinte.",
+      ],
+    },
+    missao: {
+      titulo: "Feche o mês",
+      texto:
+        "Mês com swing de +R$1.200, +R$800 e −R$600, IRRF de R$8. Em uma frase: quanto vai de DARF?",
+    },
     quiz: [
       {
         pergunta: "Lucrou R$3.000 em opções comuns no mês. Quanto de IR (fora IRRF)?",
@@ -993,7 +1400,8 @@ Prejuízo de um mês **abate lucro futuro** — sem prazo de validade. Registre 
           "Só em put",
         ],
         correta: 1,
-        explicacao: "Isenção dos R$20 mil vale só pra ação à vista. Opções pagam a partir do primeiro real de lucro.",
+        explicacao:
+          "Isenção dos R$20 mil vale só pra ação à vista. Opções pagam a partir do primeiro real de lucro.",
       },
       {
         pergunta: "Alíquota de day trade em opções:",
@@ -1014,47 +1422,86 @@ Prejuízo de um mês **abate lucro futuro** — sem prazo de validade. Registre 
         titulo: "Swing vs day trade",
         enunciado:
           "No mesmo mês: swing +R$500 e day trade em opções +R$400. Some tudo e calcule o IR devido (ignore IRRF).",
-        gabarito: "Modalidades separadas. Swing: 15%×500 = R$75. Day: 20%×400 = R$80. Total = R$155.",
+        gabarito:
+          "Modalidades separadas. Swing: 15%×500 = R$75. Day: 20%×400 = R$80. Total = R$155.",
       },
     ],
   },
-
   {
     slug: "darf-e-compensacao",
     ordem: 15,
     nivel: 5,
     titulo: "Lição 15 — DARF, compensação de prejuízo e controle mensal",
-    resumo: "Como apurar, gerar DARF código 6015, e usar prejuízo pra abater lucro futuro sem prazo.",
-    analogia:
-      "Cartão de crédito da Receita: fecha dia último do mês, vence dia último do mês seguinte. Atrasou, pega multa e juros Selic.",
-    conteudo: `
-## Passo a passo mensal
-
+    resumo:
+      "Como apurar, gerar DARF código 6015, e usar prejuízo pra abater lucro futuro sem prazo.",
+    problema: {
+      titulo: "O mês que parecia injusto",
+      texto:
+        "Janeiro deu lucro e você pagou DARF. Fevereiro deu prejuízo e você achou que o dinheiro estava perdido. Março voltou a lucrar — e você pagou imposto sobre o lucro cheio, sem abater o prejuízo de fevereiro.",
+      pergunta: "O governo devolve o prejuízo de fevereiro?",
+    },
+    conceitos: [
+      {
+        titulo: "Passo a passo mensal",
+        corpo: `
 1. **Some** lucros e prejuízos de cada operação encerrada no mês (separando swing de day trade).
 2. **Compense** prejuízos acumulados de meses anteriores (mesma modalidade).
 3. **Desconte** IRRF retido pela corretora.
 4. **Gere DARF** no site da Receita (Sicalc), código **6015**.
 5. **Pague até o último dia útil do mês seguinte.**
-
-## Compensação de prejuízo
+        `,
+      },
+      {
+        titulo: "Compensação de prejuízo",
+        corpo: `
 - Swing só compensa swing. Day trade só compensa day trade.
 - **Sem prazo de validade** — prejuízo de 2019 ainda abate lucro de 2026.
 - Precisa constar da declaração anual pra ser aceito.
-
-## Exemplo
+        `,
+      },
+      {
+        titulo: "Exemplo",
+        corpo: `
 | Mês | Resultado | IRRF | A pagar |
 |---|---|---|---|
 | Jan | +R$1.000 | R$5 | 15%×1000 − 5 = R$145 |
 | Fev | −R$800 | R$2 | Zero (acumula prejuízo R$800) |
 | Mar | +R$1.500 | R$7 | 15%×(1500−800) − 7 = R$98 |
-
-## Onde registrar
+        `,
+      },
+      {
+        titulo: "Onde registrar",
+        corpo: `
 Planilha própria ou o **diário do Zero ao Trade** — os campos de resultado alimentam essa apuração.
-    `,
+        `,
+      },
+    ],
+    analogia:
+      "Cartão de crédito da Receita: fecha dia último do mês, vence dia último do mês seguinte. Atrasou, pega multa e juros Selic.",
+    naPratica: {
+      titulo: "Checklist do fechamento mensal",
+      passos: [
+        "Feche a apuração por modalidade (swing / day trade).",
+        "Compense prejuízos acumulados — só da mesma modalidade.",
+        "Desconte o IRRF retido.",
+        "Gere o DARF 6015 e pague até o último dia útil do mês seguinte.",
+        "Confira o diário: sem registro, não há prejuízo aceito.",
+      ],
+    },
+    missao: {
+      titulo: "Compense em cadeia",
+      texto:
+        "Tudo swing: Jan −R$1.500, Fev +R$400, Mar +R$2.000. Em uma frase: quanto de IR você paga em fevereiro e quanto em março?",
+    },
     quiz: [
       {
         pergunta: "Prejuízo de swing pode compensar lucro de day trade?",
-        alternativas: ["Sim, sempre", "Não — modalidades separadas", "Só no mesmo mês", "Só com autorização da Receita"],
+        alternativas: [
+          "Sim, sempre",
+          "Não — modalidades separadas",
+          "Só no mesmo mês",
+          "Só com autorização da Receita",
+        ],
         correta: 1,
         explicacao: "Compensação é estanque: swing com swing, day trade com day trade.",
       },
@@ -1098,7 +1545,6 @@ Planilha própria ou o **diário do Zero ao Trade** — os campos de resultado a
       },
     ],
   },
-
 ];
 
 export function getLesson(slug: string) {
