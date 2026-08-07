@@ -168,10 +168,11 @@ function Home() {
   });
 
   useEffect(() => {
+    if (profileQ.isLoading || profileQ.isFetching) return;
     if (profileQ.data && !profileQ.data.onboarded) {
       navigate({ to: "/onboarding", replace: true });
     }
-  }, [profileQ.data, navigate]);
+  }, [profileQ.data, profileQ.isLoading, profileQ.isFetching, navigate]);
 
   const progress = progressQ.data ?? [];
   const rules = rulesQ.data ?? [];

@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { RULE_TEMPLATES, STRUCTURED_TEMPLATES } from "@/lib/rule-templates";
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
 
 function Onboarding() {
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const [step, setStep] = useState(1);
   const [jaOperou, setJaOperou] = useState<boolean | null>(null);
   const [selected, setSelected] = useState<Set<number>>(new Set([0, 2, 3]));
@@ -24,10 +26,19 @@ function Onboarding() {
     try {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("no user");
-      await supabase
+      const perfil = { ja_operou: !!jaOperou, onboarded: true, nivel_atual: jaOperou ? 4 : 1 };
+      const { data: atualizados, error: updateError } = await supabase
         .from("profiles")
-        .update({ ja_operou: !!jaOperou, onboarded: true, nivel_atual: jaOperou ? 4 : 1 })
-        .eq("id", u.user.id);
+        .update(perfil)
+        .eq("id", u.user.id)
+        .select("id");
+      if (updateError) throw updateError;
+      if (!atualizados || atualizados.length === 0) {
+        const { error: insertError } = await supabase
+          .from("profiles")
+          .insert({ id: u.user.id, ...perfil });
+        if (insertError) throw insertError;
+      }
 
       const rows: Array<Record<string, unknown>> = [];
       for (const i of selected) {
@@ -55,8 +66,10 @@ function Onboarding() {
         }
       }
       if (rows.length > 0) {
-        await supabase.from("personal_rules").insert(rows as never);
+        const { error: rulesError } = await supabase.from("personal_rules").insert(rows as never);
+        if (rulesError) throw rulesError;
       }
+      qc.invalidateQueries({ queryKey: ["profile"] });
       toast.success("Tudo pronto. Bora começar!");
       navigate({ to: "/home", replace: true });
     } catch (e) {
@@ -65,7 +78,6 @@ function Onboarding() {
       setLoading(false);
     }
   }
-
 
   return (
     <div className="min-h-screen grid place-items-center bg-background text-foreground p-6">
@@ -89,7 +101,9 @@ function Onboarding() {
                 className={`rounded-md border p-4 text-left transition ${jaOperou === true ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}
               >
                 <div className="font-semibold">Já compro call/put</div>
-                <div className="text-sm text-muted-foreground">Vou direto pro Nível 4 (rolagem e travas).</div>
+                <div className="text-sm text-muted-foreground">
+                  Vou direto pro Nível 4 (rolagem e travas).
+                </div>
               </button>
             </div>
             <button
@@ -136,8 +150,8 @@ function Onboarding() {
               <div className="mt-6">
                 <div className="text-sm font-semibold">Seu setup técnico (opcional)</div>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Como você já opera, pode já cadastrar indicadores e padrões que usa. O
-                  copilot vai lembrar deles — quem decide o significado é você.
+                  Como você já opera, pode já cadastrar indicadores e padrões que usa. O copilot vai
+                  lembrar deles — quem decide o significado é você.
                 </p>
                 <div className="mt-3 grid gap-2 max-h-64 overflow-auto pr-1">
                   {STRUCTURED_TEMPLATES.map((t, i) => (
