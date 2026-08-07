@@ -63,6 +63,11 @@ function LicaoPage() {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [revealed, setRevealed] = useState<Record<number, boolean>>({});
   const [saved, setSaved] = useState(false);
+  const [missaoEscolha, setMissaoEscolha] = useState<number | undefined>(undefined);
+  const [missaoExplicacao, setMissaoExplicacao] = useState("");
+  const [missaoRevelado, setMissaoRevelado] = useState(false);
+  const [missaoSalvo, setMissaoSalvo] = useState(false);
+  const [missaoReverteu, setMissaoReverteu] = useState(false);
 
   const steps = useMemo<Step[]>(() => {
     if (!lesson) return [];
@@ -144,6 +149,37 @@ function LicaoPage() {
     qc.invalidateQueries({ queryKey: ["profile"] });
   }
 
+  async function persistMissao() {
+    if (missaoSalvo || missaoEscolha === undefined) return;
+    setMissaoSalvo(true);
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) return;
+    const opcao = lesson!.missao.opcoes[missaoEscolha];
+    await supabase.from("lessons_progress").upsert(
+      {
+        user_id: u.user.id,
+        lesson_slug: lesson!.slug,
+        missao_correta: opcao.tom === "correta",
+        missao_opcao: missaoEscolha,
+        missao_explicacao: missaoExplicacao.trim() || null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,lesson_slug" },
+    );
+    qc.invalidateQueries({ queryKey: ["progress"] });
+  }
+
+  function confirmarMissao() {
+    setMissaoRevelado(true);
+    void persistMissao();
+  }
+
+  function reverConceito() {
+    setMissaoReverteu(true);
+    const alvo = steps.findIndex((s) => s.kind === "conceito");
+    jumpTo(alvo >= 0 ? alvo : 1);
+  }
+
   function go(delta: number) {
     const next = Math.min(Math.max(idx + delta, 0), steps.length - 1);
     if (steps[next]?.kind === "fim") void persist(score);
@@ -170,11 +206,17 @@ function LicaoPage() {
     setAnswers({});
     setRevealed({});
     setSaved(false);
+    setMissaoEscolha(undefined);
+    setMissaoExplicacao("");
+    setMissaoRevelado(false);
+    setMissaoSalvo(false);
+    setMissaoReverteu(false);
     if (nextLesson) navigate({ to: "/licao/$slug", params: { slug: nextLesson.slug } });
   }
 
   const isQuiz = step?.kind === "quiz";
   const quizLocked = isQuiz && !revealed[(step as { i: number }).i];
+  const missaoLocked = step?.kind === "missao" && !missaoRevelado;
 
   const rotulo =
     step?.kind === "hero"
@@ -256,7 +298,19 @@ function LicaoPage() {
             <DecisionCard titulo={lesson.naPratica.titulo} passos={lesson.naPratica.passos} />
           )}
 
-          {step?.kind === "missao" && <MissionCard missao={lesson.missao} onPronto={() => go(1)} />}
+          {step?.kind === "missao" && (
+            <MissionCard
+              missao={lesson.missao}
+              escolha={missaoEscolha}
+              explicacao={missaoExplicacao}
+              revelado={missaoRevelado}
+              onEscolher={setMissaoEscolha}
+              onExplicar={setMissaoExplicacao}
+              onConfirmar={confirmarMissao}
+              onReverConceito={reverConceito}
+              onContinuar={() => go(1)}
+            />
+          )}
 
           {step?.kind === "quiz" && (
             <QuizCard
@@ -280,6 +334,13 @@ function LicaoPage() {
               proximaLicao={nextLesson}
               onRefazer={refazerQuiz}
               onContinuar={continuarJornada}
+              missaoAcertou={
+                missaoEscolha !== undefined
+                  ? lesson.missao.opcoes[missaoEscolha].tom === "correta"
+                  : undefined
+              }
+              missaoReverteu={missaoReverteu}
+              missaoExplicada={missaoExplicacao.trim().length > 0}
             />
           )}
         </div>
@@ -291,7 +352,7 @@ function LicaoPage() {
             onPausar={() => navigate({ to: "/trilha" })}
             rotulo={rotulo}
             proximoLabel={proximoLabel}
-            proximoDisabled={quizLocked}
+            proximoDisabled={quizLocked || missaoLocked}
             voltarDisabled={idx === 0}
           />
         )}

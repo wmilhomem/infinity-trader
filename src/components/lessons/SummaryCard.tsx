@@ -8,11 +8,24 @@ type Props = {
   meta: LessonMeta;
   score: number;
   proximaLicao?: Lesson;
+  missaoAcertou?: boolean;
+  missaoReverteu: boolean;
+  missaoExplicada: boolean;
   onRefazer: () => void;
   onContinuar: () => void;
 };
 
-export function SummaryCard({ lesson, meta, score, proximaLicao, onRefazer, onContinuar }: Props) {
+export function SummaryCard({
+  lesson,
+  meta,
+  score,
+  proximaLicao,
+  missaoAcertou,
+  missaoReverteu,
+  missaoExplicada,
+  onRefazer,
+  onContinuar,
+}: Props) {
   const aprendizados = meta.resumoPontos ?? lesson.conceitos.map((c) => c.titulo);
   const bom = score >= 80;
   const titulo = lesson.titulo.replace(/^Lição \d+ — /, "");
@@ -35,6 +48,29 @@ export function SummaryCard({ lesson, meta, score, proximaLicao, onRefazer, onCo
           >
             <RefreshCcw size={14} /> Refazer o quiz
           </button>
+        )}
+        {missaoAcertou !== undefined && (
+          <div className="mx-auto mt-6 max-w-md rounded-xl border border-border bg-card/60 p-4 text-left">
+            <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Missão da lição
+            </div>
+            <ul className="mt-2 space-y-1.5 text-sm">
+              <li className="flex items-center gap-2">
+                <Check size={15} className={missaoAcertou ? "text-success" : "text-amber-400"} />
+                {missaoAcertou
+                  ? "Decisão correta na primeira tentativa"
+                  : missaoReverteu
+                    ? "Errou, reverteu aos conceitos e seguiu"
+                    : "Errou na primeira tentativa"}
+              </li>
+              {missaoExplicada && (
+                <li className="flex items-center gap-2">
+                  <Check size={15} className="text-success" />
+                  Explicou a decisão com as próprias palavras
+                </li>
+              )}
+            </ul>
+          </div>
         )}
       </div>
 

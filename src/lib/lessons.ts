@@ -28,9 +28,17 @@ export type LessonNaPratica = {
   passos: string[];
 };
 
+export type MissaoOpcao = {
+  texto: string;
+  tom: "correta" | "quase" | "errada";
+  feedback: string;
+};
+
 export type LessonMissao = {
   titulo: string;
-  texto: string;
+  situacao: string;
+  pergunta: string;
+  opcoes: MissaoOpcao[];
 };
 
 export type Lesson = {
@@ -91,9 +99,36 @@ Na **B3**, quase todas as opções sobre ações são **americanas** (podem ser 
       ],
     },
     missao: {
-      titulo: "Garanta a compra",
-      texto:
-        "Você tem R$1.000 e quer garantir o direito de comprar PETR4 a R$38 em qualquer dia do próximo mês — sem se obrigar a comprar. Em uma frase: o que você precisa comprar e quanto perde no máximo se desistir?",
+      titulo: "O que você comprou",
+      situacao:
+        "PETR4 está a R$38. Você paga R$1,20 por uma call de strike 38 que vence em 45 dias. Você acredita que a ação vai subir, mas não sabe quando.",
+      pergunta: "O que você está comprando de verdade?",
+      opcoes: [
+        {
+          texto: "Uma ação mais barata — se subir um pouco, lucra como se tivesse a ação",
+          tom: "errada",
+          feedback:
+            "Opção não é ação barata: é um direito com prazo de validade. Se o movimento não vier no prazo, o prêmio vira zero mesmo que a ação suba depois.",
+        },
+        {
+          texto: "O direito de comprar a ação a R$38 até o vencimento, com perda máxima de R$1,20",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Você identificou o que está comprando: direito, não obrigação. Perda máxima = prêmio. Se subir, você exerce ou revende o direito.",
+        },
+        {
+          texto: "Um contrato que te obriga a comprar a ação no vencimento",
+          tom: "errada",
+          feedback:
+            "Obrigação é o lado do vendedor. Você comprou o direito de escolher — pode exercer ou abandonar.",
+        },
+        {
+          texto: "Um seguro que devolve seu dinheiro se o preço cair",
+          tom: "quase",
+          feedback:
+            "Quase: a perda é limitada ao prêmio, mas ele não é reembolsável. Se o movimento não vier, você perde o prêmio inteiro — por isso só use dinheiro que aceita perder.",
+        },
+      ],
     },
     quiz: [
       {
@@ -178,9 +213,36 @@ Ex: **PETRK38**
       ],
     },
     missao: {
-      titulo: "Escolha a perna certa",
-      texto:
-        "PETR4 a R$38. Você espera que o preço suba. Em uma frase: qual série você compra (K38 ou W38) e o que essa opção te dá o direito de fazer?",
+      titulo: "Proteja a posição",
+      situacao:
+        "PETR4 está a R$38. Você tem 500 ações da Petrobras compradas a R$35 e está satisfeito, mas teme uma correção de 10% nas próximas semanas.",
+      pergunta: "Qual operação protege sua posição?",
+      opcoes: [
+        {
+          texto: "Comprar put de strike 38",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Put dá o direito de vender a R$38: se cair, seu risco deixa de ser ilimitado.",
+        },
+        {
+          texto: "Comprar call de strike 38",
+          tom: "errada",
+          feedback:
+            "Call é direito de comprar: protege quem está fora da ação, não quem já tem a posição.",
+        },
+        {
+          texto: "Vender call de strike 38",
+          tom: "errada",
+          feedback:
+            "Vender call coberta gera renda, mas limita seu ganho na alta e não protege nada na queda. Objetivo diferente.",
+        },
+        {
+          texto: "Não fazer nada",
+          tom: "quase",
+          feedback:
+            "Quase: ficar parado é uma decisão consciente — você aceita o risco total da queda. Válido se for deliberado; só não é proteção.",
+        },
+      ],
     },
     quiz: [
       {
@@ -264,9 +326,36 @@ Regra prática: opções com strike próximo do preço atual e vencimento mais c
       ],
     },
     missao: {
-      titulo: "Saia quando quiser",
-      texto:
-        "Você quer operar a série PETRK38. Em 3 passos, como você confirma, antes de entrar, que vai conseguir sair dela a preço justo?",
+      titulo: "A saída antes do vencimento",
+      situacao:
+        "Você comprou uma call K38 por R$1,50. Faltam 3 dias para o vencimento. PETR4 está a R$39,50 e sua call vale R$2,10. Você ainda acredita na alta.",
+      pergunta: "O que você verifica primeiro antes de decidir?",
+      opcoes: [
+        {
+          texto: "A liquidez da série — volume e spread de hoje",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Com 3 dias de prazo, a saída é o risco: série sem contraparte vira prisão. Volume, número de negócios e spread decidem.",
+        },
+        {
+          texto: "Se a call será exercida automaticamente",
+          tom: "quase",
+          feedback:
+            "Quase: isso importa no vencimento se a opção estiver ITM. Antes dele, o problema real é conseguir sair a preço justo.",
+        },
+        {
+          texto: "O preço de exercício da ação hoje",
+          tom: "errada",
+          feedback:
+            "Você já sabe o strike (38) e o preço atual (39,50). Essa informação não muda a decisão.",
+        },
+        {
+          texto: "O imposto sobre o lucro de R$0,60",
+          tom: "errada",
+          feedback:
+            "Imposto vem na apuração do mês. Agora o risco é não conseguir vender a posição.",
+        },
+      ],
     },
     quiz: [
       {
@@ -362,9 +451,35 @@ Call PETRK36 (strike 36) sendo negociada a R$2,80:
       ],
     },
     missao: {
-      titulo: "Separe o preço",
-      texto:
-        "PETR4 a R$38. Call K36 a R$2,80. Em uma frase: quanto desse prêmio é o que a opção já vale hoje, e quanto é expectativa?",
+      titulo: "O preço da K36",
+      situacao:
+        "PETR4 está a R$38. A call K36 (ITM) custa R$2,80 e a call K38 (ATM) custa R$1,50. Mesmo vencimento, mesmo ativo.",
+      pergunta: "Por que a K36 custa quase o dobro?",
+      opcoes: [
+        {
+          texto: "Porque ela já vale R$2,00 se exercida hoje — valor intrínseco",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Intrínseco da K36 = max(0, 38 − 36) = R$2,00. O restante, R$0,80, é extrínseco — expectativa.",
+        },
+        {
+          texto: "Porque a corretora cobra taxa maior nesse strike",
+          tom: "errada",
+          feedback: "Taxas não entram no prêmio. O prêmio é mercado: intrínseco + extrínseco.",
+        },
+        {
+          texto: "Porque a K36 tem mais tempo até o vencimento",
+          tom: "errada",
+          feedback:
+            "Mesmo vencimento, tempo igual. O que muda entre elas é o strike — e o valor intrínseco.",
+        },
+        {
+          texto: "Porque a volatilidade da K36 é maior",
+          tom: "quase",
+          feedback:
+            "Quase: volatilidade pesa no extrínseco, mas aqui a maior parte da diferença é intrínseco — a K36 já vale R$2,00.",
+        },
+      ],
     },
     quiz: [
       {
@@ -444,9 +559,36 @@ O erro clássico do iniciante é comprar OTM muito distante porque "está barato
       ],
     },
     missao: {
-      titulo: "Elimine um strike",
-      texto:
-        "PETR4 a R$38. Você espera +5% em 30 dias. Entre a K34 (ITM), a K38 (ATM) e a K44 (OTM), qual strike você descarta na hora — e por quê (uma frase)?",
+      titulo: "O strike barato",
+      situacao:
+        "PETR4 está a R$38. Você espera alta de 5% em 60 dias. A call K44 (OTM) custa R$0,30 — parece um achado.",
+      pergunta: "Por que a K44 é um risco disfarçado?",
+      opcoes: [
+        {
+          texto: "Porque exige um movimento que o ativo raramente faz nesse prazo",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Barato reflete probabilidade baixa: o mercado cobra pouco porque paga pouco. Barato não é o mesmo que valor.",
+        },
+        {
+          texto: "Porque a série não tem liquidez",
+          tom: "quase",
+          feedback:
+            "Quase: liquidez sempre importa, mas o risco central da K44 é a distância do strike — não a contraparte.",
+        },
+        {
+          texto: "Porque o vencimento é curto demais",
+          tom: "errada",
+          feedback:
+            "O prazo (60 dias) foi a sua escolha. O problema da K44 é o strike: exige +15% para só virar ITM.",
+        },
+        {
+          texto: "Porque a corretora cobra mais caro para OTM",
+          tom: "errada",
+          feedback:
+            "Não: o preço baixo é o mercado. A K44 custa pouco porque a chance de terminar ITM é pequena.",
+        },
+      ],
     },
     quiz: [
       {
@@ -535,9 +677,35 @@ Se sua tese depende de um evento com data (balanço, decisão de juros), escolha
       ],
     },
     missao: {
-      titulo: "Escolha o prazo com folga",
-      texto:
-        "O balanço da PETR4 sai em 20 dias. A call de 10 dias custa metade da de 30 dias. Qual você compra — e qual é o motivo em uma frase?",
+      titulo: "O relógio da posição",
+      situacao:
+        "Você comprou uma call K38 por R$1,50 com 20 dias de prazo. O balanço da empresa sai em 15 dias. O ativo está parado há uma semana.",
+      pergunta: "Qual é o maior risco da sua posição agora?",
+      opcoes: [
+        {
+          texto: "O theta: a opção derrete enquanto o ativo não anda",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Você paga aluguel de tempo todo dia. Com o ativo parado, o extrínseco cai — e a corrosão acelera perto do vencimento.",
+        },
+        {
+          texto: "O balanço vir antes do vencimento",
+          tom: "errada",
+          feedback:
+            "Seu vencimento (20 dias) é depois do balanço (15): você participa do evento. Isso está a seu favor.",
+        },
+        {
+          texto: "A liquidez da série",
+          tom: "quase",
+          feedback:
+            "Quase: liquidez sempre importa, mas aqui o vilão número um é o tempo — não a contraparte.",
+        },
+        {
+          texto: "O imposto sobre o prêmio",
+          tom: "errada",
+          feedback: "Imposto existe, mas não é o risco de curto prazo de uma posição viva.",
+        },
+      ],
     },
     quiz: [
       {
@@ -637,9 +805,36 @@ O risco não está na perda máxima — está na **frequência**. Você pode per
       ],
     },
     missao: {
-      titulo: "Dimensione antes de entrar",
-      texto:
-        "Capital de R$20.000, regra do 1%, call a R$0,80 (lote de 100). Em uma frase: quantos lotes cabem — e qual é a sua saída combinada antes de enviar a ordem?",
+      titulo: "Dimensione antes de clicar",
+      situacao:
+        "Você quer comprar uma call K38 por R$1,20 (lote de 100). Seu patrimônio é R$20.000 e sua regra é arriscar no máximo 1% por operação.",
+      pergunta: "Quantos lotes cabem dentro da sua regra?",
+      opcoes: [
+        {
+          texto: "1 lote (R$120)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. 1% de R$20.000 = R$200. 1 lote (R$120) respeita a regra; 2 lotes (R$240) a furariam.",
+        },
+        {
+          texto: "2 lotes (R$240)",
+          tom: "quase",
+          feedback:
+            "Quase: R$240 passa do teto de R$200. O prêmio é o risco — dimensione por ele, não pelo lucro imaginado.",
+        },
+        {
+          texto: "5 lotes (R$600)",
+          tom: "errada",
+          feedback:
+            "R$600 é 3% do patrimônio numa operação. Uma sequência normal de perdas com esse tamanho não deixa a conta voltar.",
+        },
+        {
+          texto: "Quantos quiser, pois a perda é limitada",
+          tom: "errada",
+          feedback:
+            "Perda limitada por trade não limita a sequência. É a frequência de perdas que destrói conta sem position sizing.",
+        },
+      ],
     },
     quiz: [
       {
@@ -743,9 +938,36 @@ Você vendeu a **alta acima do strike**. Em troca, recebeu um prêmio fixo. Isso
       ],
     },
     missao: {
-      titulo: "Escolha o strike",
-      texto:
-        "Você comprou a ação a R$30 e quer prêmio. A call K33 paga R$0,90; a K36 paga R$0,30. Em uma frase: qual strike você vende — e em que preço você aceita vender a ação de verdade?",
+      titulo: "O preço da renda",
+      situacao:
+        "Você tem 100 PETR4 compradas a R$30. Alguém oferece R$0,90 pela call K33 (vence em 30 dias). Você acredita que a ação pode chegar a R$36.",
+      pergunta: "Qual é a pergunta decisiva antes de vender?",
+      opcoes: [
+        {
+          texto: '"Eu aceitaria vender minhas ações a R$33?"',
+          tom: "correta",
+          feedback:
+            "Boa decisão. Se for exercido a R$33 e você não queria vender, o prêmio de R$0,90 não compensa. Strike = preço de venda aceito.",
+        },
+        {
+          texto: '"É o maior prêmio do book?"',
+          tom: "quase",
+          feedback:
+            "Quase: prêmio maior pode ser justamente o strike onde você menos quer vender. Primeiro o preço de exercício, depois o prêmio.",
+        },
+        {
+          texto: '"A queda pode ser forte?"',
+          tom: "errada",
+          feedback:
+            "O risco de queda continua todo com você de qualquer jeito — o prêmio só amortece R$0,90.",
+        },
+        {
+          texto: '"A call vence em 30 dias?"',
+          tom: "errada",
+          feedback:
+            "O vencimento você já definiu. A pergunta que decide é o strike que você aceita como venda.",
+        },
+      ],
     },
     quiz: [
       {
@@ -847,9 +1069,36 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
       ],
     },
     missao: {
-      titulo: "O limite é uma regra",
-      texto:
-        "Sua call já foi rolada uma vez e estourou de novo. Em uma frase: o que você faz agora — e qual regra do guia te dá essa resposta?",
+      titulo: "A call com 2 dias",
+      situacao:
+        "PETR4 está em R$38. Você comprou uma CALL de strike 38. Faltam 2 dias para o vencimento. Você continua acreditando na alta.",
+      pergunta: "O que você faria com essa posição?",
+      opcoes: [
+        {
+          texto: "Deixar vencer",
+          tom: "errada",
+          feedback:
+            "Com 2 dias e a tese viva, deixar vencer é entregar o prêmio para o theta. O problema não é a tese — é o prazo.",
+        },
+        {
+          texto: "Fazer Roll Out",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Você identificou que o problema não é necessariamente a tese, mas o tempo restante. Roll Out mantém o strike e aumenta o tempo da operação.",
+        },
+        {
+          texto: "Fazer Roll Down",
+          tom: "quase",
+          feedback:
+            "Quase. Você percebeu que a operação precisa ser ajustada, mas escolheu uma rolagem diferente. Roll Down abaixa o strike — é para quem a tese virou baixista. Quem continua acreditando na alta e só precisa de tempo faz Roll Out. Veja novamente a diferença entre Roll Out e Roll Down.",
+        },
+        {
+          texto: "Encerrar",
+          tom: "quase",
+          feedback:
+            "Quase: encerrar é sempre legítimo, mas você ainda acredita na alta — e o problema é só o prazo. Roll Out resolve com mais tempo. Se a tese tivesse caído, aí sim: encerra.",
+        },
+      ],
     },
     quiz: [
       {
@@ -959,9 +1208,36 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
       ],
     },
     missao: {
-      titulo: "Leia a trava",
-      texto:
-        "Trava de alta K38/K40 por R$0,90 com PETR4 a R$38. Em uma frase: em que preço você para de ganhar, e qual é a sua perda máxima?",
+      titulo: "Quantas travas?",
+      situacao:
+        "PETR4 está a R$38. Você monta uma trava de alta K38/K40 por R$0,90 (R$90 por lote). Seu patrimônio é R$20.000 e a regra do 1% vale para tudo.",
+      pergunta: "Quantos lotes você monta?",
+      opcoes: [
+        {
+          texto: "2 lotes (R$180)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. 1% de R$20.000 = R$200. 2 lotes (R$180) cabem; 3 lotes (R$270) já furariam o limite.",
+        },
+        {
+          texto: "1 lote (R$90)",
+          tom: "quase",
+          feedback:
+            "Quase: 1 lote é válido e conservador, mas 2 lotes ainda respeitam a regra — você não precisa operar no teto.",
+        },
+        {
+          texto: "3 lotes (R$270)",
+          tom: "errada",
+          feedback:
+            "R$270 > R$200: você trocou a regra pelo palpite. Risco se define pela perda, nunca pelo ganho.",
+        },
+        {
+          texto: "10 lotes, pois a perda é limitada",
+          tom: "errada",
+          feedback:
+            "Perda limitada não significa perda pequena: 10 lotes = R$900 = 4,5% do patrimônio numa só operação.",
+        },
+      ],
     },
     quiz: [
       {
@@ -1057,9 +1333,34 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
       ],
     },
     missao: {
-      titulo: "Leia a trava de baixa",
-      texto:
-        "Trava K38/K36 por R$0,90 com PETR4 a R$38. Em uma frase: a partir de que preço do ativo você começa a lucrar, e onde o lucro para?",
+      titulo: "Queda moderada",
+      situacao:
+        "PETR4 está a R$38. Você espera uma queda moderada, de cerca de 5%. A put K38 pura custa R$1,40. A trava K38/K36 custa R$0,90.",
+      pergunta: "Qual estrutura combina com a sua expectativa?",
+      opcoes: [
+        {
+          texto: "Trava K38/K36 por R$0,90",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Queda moderada + prêmio menor: a trava barateia a aposta. Se esperasse queda forte, a put pura ganharia no extremo.",
+        },
+        {
+          texto: "Put K38 pura por R$1,40",
+          tom: "quase",
+          feedback:
+            "Quase: a put pura paga no extremo, mas custa mais. Para uma queda de 5%, o custo extra raramente compensa.",
+        },
+        {
+          texto: "Vender put K36",
+          tom: "errada",
+          feedback: "Vender put é apostar que NÃO cai — direção contrária à sua tese.",
+        },
+        {
+          texto: "Trava de alta K38/K40",
+          tom: "errada",
+          feedback: "Trava de alta lucra se o ativo subir: a direção oposta da sua aposta.",
+        },
+      ],
     },
     quiz: [
       {
@@ -1152,9 +1453,35 @@ Vendeu call PETRK40 por R$1,00. PETR4 subiu pra R$41.
       ],
     },
     missao: {
-      titulo: "Reconheça a fuga",
-      texto:
-        "Rolar a mesma call pela segunda vez, com débito de R$1,30 e sem tempo extra. Em uma frase: por que isso é quase sempre erro — e o que a regra do guia manda fazer?",
+      titulo: "A segunda rolagem",
+      situacao:
+        "Você vendeu a call K40 por R$1,00. PETR4 está a R$41,50 e a call vale R$1,80. Você já rolou essa operação uma vez no mês passado.",
+      pergunta: "O que a regra de ouro manda fazer?",
+      opcoes: [
+        {
+          texto: "Rolar de novo para o próximo mês",
+          tom: "errada",
+          feedback: "Máximo 1 rolagem por operação. A segunda rolagem é insistência, não gestão.",
+        },
+        {
+          texto: "Encerrar a posição",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Você já rolou uma vez — a regra de ouro é 1 rolagem. Se falhou de novo, encerra.",
+        },
+        {
+          texto: "Rolar com strike maior",
+          tom: "quase",
+          feedback:
+            "Quase: mudar o strike não muda o fato de que você já rolou. A regra vale para a operação, não para o tipo de roll.",
+        },
+        {
+          texto: "Não fazer nada",
+          tom: "errada",
+          feedback:
+            "Ficar parado com a call ITM é decidir ser exercido por omissão — e com prejuízo de R$0,80 no papel.",
+        },
+      ],
     },
     quiz: [
       {
@@ -1265,9 +1592,35 @@ Defina no diário **antes de abrir**:
       ],
     },
     missao: {
-      titulo: "Dimensione a operação",
-      texto:
-        "Patrimônio de R$80.000, trava a R$2,00/ação (lote de 100). Em uma frase: quantos lotes você monta no máximo — e qual número você verifica antes de enviar a ordem?",
+      titulo: "O setup perfeito",
+      situacao:
+        'Sua trava deu lucro em 3 de 5 operações. Agora você quer montar 8 lotes "porque o setup está perfeito". Patrimônio: R$50.000. A trava custa R$90 por lote.',
+      pergunta: "O que a regra do 1% decide?",
+      opcoes: [
+        {
+          texto: "Máximo 5 lotes (R$450 ≤ R$500)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. 1% de R$50.000 = R$500. 8 lotes = R$720 (1,4%): o setup bonito não muda a matemática da ruína.",
+        },
+        {
+          texto: "8 lotes, porque a taxa de acerto é 60%",
+          tom: "errada",
+          feedback:
+            "Acerto de 60% não compensa perdas maiores: com 8 lotes, uma sequência ruim derruba o mês. Expectativa decide, não otimismo.",
+        },
+        {
+          texto: "Máximo 6 lotes (R$540)",
+          tom: "quase",
+          feedback: "Quase: R$540 ainda passa do teto de R$500. O limite é 5 lotes.",
+        },
+        {
+          texto: "Qualquer tamanho, pois a perda é limitada",
+          tom: "errada",
+          feedback:
+            "Perda limitada por operação não é risco aceitável. O limite é o capital, não a estrutura.",
+        },
+      ],
     },
     quiz: [
       {
@@ -1380,9 +1733,34 @@ Prejuízo de um mês **abate lucro futuro** — sem prazo de validade. Registre 
       ],
     },
     missao: {
-      titulo: "Feche o mês",
-      texto:
-        "Mês com swing de +R$1.200, +R$800 e −R$600, IRRF de R$8. Em uma frase: quanto vai de DARF?",
+      titulo: "Quanto é do governo",
+      situacao:
+        "No mês você lucrou R$3.000 em opções comuns (swing). A corretora reteve R$8 de IRRF. Você não fez day trade.",
+      pergunta: "Quanto de IR incide sobre esse lucro (fora o IRRF retido)?",
+      opcoes: [
+        {
+          texto: "R$450",
+          tom: "correta",
+          feedback:
+            "Boa decisão. 15% × R$3.000 = R$450. Opções não têm isenção dos R$20 mil — todo lucro é tributado.",
+        },
+        {
+          texto: "R$600",
+          tom: "errada",
+          feedback: "R$600 seria 20% — alíquota de day trade, não de operação comum.",
+        },
+        {
+          texto: "R$150",
+          tom: "errada",
+          feedback: "R$150 seria 5%: não existe essa alíquota para opções.",
+        },
+        {
+          texto: "R$0, porque lucrou menos de R$20 mil",
+          tom: "quase",
+          feedback:
+            "Quase: a isenção de R$20 mil vale só para ação à vista. Opções pagam a partir do primeiro real de lucro.",
+        },
+      ],
     },
     quiz: [
       {
@@ -1489,9 +1867,36 @@ Planilha própria ou o **diário do Zero ao Trade** — os campos de resultado a
       ],
     },
     missao: {
-      titulo: "Compense em cadeia",
-      texto:
-        "Tudo swing: Jan −R$1.500, Fev +R$400, Mar +R$2.000. Em uma frase: quanto de IR você paga em fevereiro e quanto em março?",
+      titulo: "Compensação em cadeia",
+      situacao:
+        "Tudo em swing: janeiro −R$1.500, fevereiro +R$400, março +R$2.000. Você não pagou DARF em janeiro nem fevereiro.",
+      pergunta: "Quanto de DARF você paga em março?",
+      opcoes: [
+        {
+          texto: "R$135",
+          tom: "correta",
+          feedback:
+            "Boa decisão. O prejuízo de janeiro (−R$1.500) foi abatido por fevereiro (+R$400), sobrando R$1.100. 15% × (2.000 − 1.100) = R$135.",
+        },
+        {
+          texto: "R$300",
+          tom: "errada",
+          feedback:
+            "R$300 = 15% de R$2.000 cheio: você esqueceu de compensar o prejuízo acumulado de R$1.100.",
+        },
+        {
+          texto: "R$135 + juros de janeiro",
+          tom: "quase",
+          feedback:
+            "Quase: o DARF de março é R$135 — e janeiro não tinha DARF a pagar (prejuízo), então não há juros.",
+        },
+        {
+          texto: "R$0, pois o prejuízo cobriu tudo",
+          tom: "errada",
+          feedback:
+            "O prejuízo de R$1.500 abateu R$400 (fev) e R$1.100 (mar): sobra R$900 tributável → R$135.",
+        },
+      ],
     },
     quiz: [
       {
