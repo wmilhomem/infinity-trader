@@ -14,9 +14,6 @@ export function ConceptCard({ conceito, i, total }: Props) {
         <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
           Conceito {i + 1} de {total}
         </span>
-        <span className="hidden font-mono text-[11px] text-muted-foreground/60 sm:block">
-          1 min
-        </span>
       </div>
       <h2 className="mt-3 text-2xl font-semibold tracking-tight">{conceito.titulo}</h2>
       <div className="mt-4 max-w-xl">

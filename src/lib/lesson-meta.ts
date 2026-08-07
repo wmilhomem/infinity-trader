@@ -3,7 +3,19 @@
 // manter src/lib/lessons.ts focado em texto/quiz.
 
 export type LessonVisualKind =
-  "callput" | "moneyness" | "theta" | "travas" | "fiscal" | "premio" | "none";
+  | "callput"
+  | "moneyness"
+  | "theta"
+  | "travas"
+  | "fiscal"
+  | "premio"
+  | "direito"
+  | "vencimento"
+  | "sizing"
+  | "coberta"
+  | "roll"
+  | "risco"
+  | "none";
 
 export type LessonMeta = {
   objetivo: string;
@@ -25,6 +37,7 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
   "o-que-e-opcao": {
     objetivo: "Explicar, com suas palavras, o que você compra quando compra uma opção.",
     tempoMin: 5,
+    visual: "direito",
     erroComum: {
       titulo: "Achar que opção é ação barata",
       texto:
@@ -56,6 +69,7 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
   "vencimento-e-exercicio": {
     objetivo: "Saber o que acontece com sua posição na data de vencimento.",
     tempoMin: 6,
+    visual: "vencimento",
     erroComum: {
       titulo: "Esquecer a data de vencimento",
       texto:
@@ -112,6 +126,7 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
   "compra-a-seco": {
     objetivo: "Definir quanto do seu capital pode virar pó numa compra a seco.",
     tempoMin: 7,
+    visual: "sizing",
     erroComum: {
       titulo: "Dobrar a aposta depois de perder",
       texto:
@@ -121,6 +136,7 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
   "venda-coberta": {
     objetivo: "Entender o que você troca ao vender uma call contra suas ações.",
     tempoMin: 7,
+    visual: "coberta",
     erroComum: {
       titulo: "Vender call em ação que você não quer vender",
       texto:
@@ -166,7 +182,7 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
   "rolagem-defensiva": {
     objetivo: "Aplicar um checklist antes de rolar uma posição perdedora.",
     tempoMin: 8,
-    visual: "travas",
+    visual: "roll",
     erroComum: {
       titulo: "Rolar sempre para o mesmo strike",
       texto: "Rolar mantendo o mesmo strike costuma só empurrar o problema com custo adicional.",
@@ -175,6 +191,7 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
   "gestao-de-risco-travas": {
     objetivo: "Dimensionar a posição pela regra de 1% antes de pensar em lucro.",
     tempoMin: 8,
+    visual: "risco",
     erroComum: {
       titulo: "Dimensionar pelo lucro possível",
       texto: "Tamanho de posição se define pela perda aceitável, nunca pelo ganho imaginado.",
