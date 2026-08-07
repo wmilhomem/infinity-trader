@@ -1,48 +1,44 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Activity,
-  AlertTriangle,
   ArrowRight,
   BookOpen,
-  Calculator,
+  Brain,
   Check,
   ClipboardList,
   Compass,
   Eye,
   GraduationCap,
-  Hourglass,
+  History,
   LineChart,
-  Quote,
-  Scale,
+  ListChecks,
+  Map,
+  MessageCircleQuestion,
+  Moon,
+  PenLine,
   ScrollText,
-  ShieldCheck,
-  SlidersHorizontal,
   Sparkles,
   Sprout,
+  Sunrise,
+  Target,
   TrendingUp,
   X,
-  Zap,
 } from "lucide-react";
-import { PayoffCurve } from "@/components/landing/PayoffCurve";
 import { Reveal } from "@/components/landing/Reveal";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Zero ao Trade — Decisões conscientes em um mercado incerto" },
+      { title: "Zero ao Trade — Pare de operar por impulso" },
       {
         name: "description",
         content:
-          "O mercado não falta informação — falta processo. O Zero ao Trade transforma impulsos em decisões conscientes: o copilot informa, você decide.",
+          "O Zero ao Trade não prevê o mercado. Ele ajuda você a desenvolver uma forma melhor de decidir: check, simulação, registro, reflexão e evolução.",
       },
-      {
-        property: "og:title",
-        content: "Zero ao Trade — Decisões conscientes em um mercado incerto",
-      },
+      { property: "og:title", content: "Zero ao Trade — Pare de operar por impulso" },
       {
         property: "og:description",
         content:
-          "Desenvolva a habilidade mais importante do mercado: tomar boas decisões quando existe incerteza. O copilot informa, você decide.",
+          "Transforme cada operação em aprendizado através de um ciclo contínuo de reflexão, disciplina e evolução.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -51,156 +47,90 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const PROBLEMA = [
-  {
-    icon: Activity,
-    titulo: "Ansiedade",
-    desc: "Decidir sob pressão para sentir que está participando.",
-  },
-  { icon: Zap, titulo: "Impulso", desc: "Clicar antes de entender, só porque a tela anima." },
-  {
-    icon: TrendingUp,
-    titulo: "Excesso de confiança",
-    desc: "Vencer algumas vezes e achar que ficou imune a errar.",
-  },
-  {
-    icon: Hourglass,
-    titulo: "Medo de ficar de fora",
-    desc: "Entrar atrasado, às pressas, no que já subiu.",
-  },
-  {
-    icon: SlidersHorizontal,
-    titulo: "Falta de critérios",
-    desc: "Cada operação um método novo — nenhum processo.",
-  },
+const CICLO_HERO = ["Check", "Simular", "Registrar", "Refletir", "Evoluir"];
+
+const HOJE = [
+  "Decide no impulso",
+  "Aprende depois do prejuízo",
+  "Esquece por que entrou",
+  "Repete os mesmos erros",
+  "Confunde sorte com competência",
 ];
 
-const LOOP = [
-  {
-    icon: BookOpen,
-    n: "01",
-    titulo: "Aprender",
-    desc: "Conceitos complexos em linguagem simples. Você entende primeiro.",
-  },
-  {
-    icon: ScrollText,
-    n: "02",
-    titulo: "Definir critérios",
-    desc: "Escreva as regras que você — não o mercado — vai seguir.",
-  },
-  {
-    icon: Calculator,
-    n: "03",
-    titulo: "Simular riscos",
-    desc: "Veja quanto pode perder antes de correr o risco.",
-  },
-  {
-    icon: ClipboardList,
-    n: "04",
-    titulo: "Registrar escolhas",
-    desc: "O que fez, por quê, com qual regra e como se sentia.",
-  },
-  {
-    icon: LineChart,
-    n: "05",
-    titulo: "Revisar resultados",
-    desc: "Planejado contra acontecido — sem culpa, com leitura.",
-  },
-  {
-    icon: Sprout,
-    n: "06",
-    titulo: "Evoluir",
-    desc: "Cada ciclo começa de novo, com um processo melhor.",
-  },
+const COM_ZAT = [
+  "Pensa antes de agir",
+  "Visualiza o risco",
+  "Registra sua hipótese",
+  "Aprende com cada decisão",
+  "Evolui seu processo",
 ];
 
-const EVENTOS = [
-  { titulo: "Impulso", desc: "Entrar porque deu ansiedade, porque subiu, porque alguém avisou." },
-  { titulo: "Quebra de regras", desc: "Ficar na mesa quando a própria regra mandava sair." },
-  {
-    titulo: "Recuperação agressiva",
-    desc: "Aumentar o risco logo depois de perder, para recuperar.",
-  },
-  {
-    titulo: "Confirmação, não evidência",
-    desc: "Procurar quem concorde com a decisão, em vez de dados.",
-  },
+const FLUXO = [
+  { icon: BookOpen, titulo: "Conhecimento", desc: "Entender antes de arriscar." },
+  { icon: ScrollText, titulo: "Regras Pessoais", desc: "O que você não pode quebrar." },
+  { icon: LineChart, titulo: "Simulação", desc: "Ver o risco antes dele existir." },
+  { icon: Target, titulo: "Decisão", desc: "Escolher com critério, não com pressa." },
+  { icon: PenLine, titulo: "Registro", desc: "Guardar o porquê, não só o quanto." },
+  { icon: Brain, titulo: "Reflexão", desc: "Ler o que aconteceu sem culpa." },
+  { icon: Sprout, titulo: "Evolução", desc: "Voltar ao começo um pouco melhor." },
 ];
 
-const CONCEITOS = ["Theta", "Volatilidade", "Gregas", "Travas", "Rolling"];
+const PERGUNTAS = [
+  "Como você está chegando ao mercado hoje?",
+  "Por que você quer operar?",
+  "Qual regra você não pode quebrar?",
+  "Você já simulou essa ideia?",
+  "Você consegue explicar sua tese?",
+];
 
-function PulseLine() {
+const DIA = [
+  { emoji: "🌅", titulo: "Check Cognitivo", desc: "“Como você chega ao mercado hoje?”" },
+  { emoji: "📖", titulo: "Sua regra mais importante", desc: "O limite que você mesmo escreveu." },
+  { emoji: "📈", titulo: "Monte sua hipótese", desc: "O que você espera que aconteça." },
+  { emoji: "🎯", titulo: "Simule antes", desc: "Veja a perda máxima em reais." },
+  { emoji: "📝", titulo: "Registre por que decidiu", desc: "A tese fica escrita, não na memória." },
+  { emoji: "🌙", titulo: "Feche o dia refletindo", desc: "O que o processo te mostrou." },
+  { emoji: "📚", titulo: "Amanhã você começa melhor", desc: "O ciclo recomeça com mais clareza." },
+];
+
+const MODULOS = [
+  { verbo: "Aprenda", desc: "sem jargões.", icon: GraduationCap },
+  { verbo: "Defina", desc: "suas próprias regras.", icon: ScrollText },
+  { verbo: "Simule", desc: "antes de arriscar dinheiro.", icon: LineChart },
+  { verbo: "Registre", desc: "o motivo da decisão.", icon: PenLine },
+  { verbo: "Reviva", desc: "qualquer operação.", icon: History },
+  { verbo: "Descubra", desc: "seus padrões.", icon: Map },
+  { verbo: "Evolua", desc: "comparando quem você era com quem está se tornando.", icon: Sprout },
+];
+
+const PILARES = [
+  {
+    titulo: "Processo antes do lucro",
+    desc: "O sistema mede a qualidade da decisão, não apenas o resultado financeiro.",
+  },
+  { titulo: "Educação antes da execução", desc: "Você aprende antes de arriscar dinheiro." },
+  { titulo: "Reflexão antes da repetição", desc: "Toda decisão vira aprendizado." },
+  { titulo: "Consciência antes da confiança", desc: "A confiança nasce do processo. Não da sorte." },
+];
+
+const ENCONTRA = [
+  "Trilha completa de Opções da B3",
+  "Simulador visual",
+  "Check Cognitivo",
+  "Diário de Decisões",
+  "Replay das operações",
+  "Mapa dos seus padrões",
+  "Copilot Educacional",
+  "Missões personalizadas",
+  "Evolução ao longo do tempo",
+];
+
+function Eyebrow({ n, children }: { n: string; children: React.ReactNode }) {
   return (
-    <svg viewBox="0 0 320 46" className="mx-auto mt-12 w-full max-w-md" aria-hidden="true">
-      <text
-        x="0"
-        y="12"
-        fontSize="10"
-        fill="rgba(255,255,255,0.5)"
-        fontFamily="JetBrains Mono, monospace"
-        letterSpacing="1"
-      >
-        IMPULSO
-      </text>
-      <text
-        x="320"
-        y="12"
-        textAnchor="end"
-        fontSize="10"
-        fill="oklch(0.72 0.18 155)"
-        fontFamily="JetBrains Mono, monospace"
-        letterSpacing="1"
-      >
-        DECISÃO
-      </text>
-      <line x1="14" y1="30" x2="306" y2="30" stroke="rgba(255,255,255,0.14)" strokeWidth="1" />
-      <line
-        x1="4"
-        y1="30"
-        x2="316"
-        y2="30"
-        stroke="oklch(0.78 0.17 65)"
-        strokeWidth="1"
-        strokeDasharray="4 90"
-        strokeDashoffset="2"
-      />
-      <circle r="5" fill="oklch(0.78 0.17 65)">
-        <animate attributeName="cx" values="14;306" dur="7s" repeatCount="indefinite" />
-        <animate attributeName="cy" values="30;30" dur="7s" repeatCount="indefinite" />
-      </circle>
-      <circle r="10" fill="oklch(0.78 0.17 65)" opacity="0.25">
-        <animate attributeName="cx" values="14;306" dur="7s" repeatCount="indefinite" />
-        <animate attributeName="cy" values="30;30" dur="7s" repeatCount="indefinite" />
-      </circle>
-    </svg>
-  );
-}
-
-function RingLoop() {
-  return (
-    <svg viewBox="0 0 64 64" className="size-16" aria-hidden="true">
-      <g>
-        <animateTransform
-          attributeName="transform"
-          type="rotate"
-          from="0 32 32"
-          to="360 32 32"
-          dur="28s"
-          repeatCount="indefinite"
-        />
-        <circle
-          cx="32"
-          cy="32"
-          r="29"
-          fill="none"
-          stroke="oklch(0.78 0.17 65 / 0.55)"
-          strokeWidth="2"
-          strokeDasharray="3 8"
-        />
-      </g>
-      <circle cx="32" cy="32" r="9" fill="oklch(0.78 0.17 65 / 0.12)" />
-      <circle cx="32" cy="32" r="4" fill="oklch(0.78 0.17 65)" />
-    </svg>
+    <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+      <span className="font-mono text-primary">{n}</span>
+      {children}
+    </div>
   );
 }
 
@@ -208,23 +138,20 @@ function Landing() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
       <div
-        className="pointer-events-none absolute -top-40 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full opacity-[0.16] blur-3xl"
+        className="pointer-events-none absolute -top-56 left-1/2 h-[560px] w-[900px] -translate-x-1/2 rounded-full opacity-[0.13] blur-3xl"
         style={{ background: "radial-gradient(closest-side, oklch(0.78 0.17 65), transparent)" }}
-      />
-      <div
-        className="pointer-events-none absolute bottom-0 right-0 h-[420px] w-[520px] rounded-full opacity-[0.08] blur-3xl"
-        style={{ background: "radial-gradient(closest-side, oklch(0.72 0.18 155), transparent)" }}
       />
 
       <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Link to="/" className="flex items-center gap-2">
-          <div className="grid size-9 place-items-center rounded-md bg-primary text-primary-foreground font-mono font-bold">
+          <div className="grid size-9 place-items-center rounded-md bg-primary font-mono font-bold text-primary-foreground">
             0→
           </div>
           <div className="font-semibold">Zero ao Trade</div>
         </Link>
         <Link
           to="/auth"
+          search={{ mode: "login" }}
           className="rounded-md border border-border px-4 py-2 text-sm transition-colors hover:bg-accent"
         >
           Entrar
@@ -232,35 +159,40 @@ function Landing() {
       </header>
 
       {/* HERO */}
-      <section className="relative z-10 mx-auto max-w-4xl px-6 pb-28 pt-14 text-center md:pt-20">
+      <section className="relative z-10 mx-auto max-w-4xl px-6 pb-6 pt-16 text-center md:pt-24">
         <Reveal>
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary">
-            <span className="relative flex size-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-              <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
-            </span>
-            Copilot informa. Você decide.
-          </div>
-        </Reveal>
-
-        <Reveal delay={90}>
-          <h1 className="mx-auto mt-8 max-w-3xl text-4xl font-bold leading-[1.08] tracking-tight md:text-6xl">
-            Desenvolva a habilidade mais importante do mercado:
-            <span className="text-primary"> tomar boas decisões quando existe incerteza.</span>
+          <h1 className="mx-auto max-w-3xl text-4xl font-bold leading-[1.06] tracking-tight md:text-6xl">
+            Pare de operar por impulso.
+            <br />
+            <span className="text-primary">Comece a construir um processo.</span>
           </h1>
         </Reveal>
 
+        <Reveal delay={100}>
+          <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+            O Zero ao Trade não prevê o mercado.
+            <br />
+            Ele ajuda você a desenvolver uma forma melhor de decidir.
+          </p>
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-foreground">
+            Transforme cada operação em aprendizado através de um ciclo contínuo de reflexão,
+            disciplina e evolução.
+          </p>
+        </Reveal>
+
         <Reveal delay={180}>
-          <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            Não prometemos sinais.
-            <br />
-            Não prometemos acertar o mercado.
-            <br />
-            Construímos um sistema que transforma impulsos em decisões conscientes.
-          </p>
-          <p className="mx-auto mt-5 max-w-2xl text-lg font-medium text-foreground">
-            Enquanto a maioria aprende a operar, você aprende a pensar antes de operar.
-          </p>
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-mono text-xs tracking-wide text-muted-foreground">
+            {CICLO_HERO.map((etapa, i) => (
+              <span key={etapa} className="flex items-center gap-3">
+                <span className="rounded-full border border-border bg-card/60 px-3 py-1.5 text-foreground">
+                  {etapa}
+                </span>
+                {i < CICLO_HERO.length - 1 ? (
+                  <span className="text-primary/60">→</span>
+                ) : null}
+              </span>
+            ))}
+          </div>
         </Reveal>
 
         <Reveal delay={260}>
@@ -270,518 +202,339 @@ function Landing() {
               search={{ mode: "signup" }}
               className="group inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
             >
-              Começar do Zero
+              Começar gratuitamente
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <Link
-              to="/auth"
-              search={{ mode: "login" }}
+            <a
+              href="#como-funciona"
               className="rounded-xl border border-border bg-card/60 px-8 py-4 text-sm font-semibold transition-colors hover:bg-accent"
             >
-              Já Opero
-            </Link>
+              Ver como funciona
+            </a>
           </div>
         </Reveal>
 
         <Reveal delay={340}>
-          <PulseLine />
-        </Reveal>
-      </section>
-
-      {/* PROBLEMA */}
-      <section className="relative z-10 mx-auto max-w-6xl px-6 py-24">
-        <Reveal>
-          <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-            <span className="font-mono text-primary">01</span> O ponto de partida
-          </div>
-          <h2 className="mt-4 max-w-3xl text-3xl font-bold tracking-tight md:text-5xl">
-            O mercado não falta informação.
+          <div className="mx-auto mt-16 max-w-xl border-t border-border pt-8 text-sm leading-relaxed text-muted-foreground">
+            Mais de 90% das pessoas físicas registram perdas ao operar de forma recorrente no
+            mercado.
             <br />
-            <span className="text-primary">O mercado falta processo.</span>
-          </h2>
-          <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-            Todos os dias, milhares de investidores tomam decisões baseadas em:
-          </p>
-        </Reveal>
-
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {PROBLEMA.map((p, i) => (
-            <Reveal key={p.titulo} delay={i * 70}>
-              <div className="group h-full rounded-2xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-loss/50 hover:bg-loss/5">
-                <p.icon className="text-loss/80" size={20} />
-                <div className="mt-3 font-semibold">{p.titulo}</div>
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        <Reveal>
-          <div className="mx-auto mt-14 max-w-3xl text-center">
-            <p className="text-lg leading-relaxed text-muted-foreground">
-              O resultado normalmente não aparece na primeira operação. Aparece inevitavelmente, ao
-              longo do tempo.
-            </p>
-            <p className="mt-8 text-3xl font-bold tracking-tight md:text-4xl">
-              Existe um jeito diferente.
-            </p>
-            <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              Em vez de tentar prever o mercado, aprenda a construir um{" "}
-              <span className="text-foreground">processo de decisão</span>. Foi exatamente para isso
-              que criamos o <span className="text-foreground">Zero ao Trade</span>.
-            </p>
+            O problema raramente é falta de informação.
+            <br />
+            <span className="text-foreground">Quase sempre é falta de processo.</span>
           </div>
         </Reveal>
       </section>
 
-      {/* CICLO DE DECISÃO */}
-      <section className="relative z-10 mx-auto max-w-6xl px-6 py-24">
+      {/* 02 — MÉTODO x INFORMAÇÃO */}
+      <section className="relative z-10 mx-auto max-w-5xl px-6 py-28">
         <Reveal>
-          <div className="flex items-center gap-4">
-            <RingLoop />
-            <div>
-              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                <span className="font-mono text-primary">02</span> O método
-              </div>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
-                Toda boa decisão passa por uma sequência.
-              </h2>
-            </div>
-          </div>
-          <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-            Não são módulos soltos — é uma transformação. O <em>Decision Lifecycle</em> que dá nome
-            ao nosso sistema operacional.
-          </p>
+          <Eyebrow n="01">O ponto de partida</Eyebrow>
+          <h2 className="mt-4 max-w-3xl text-3xl font-bold tracking-tight md:text-5xl">
+            Você não precisa de mais informação.
+            <br />
+            <span className="text-primary">Você precisa de um método.</span>
+          </h2>
         </Reveal>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {LOOP.map((etapa, i) => (
+        <div className="mt-12 grid gap-4 md:grid-cols-2">
+          <Reveal>
+            <div className="h-full rounded-2xl border border-border bg-card p-7">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Hoje
+              </div>
+              <ul className="mt-5 space-y-3">
+                {HOJE.map((t) => (
+                  <li key={t} className="flex items-start gap-3 text-[15px] text-muted-foreground">
+                    <X size={16} className="mt-0.5 shrink-0 text-loss" />
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+          <Reveal delay={100}>
+            <div className="h-full rounded-2xl border border-success/30 bg-success/5 p-7">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-success">
+                Com o Zero ao Trade
+              </div>
+              <ul className="mt-5 space-y-3">
+                {COM_ZAT.map((t) => (
+                  <li key={t} className="flex items-start gap-3 text-[15px]">
+                    <Check size={16} className="mt-0.5 shrink-0 text-success" />
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* 03 — O QUE É / FLUXO */}
+      <section id="como-funciona" className="relative z-10 mx-auto max-w-5xl px-6 py-28">
+        <Reveal>
+          <Eyebrow n="02">A categoria</Eyebrow>
+          <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
+            Não é um curso.
+            <br />
+            Não é uma corretora.
+            <br />
+            Não é uma IA que manda comprar.
+            <br />
+            <span className="text-primary">É uma nova forma de aprender a decidir.</span>
+          </h2>
+        </Reveal>
+
+        <div className="mt-14 space-y-3">
+          {FLUXO.map((etapa, i) => (
             <Reveal key={etapa.titulo} delay={i * 60}>
-              <div className="group relative h-full overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-primary/50">
-                <div className="flex items-center justify-between">
-                  <div className="grid size-11 place-items-center rounded-xl bg-primary/15 text-primary">
+              <div className="flex items-center gap-5">
+                <div className="flex flex-col items-center">
+                  <div className="grid size-12 shrink-0 place-items-center rounded-2xl border border-primary/25 bg-primary/10 text-primary">
                     <etapa.icon size={20} />
                   </div>
-                  <span className="font-mono text-2xl font-bold text-muted-foreground/25">
-                    {etapa.n}
-                  </span>
                 </div>
-                <div className="mt-4 text-lg font-semibold">{etapa.titulo}</div>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{etapa.desc}</p>
-                {i < LOOP.length - 1 ? (
-                  <ArrowRight
-                    size={14}
-                    className="mt-4 text-muted-foreground/40 transition-all group-hover:translate-x-1 group-hover:text-primary lg:mt-6"
-                  />
-                ) : (
-                  <span className="mt-4 block rounded-full bg-primary/15 px-3 py-1 text-[11px] font-semibold text-primary lg:mt-6">
-                    e recomeça
-                  </span>
-                )}
+                <div className="flex-1 rounded-2xl border border-border bg-card px-6 py-4">
+                  <div className="font-semibold">{etapa.titulo}</div>
+                  <p className="text-sm text-muted-foreground">{etapa.desc}</p>
+                </div>
               </div>
+              {i < FLUXO.length - 1 ? (
+                <div className="ml-6 h-5 w-px bg-gradient-to-b from-primary/50 to-primary/10" />
+              ) : null}
             </Reveal>
           ))}
         </div>
       </section>
 
-      {/* QUALIDADE DA DECISÃO */}
-      <section className="relative z-10 mx-auto max-w-6xl px-6 py-24">
-        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-          <Reveal>
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-              <span className="font-mono text-primary">03</span> O que medimos
-            </div>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
-              A maioria mede lucro.
-              <br />
-              <span className="text-primary">Nós medimos qualidade da decisão.</span>
-            </h2>
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-              Uma operação lucrativa pode ter sido uma decisão ruim. Uma operação com prejuízo pode
-              ter sido executada exatamente como deveria.
-            </p>
-            <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-              Se você confunde resultado com qualidade da decisão, nunca consegue evoluir.
-            </p>
-            <div className="mt-8 flex items-center gap-4">
-              <div className="grid size-12 place-items-center rounded-2xl bg-success/15 text-success">
-                <ShieldCheck size={24} />
-              </div>
-              <div>
-                <div className="text-sm font-semibold">Decision Score</div>
-                <p className="text-sm text-muted-foreground">
-                  Mede o processo, de 0 a 100. O lucro nunca entra na conta. Ele é consequência.
-                </p>
-              </div>
-            </div>
-          </Reveal>
-
-          <div className="space-y-4">
-            <Reveal delay={80}>
-              <div className="rounded-2xl border border-success/30 bg-success/5 p-6">
-                <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-success">
-                  <Check size={14} /> Entender isso liberta
-                </div>
-                <p className="mt-3 text-[15px] leading-relaxed">
-                  Você para de julgar cada operação pelo número final — e passa a julgar pelo quanto
-                  seguiu o próprio processo.
-                </p>
-              </div>
-            </Reveal>
-            <Reveal delay={160}>
-              <div className="rounded-2xl border border-loss/30 bg-loss/5 p-6">
-                <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-loss">
-                  <X size={14} /> O erro que trava todo mundo
-                </div>
-                <p className="mt-3 text-[15px] leading-relaxed">
-                  Lucrativa não significa boa. Prejuízo não significa burrice. O que você{" "}
-                  <span className="text-foreground">controla</span> é a decisão — não a
-                  consequência.
-                </p>
-              </div>
-            </Reveal>
-          </div>
-        </div>
+      {/* 04 — PERGUNTAS */}
+      <section className="relative z-10 mx-auto max-w-6xl px-6 py-28">
         <Reveal>
-          <p className="mt-16 text-center font-mono text-xl font-bold tracking-tight text-primary md:text-2xl">
-            O lucro é consequência. O processo é o produto.
-          </p>
-        </Reveal>
-      </section>
-
-      {/* COMPORTAMENTO */}
-      <section className="relative z-10 mx-auto max-w-6xl px-6 py-24">
-        <Reveal>
-          <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-            <span className="font-mono text-primary">04</span> O adversário
-          </div>
+          <Eyebrow n="03">O momento anterior à ordem</Eyebrow>
           <h2 className="mt-4 max-w-3xl text-3xl font-bold tracking-tight md:text-5xl">
-            Seu maior adversário raramente é o mercado.
+            Antes de clicar em Comprar…
             <br />
-            <span className="text-primary">É você.</span>
+            <span className="text-primary">o sistema faz perguntas.</span>
           </h2>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            O sistema identifica padrões que normalmente passam despercebidos — e os torna visíveis
-            antes que custem dinheiro.
-          </p>
+          <p className="mt-4 text-lg text-muted-foreground">Não entrega respostas.</p>
         </Reveal>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2">
-          {EVENTOS.map((a, i) => (
-            <Reveal key={a.titulo} delay={i * 70}>
-              <div className="flex gap-4 rounded-2xl border border-border bg-card p-5">
-                <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-loss/10 text-loss">
-                  <AlertTriangle size={18} />
-                </div>
-                <div>
-                  <div className="font-semibold">{a.titulo}</div>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{a.desc}</p>
-                </div>
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {PERGUNTAS.map((q, i) => (
+            <Reveal key={q} delay={i * 70}>
+              <div className="h-full rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40">
+                <MessageCircleQuestion size={18} className="text-primary" />
+                <p className="mt-4 text-lg leading-snug">{q}</p>
               </div>
             </Reveal>
           ))}
         </div>
 
         <Reveal>
-          <div className="mx-auto mt-12 max-w-3xl rounded-2xl border border-primary/30 bg-primary/5 p-8 text-center">
-            <Quote className="mx-auto text-primary" size={22} />
-            <p className="mt-4 text-xl leading-relaxed md:text-2xl">
-              O objetivo não é julgar. É tornar os padrões visíveis{" "}
-              <span className="text-primary">antes</span> que custem dinheiro.
-            </p>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* EDUCAÇÃO */}
-      <section className="relative z-10 mx-auto max-w-6xl px-6 py-24">
-        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-          <Reveal>
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-              <span className="font-mono text-primary">04</span> A base
-            </div>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
-              Aprender sem decorar.
-            </h2>
-            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-              Opções parecem difíceis porque normalmente são ensinadas do jeito errado. Nós
-              traduzimos conceitos complexos em linguagem simples — com analogias visuais e exemplos
-              reais.
-            </p>
-            <p className="mt-4 text-lg font-medium text-foreground">
-              Você entende primeiro. Memoriza depois.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-2">
-              {CONCEITOS.map((c) => (
-                <span
-                  key={c}
-                  className="rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary"
-                >
-                  {c}
-                </span>
-              ))}
-            </div>
-          </Reveal>
-
-          <Reveal delay={100}>
-            <div className="space-y-3">
-              <div className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5">
-                <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
-                  <GraduationCap size={20} />
-                </div>
-                <div>
-                  <div className="font-semibold">Cada conceito vira uma conversa</div>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    Nada de glossário decorado: uma pergunta de cada vez, com um visual que mostra o
-                    que está acontecendo.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5">
-                <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
-                  <Sparkles size={20} />
-                </div>
-                <div>
-                  <div className="font-semibold">Trilha progressiva, sem pulo</div>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    Você só avança quando demonstra que entende — não quando adivinha.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* SIMULADOR */}
-      <section className="relative z-10 mx-auto max-w-6xl px-6 py-24">
-        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-          <Reveal>
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-              <span className="font-mono text-primary">05</span> Antes de entrar
-            </div>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
-              Veja o risco
-              <br />
-              antes de correr o risco.
-            </h2>
-            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-              Monte estruturas. Visualize o payoff. Entenda quanto pode ganhar, quanto pode perder
-              e, principalmente:{" "}
-              <span className="text-foreground">por que aquela estrutura faz sentido</span>.
-            </p>
-            <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-              O simulador conversa com você antes de mostrar qualquer número técnico — porque quem
-              entende primeiro, decide melhor.
-            </p>
-          </Reveal>
-
-          <Reveal delay={120}>
-            <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                  <Eye size={14} /> A história do seu dinheiro
-                </div>
-                <div className="flex flex-wrap items-center gap-3 text-[10px] text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <span className="inline-block size-2 rounded-full bg-[oklch(0.78_0.17_65)]" />{" "}
-                    hoje
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <span className="inline-block size-2 rounded-full bg-success" /> lucro
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <span className="inline-block size-2 rounded-full bg-loss" /> perda
-                  </span>
-                </div>
-              </div>
-              <div className="mt-5">
-                <PayoffCurve />
-              </div>
-              <div className="mt-5 grid grid-cols-3 gap-2">
-                <div className="rounded-lg border border-border bg-background p-3 text-center">
-                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                    Risco máximo
-                  </div>
-                  <div className="mt-0.5 font-mono text-sm font-bold text-loss">R$ 90</div>
-                </div>
-                <div className="rounded-lg border border-border bg-background p-3 text-center">
-                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                    Lucro máximo
-                  </div>
-                  <div className="mt-0.5 font-mono text-sm font-bold text-success">R$ 10</div>
-                </div>
-                <div className="rounded-lg border border-border bg-background p-3 text-center">
-                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                    Ponto de equilíbrio
-                  </div>
-                  <div className="mt-0.5 font-mono text-sm font-bold">R$ 38,90</div>
-                </div>
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* DIÁRIO */}
-      <section className="relative z-10 mx-auto max-w-6xl px-6 py-24">
-        <Reveal>
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="flex items-center justify-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-              <span className="font-mono text-primary">06</span> A memória
-            </div>
-            <h2 className="mt-4 text-4xl font-bold tracking-tight md:text-6xl">
-              Sua memória falha.
-              <br />
-              <span className="text-primary">Seu processo não.</span>
-            </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              Toda decisão fica registrada: o que você fez, por que fez, qual regra utilizou e como
-              se sentia. Meses depois, você consegue responder uma pergunta que quase ninguém
-              consegue:
-            </p>
-          </div>
-        </Reveal>
-        <Reveal delay={120}>
-          <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-primary/30 bg-primary/5 p-8 text-center">
-            <p className="text-2xl font-bold leading-relaxed tracking-tight md:text-3xl">
-              “Eu ganho dinheiro porque tenho método —
-              <span className="text-primary">ou apesar dele?</span>”
-            </p>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* POR QUE ISSO IMPORTA */}
-      <section className="relative z-10 mx-auto max-w-6xl px-6 py-24">
-        <Reveal>
-          <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-            <span className="font-mono text-primary">07</span> Por que isso importa
-          </div>
-          <h2 className="mt-4 max-w-3xl text-3xl font-bold tracking-tight md:text-5xl">
-            Existem milhares de ferramentas para mostrar gráficos.
-            <br />
-            <span className="text-primary">Quase ninguém ensina a decidir.</span>
-          </h2>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            Há centenas de cursos ensinando estratégias — e quase ninguém ensina a construir um
-            processo consistente para decidir sob incerteza. O Zero ao Trade nasceu exatamente para
-            preencher essa lacuna.
+          <p className="mt-12 text-center text-xl font-semibold tracking-tight md:text-2xl">
+            A maioria das perdas começa antes da ordem ser enviada.
           </p>
         </Reveal>
+      </section>
 
-        <Reveal delay={100}>
-          <div className="mt-10 grid gap-4 lg:grid-cols-[1fr_1fr]">
-            <div className="flex items-start gap-4 rounded-2xl border border-border bg-card p-6">
-              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent text-muted-foreground">
-                <LineChart size={18} />
-              </div>
-              <div>
-                <div className="font-semibold">Gráficos mostram o preço</div>
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Onde a coisa esteve. Nunca explicam como o ser humano decide ali dentro.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 rounded-2xl border border-border bg-card p-6">
-              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent text-muted-foreground">
-                <Compass size={18} />
-              </div>
-              <div>
-                <div className="font-semibold">Cursos ensinam estratégias</div>
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Assumem que o problema é saber o que comprar. O problema real está a um passo
-                  antes.
-                </p>
-              </div>
-            </div>
+      {/* 05 — UM DIA */}
+      <section className="relative z-10 mx-auto max-w-6xl px-6 py-28">
+        <Reveal>
+          <Eyebrow n="04">A rotina</Eyebrow>
+          <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
+            Veja como um dia acontece.
+          </h2>
+        </Reveal>
+
+        <div className="mt-12 -mx-6 overflow-x-auto px-6 pb-4">
+          <div className="flex min-w-max items-stretch gap-3">
+            {DIA.map((m, i) => (
+              <Reveal key={m.titulo} delay={i * 60}>
+                <div className="flex items-stretch gap-3">
+                  <div className="flex w-56 flex-col rounded-2xl border border-border bg-card p-5">
+                    <div className="text-2xl">{m.emoji}</div>
+                    <div className="mt-3 font-semibold leading-snug">{m.titulo}</div>
+                    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{m.desc}</p>
+                  </div>
+                  {i < DIA.length - 1 ? (
+                    <div className="flex items-center text-primary/50">→</div>
+                  ) : null}
+                </div>
+              </Reveal>
+            ))}
           </div>
+        </div>
+      </section>
+
+      {/* 06 — MÓDULOS NARRATIVOS */}
+      <section className="relative z-10 mx-auto max-w-6xl px-6 py-28">
+        <Reveal>
+          <Eyebrow n="05">O que você faz aqui</Eyebrow>
+          <h2 className="mt-4 max-w-3xl text-3xl font-bold tracking-tight md:text-5xl">
+            Você não evolui porque ganhou.
+            <br />
+            <span className="text-primary">Você evolui porque entende suas decisões.</span>
+          </h2>
+        </Reveal>
+
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {MODULOS.map((m, i) => (
+            <Reveal key={m.verbo} delay={i * 60}>
+              <div className="h-full rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40">
+                <m.icon size={20} className="text-primary" />
+                <div className="mt-4 text-2xl font-bold tracking-tight">{m.verbo}</div>
+                <p className="mt-1 text-[15px] text-muted-foreground">{m.desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* 07 — PILARES */}
+      <section className="relative z-10 mx-auto max-w-5xl px-6 py-28">
+        <Reveal>
+          <Eyebrow n="06">Os pilares</Eyebrow>
+          <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
+            O que torna o Zero ao Trade diferente?
+          </h2>
+        </Reveal>
+
+        <div className="mt-12 grid gap-4 md:grid-cols-2">
+          {PILARES.map((p, i) => (
+            <Reveal key={p.titulo} delay={i * 70}>
+              <div className="h-full rounded-2xl border border-border bg-card p-7">
+                <div className="font-mono text-xs text-primary">0{i + 1}</div>
+                <div className="mt-3 text-xl font-semibold tracking-tight">{p.titulo}</div>
+                <p className="mt-2 leading-relaxed text-muted-foreground">{p.desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* 08 — IDENTIDADE */}
+      <section className="relative z-10 mx-auto max-w-4xl px-6 py-32 text-center">
+        <Reveal>
+          <Sparkles size={22} className="mx-auto text-primary" />
+          <p className="mt-6 text-sm uppercase tracking-[0.18em] text-muted-foreground">
+            Inspirado por uma pergunta simples
+          </p>
+          <p className="mt-8 text-3xl font-bold leading-snug tracking-tight md:text-4xl">
+            E se o problema nunca tivesse sido escolher o ativo…
+            <br />
+            <span className="text-primary">…mas aprender a decidir melhor?</span>
+          </p>
         </Reveal>
       </section>
 
-      {/* EVIDÊNCIA */}
-      <section className="relative z-10 mx-auto max-w-4xl px-6 py-24">
+      {/* 09 — O QUE VOCÊ ENCONTRA */}
+      <section className="relative z-10 mx-auto max-w-5xl px-6 py-28">
         <Reveal>
-          <div className="rounded-2xl border border-border bg-card p-8 md:p-10">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-              <Scale size={14} /> O problema não é apenas técnico — é comportamental
-            </div>
-            <p className="mt-5 text-[15px] leading-relaxed text-muted-foreground md:text-base">
-              Estudos brasileiros conduzidos por pesquisadores da{" "}
-              <span className="text-foreground">FGV</span> mostram que a maior parte dos
-              investidores pessoa física que entra em operações de curtíssimo prazo termina
-              acumulando prejuízos — e que muitos abandonam a atividade antes mesmo de desenvolver
-              um processo consistente.
-            </p>
-            <div className="mt-6 border-t border-border pt-6 text-[15px] leading-relaxed md:text-base">
-              <p className="text-foreground">O Zero ao Trade não promete mudar o mercado.</p>
-              <p className="mt-1 text-muted-foreground">
-                Ele busca mudar a forma como você toma decisões dentro dele.
+          <Eyebrow n="07">Dentro da plataforma</Eyebrow>
+          <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
+            O que você encontrará aqui
+          </h2>
+        </Reveal>
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {ENCONTRA.map((item, i) => (
+            <Reveal key={item} delay={i * 45}>
+              <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-5 py-4 text-[15px]">
+                <Check size={16} className="shrink-0 text-success" />
+                {item}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* 10 — PARA QUEM É */}
+      <section className="relative z-10 mx-auto max-w-5xl px-6 py-28">
+        <Reveal>
+          <Eyebrow n="08">Para quem é</Eyebrow>
+        </Reveal>
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <Reveal>
+            <div className="h-full rounded-2xl border border-border bg-card p-8">
+              <Sprout size={20} className="text-primary" />
+              <div className="mt-4 text-2xl font-bold tracking-tight">Nunca operou</div>
+              <p className="mt-3 leading-relaxed text-muted-foreground">
+                Aprenda do zero.
+                <br />
+                Sem jargões.
+                <br />
+                Sem promessas.
               </p>
             </div>
-          </div>
+          </Reveal>
+          <Reveal delay={100}>
+            <div className="h-full rounded-2xl border border-border bg-card p-8">
+              <TrendingUp size={20} className="text-primary" />
+              <div className="mt-4 text-2xl font-bold tracking-tight">Já opera</div>
+              <p className="mt-3 leading-relaxed text-muted-foreground">
+                Estruture seu processo.
+                <br />
+                Descubra padrões.
+                <br />
+                Melhore sua disciplina.
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* 11 — COMPROMISSO */}
+      <section className="relative z-10 mx-auto max-w-3xl px-6 py-28">
+        <Reveal>
+          <Eyebrow n="09">O compromisso da plataforma</Eyebrow>
+          <ul className="mt-8 space-y-3">
+            {[
+              "Não prometemos lucro.",
+              "Não prometemos acertar o mercado.",
+              "Não recomendamos ativos.",
+            ].map((t) => (
+              <li key={t} className="flex items-start gap-3 text-lg text-muted-foreground">
+                <X size={18} className="mt-1 shrink-0 text-loss" />
+                {t}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-10 text-xl font-semibold">Prometemos algo diferente.</p>
+          <p className="mt-3 text-2xl font-bold leading-snug tracking-tight text-primary md:text-3xl">
+            Ajudar você a construir um processo de decisão mais consciente.
+          </p>
         </Reveal>
       </section>
 
-      {/* POSICIONAMENTO */}
-      <section className="relative z-10 mx-auto max-w-4xl px-6 pb-10">
+      {/* CTA FINAL */}
+      <section className="relative z-10 mx-auto max-w-3xl px-6 pb-32 pt-12 text-center">
         <Reveal>
-          <div className="border-l-2 border-primary/50 pl-6 md:pl-8">
-            <Quote className="text-primary/70" size={20} />
-            <p className="mt-4 text-xl leading-relaxed md:text-2xl">
-              O Zero ao Trade é uma plataforma para desenvolver{" "}
-              <span className="text-primary">
-                a qualidade das decisões em ambientes de incerteza
-              </span>
-              . Começamos pelo mercado de opções porque é um dos ambientes onde os erros de decisão
-              aparecem de forma mais evidente.
-            </p>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* MANIFESTO */}
-      <section className="relative z-10 px-6 py-28 text-center">
-        <Reveal>
-          <div className="flex items-center justify-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-            <span className="font-mono text-primary">08</span> O manifesto
-          </div>
-          <h2 className="mx-auto mt-6 max-w-4xl text-4xl font-bold leading-tight tracking-tight md:text-6xl">
-            O mercado sempre será incerto.
+          <p className="text-3xl font-bold leading-snug tracking-tight md:text-4xl">
+            O mercado continuará sendo incerto.
             <br />
             <span className="text-primary">Sua forma de decidir não precisa ser.</span>
-          </h2>
-          <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            O Zero ao Trade não existe para prever o próximo movimento da Bolsa. Existe para ajudar
-            você a construir algo muito mais valioso: um processo de decisão que continua
-            funcionando quando o mercado muda.
           </p>
-          <p className="mx-auto mt-6 max-w-2xl text-xl font-medium text-foreground md:text-2xl">
-            Porque sobreviver sempre vem antes de lucrar.
+          <p className="mx-auto mt-6 max-w-xl leading-relaxed text-muted-foreground">
+            Comece hoje a construir um processo que você consiga explicar, revisar e melhorar ao
+            longo do tempo.
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              to="/auth"
-              search={{ mode: "signup" }}
-              className="group inline-flex items-center gap-2 rounded-xl bg-primary px-10 py-4 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-            >
-              Começar minha jornada
-              <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </div>
+          <Link
+            to="/auth"
+            search={{ mode: "signup" }}
+            className="group mt-10 inline-flex items-center gap-2 rounded-xl bg-primary px-9 py-4 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
+          >
+            Começar gratuitamente
+            <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+          </Link>
         </Reveal>
       </section>
 
-      <footer className="relative z-10 border-t border-border py-10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 text-center md:flex-row md:justify-between md:text-left">
-          <div className="flex items-center gap-2">
-            <div className="grid size-7 place-items-center rounded-md bg-primary text-primary-foreground font-mono text-xs font-bold">
-              0→
-            </div>
-            <span className="text-sm font-semibold">Zero ao Trade</span>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Conteúdo educacional. Não é recomendação de investimento.
+      <footer className="relative z-10 border-t border-border">
+        <div className="mx-auto max-w-6xl px-6 py-10 text-xs leading-relaxed text-muted-foreground">
+          <p>
+            Zero ao Trade — conteúdo educacional. Nada aqui é recomendação de investimento. Dados de
+            perdas recorrentes de pessoas físicas baseados em estudos acadêmicos brasileiros (FGV) e
+            levantamentos públicos de mercado.
           </p>
         </div>
       </footer>

@@ -197,7 +197,7 @@ export type Database = {
           id: string
           motivo: string
           regra_id: string | null
-          sinal: Json
+          sinal: Json | null
           user_id: string
         }
         Insert: {
@@ -206,7 +206,7 @@ export type Database = {
           id?: string
           motivo: string
           regra_id?: string | null
-          sinal?: Json
+          sinal?: Json | null
           user_id: string
         }
         Update: {
@@ -215,18 +215,10 @@ export type Database = {
           id?: string
           motivo?: string
           regra_id?: string | null
-          sinal?: Json
+          sinal?: Json | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "cheques_cognitivos_regra_id_fkey"
-            columns: ["regra_id"]
-            isOneToOne: false
-            referencedRelation: "personal_rules"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       decision_memory: {
         Row: {
@@ -559,15 +551,15 @@ export type Database = {
           conteudo: string
           created_at: string
           data: string
-          estado: string | null
+          estado: string
           id: string
           user_id: string
         }
         Insert: {
-          conteudo: string
+          conteudo?: string
           created_at?: string
-          data: string
-          estado?: string | null
+          data?: string
+          estado: string
           id?: string
           user_id: string
         }
@@ -575,7 +567,7 @@ export type Database = {
           conteudo?: string
           created_at?: string
           data?: string
-          estado?: string | null
+          estado?: string
           id?: string
           user_id?: string
         }
