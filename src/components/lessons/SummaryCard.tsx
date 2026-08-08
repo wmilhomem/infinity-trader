@@ -11,6 +11,8 @@ type Props = {
   missaoAcertou?: boolean;
   missaoReverteu: boolean;
   missaoExplicada: boolean;
+  missaoExplicacaoCoerente: boolean;
+  transferAcertou?: boolean;
   onRefazer: () => void;
   onContinuar: () => void;
 };
@@ -23,6 +25,8 @@ export function SummaryCard({
   missaoAcertou,
   missaoReverteu,
   missaoExplicada,
+  missaoExplicacaoCoerente,
+  transferAcertou,
   onRefazer,
   onContinuar,
 }: Props) {
@@ -52,24 +56,53 @@ export function SummaryCard({
         {missaoAcertou !== undefined && (
           <div className="mx-auto mt-6 max-w-md rounded-xl border border-border bg-card/60 p-4 text-left">
             <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-              Missão da lição
+              Domínio da lição
             </div>
             <ul className="mt-2 space-y-1.5 text-sm">
               <li className="flex items-center gap-2">
-                <Check size={15} className={missaoAcertou ? "text-success" : "text-amber-400"} />
+                <Check
+                  size={15}
+                  className={
+                    missaoAcertou
+                      ? "text-success"
+                      : missaoReverteu
+                        ? "text-amber-400"
+                        : "text-amber-400"
+                  }
+                />
                 {missaoAcertou
-                  ? "Decisão correta na primeira tentativa"
+                  ? "Reconhece a decisão correta"
                   : missaoReverteu
-                    ? "Errou, reverteu aos conceitos e seguiu"
-                    : "Errou na primeira tentativa"}
+                    ? "Errou a decisão, mas reverteu aos conceitos"
+                    : "Ainda pratica: a decisão certa na primeira tentativa"}
               </li>
-              {missaoExplicada && (
-                <li className="flex items-center gap-2">
-                  <Check size={15} className="text-success" />
-                  Explicou a decisão com as próprias palavras
-                </li>
-              )}
+              <li className="flex items-center gap-2">
+                <Check size={15} className={transferAcertou ? "text-success" : "text-amber-400"} />
+                {transferAcertou
+                  ? "Aplica o conceito em outro cenário"
+                  : "Ainda pratica: aplicar o conceito em outro cenário"}
+              </li>
+              <li className="flex items-center gap-2">
+                <Check
+                  size={15}
+                  className={
+                    missaoExplicada && missaoExplicacaoCoerente ? "text-success" : "text-amber-400"
+                  }
+                />
+                {missaoExplicada && missaoExplicacaoCoerente
+                  ? "Explica a decisão com as próprias palavras"
+                  : missaoExplicada
+                    ? "Escreveu uma explicação — revise os termos da lição"
+                    : "Ainda pratica: explicar a decisão em uma frase"}
+              </li>
             </ul>
+            {(!missaoAcertou ||
+              !transferAcertou ||
+              !(missaoExplicada && missaoExplicacaoCoerente)) && (
+              <div className="mt-3 rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm">
+                Ainda pratique: <strong>{lesson.missao.aindaPratique}</strong>
+              </div>
+            )}
           </div>
         )}
       </div>

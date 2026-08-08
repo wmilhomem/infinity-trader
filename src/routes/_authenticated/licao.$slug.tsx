@@ -68,6 +68,14 @@ function LicaoPage() {
   const [missaoRevelado, setMissaoRevelado] = useState(false);
   const [missaoSalvo, setMissaoSalvo] = useState(false);
   const [missaoReverteu, setMissaoReverteu] = useState(false);
+  const [transferEscolha, setTransferEscolha] = useState<number | undefined>(undefined);
+  const [transferRevelado, setTransferRevelado] = useState(false);
+  const [transferSalvo, setTransferSalvo] = useState(false);
+
+  function explicacaoCoerente(texto: string, termos: string[]): boolean {
+    const t = texto.toLocaleLowerCase("pt-BR");
+    return termos.some((k) => t.includes(k.toLocaleLowerCase("pt-BR")));
+  }
 
   const steps = useMemo<Step[]>(() => {
     if (!lesson) return [];
@@ -155,13 +163,18 @@ function LicaoPage() {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
     const opcao = lesson!.missao.opcoes[missaoEscolha];
+    const explicacao = missaoExplicacao.trim();
     await supabase.from("lessons_progress").upsert(
       {
         user_id: u.user.id,
         lesson_slug: lesson!.slug,
         missao_correta: opcao.tom === "correta",
         missao_opcao: missaoEscolha,
-        missao_explicacao: missaoExplicacao.trim() || null,
+        missao_explicacao: explicacao || null,
+        explicacao_coerente:
+          explicacao.length > 0
+            ? explicacaoCoerente(explicacao, lesson!.missao.termosExplicacao)
+            : null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id,lesson_slug" },
@@ -172,6 +185,30 @@ function LicaoPage() {
   function confirmarMissao() {
     setMissaoRevelado(true);
     void persistMissao();
+  }
+
+  async function persistTransferencia() {
+    if (transferSalvo || transferEscolha === undefined) return;
+    setTransferSalvo(true);
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) return;
+    const opcao = lesson!.missao.transferencia.opcoes[transferEscolha];
+    await supabase.from("lessons_progress").upsert(
+      {
+        user_id: u.user.id,
+        lesson_slug: lesson!.slug,
+        transferencia_correta: opcao.tom === "correta",
+        transferencia_opcao: transferEscolha,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,lesson_slug" },
+    );
+    qc.invalidateQueries({ queryKey: ["progress"] });
+  }
+
+  function confirmarTransferencia() {
+    setTransferRevelado(true);
+    void persistTransferencia();
   }
 
   function reverConceito() {
@@ -211,12 +248,15 @@ function LicaoPage() {
     setMissaoRevelado(false);
     setMissaoSalvo(false);
     setMissaoReverteu(false);
+    setTransferEscolha(undefined);
+    setTransferRevelado(false);
+    setTransferSalvo(false);
     if (nextLesson) navigate({ to: "/licao/$slug", params: { slug: nextLesson.slug } });
   }
 
   const isQuiz = step?.kind === "quiz";
   const quizLocked = isQuiz && !revealed[(step as { i: number }).i];
-  const missaoLocked = step?.kind === "missao" && !missaoRevelado;
+  const missaoLocked = step?.kind === "missao" && !(missaoRevelado && transferRevelado);
 
   const rotulo =
     step?.kind === "hero"
@@ -304,10 +344,14 @@ function LicaoPage() {
               escolha={missaoEscolha}
               explicacao={missaoExplicacao}
               revelado={missaoRevelado}
+              transferEscolha={transferEscolha}
+              transferRevelado={transferRevelado}
               onEscolher={setMissaoEscolha}
               onExplicar={setMissaoExplicacao}
               onConfirmar={confirmarMissao}
               onReverConceito={reverConceito}
+              onEscolherTransferencia={setTransferEscolha}
+              onConfirmarTransferencia={confirmarTransferencia}
               onContinuar={() => go(1)}
             />
           )}
@@ -341,6 +385,15 @@ function LicaoPage() {
               }
               missaoReverteu={missaoReverteu}
               missaoExplicada={missaoExplicacao.trim().length > 0}
+              missaoExplicacaoCoerente={explicacaoCoerente(
+                missaoExplicacao,
+                lesson.missao.termosExplicacao,
+              )}
+              transferAcertou={
+                transferEscolha !== undefined
+                  ? lesson.missao.transferencia.opcoes[transferEscolha].tom === "correta"
+                  : undefined
+              }
             />
           )}
         </div>
