@@ -432,12 +432,15 @@ function Landing() {
         <div className="mt-12 grid gap-4 md:grid-cols-2">
           {PILARES.map((p, i) => (
             <Reveal key={p.titulo} delay={i * 70}>
-              <div className="h-full glass-panel rounded-2xl p-7">
-                <div className="font-mono text-xs text-primary">0{i + 1}</div>
-                <div className="mt-3 text-xl font-semibold tracking-tight">{p.titulo}</div>
-                <p className="mt-2 leading-relaxed text-muted-foreground">{p.desc}</p>
-              </div>
+              <Tilt3D max={5}>
+                <div className="h-full overflow-hidden glass-panel rounded-2xl p-7">
+                  <div className="font-mono text-xs text-primary">0{i + 1}</div>
+                  <div className="mt-3 text-xl font-semibold tracking-tight">{p.titulo}</div>
+                  <p className="mt-2 leading-relaxed text-muted-foreground">{p.desc}</p>
+                </div>
+              </Tilt3D>
             </Reveal>
+
           ))}
         </div>
       </section>
