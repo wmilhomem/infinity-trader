@@ -7,6 +7,7 @@ import { LESSONS } from "@/lib/lessons";
 import { cn } from "@/lib/utils";
 import { preverTamanhoPosicao } from "@/engines/behavior-forecast";
 import { montarPainelDeVoo, type CheckCognitivo } from "@/engines/readiness";
+import { useCaminho } from "@/lib/use-caminho";
 import type { DiaryEntry } from "@/engines/types";
 import { CheckCognitivoModal } from "@/components/CheckCognitivoModal";
 import {
@@ -55,6 +56,7 @@ export const Route = createFileRoute("/_authenticated/home")({
 
 function Home() {
   const navigate = useNavigate();
+  const { caminho } = useCaminho();
   const [expandido, setExpandido] = useState(false);
   const [checkAberto, setCheckAberto] = useState(false);
   const [ritualAberto, setRitualAberto] = useState(false);
@@ -219,13 +221,20 @@ function Home() {
   const temRegras = rules.length >= 3;
 
   const missao = [
-    {
-      done: licaoHoje,
-      label: `Entender "${proximaLicao.titulo}"`,
-      to: "/licao/$slug" as const,
-      params: { slug: proximaLicao.slug },
-      min: 8,
-    },
+    caminho === "futuros"
+      ? {
+          done: false,
+          label: "Explorar os conceitos essenciais de futuros",
+          to: "/trilha" as const,
+          min: 8,
+        }
+      : {
+          done: licaoHoje,
+          label: `Entender "${proximaLicao.titulo}"`,
+          to: "/licao/$slug" as const,
+          params: { slug: proximaLicao.slug },
+          min: 8,
+        },
     { done: temRegras, label: "Atualizar suas regras", to: "/regras" as const, min: 3 },
     {
       done: simHoje,

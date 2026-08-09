@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { formatarGuiaParaPrompt } from "@/lib/plataforma-guia";
+import { padronizarCaminho } from "@/lib/caminho";
 import {
   formatOmniscientContextForPrompt,
   type OmniscientContext,
@@ -9,8 +10,8 @@ import {
 
 type Body = { threadId: string; messages: { role: "user" | "assistant"; content: string }[] };
 
-const SYSTEM_PROMPT = `Você é o Copilot do "Zero ao Trade", um app educacional sobre opções da B3.
-
+const SYSTEM_PROMPT = `Você é o Copilot do "Zero ao Trade", um app educacional sobre decisão em mercados da B3 (opções e day trade de WIN/WDO).
+ 
 REGRAS ABSOLUTAS (nunca quebre):
 - Responda SOMENTE com base no conteúdo educacional do app, nas regras que o usuário definiu, ou no histórico registrado por ele.
 - NUNCA dê recomendação de compra/venda de um ativo específico ("devo comprar essa call?" → redirecione: "Isso é conteúdo educacional, não recomendação de investimento. Posso te ajudar a analisar a estrutura, os riscos e verificar se ela respeita suas próprias regras.").
@@ -79,6 +80,12 @@ export const Route = createFileRoute("/api/chat")({
 
         if (!threadRes.data) return new Response("Thread not found", { status: 404 });
         const userId = threadRes.data.user_id;
+        const { data: perfil } = await supabaseUser
+          .from("profiles")
+          .select("caminho")
+          .eq("id", userId)
+          .maybeSingle();
+        const caminho = padronizarCaminho(perfil?.caminho);
 
         const rulesText =
           (rulesRes.data ?? []).map((r) => `- [${r.categoria}] ${r.texto}`).join("\n") ||
@@ -91,7 +98,13 @@ export const Route = createFileRoute("/api/chat")({
             )
             .join("\n") || "(vazio)";
 
-        const contextBlock = `\n\n===\nREGRAS PESSOAIS DO USUÁRIO:\n${rulesText}\n\nÚLTIMAS 10 DECISÕES DO DIÁRIO:\n${diaryText}\n===\n`;
+        const contextBlock = `\n\n===\nCAMINHO DO USUÁRIO: ${
+          caminho === "futuros"
+            ? "day trade (WIN/WDO) — mini índice e mini dólar. Prefira exemplos de futuros: valor do ponto (WIN R$0,20 / WDO R$10), tick, margem mínima, ajuste diário, pregão 9h-18h, dimensionamento por stop."
+            : caminho === "opcoes"
+              ? "opções — calls e puts da B3. Prefira exemplos com as analogias do guia."
+              : "geral — opções e day trade. Use o exemplo que melhor encaixar na pergunta."
+        }\nREGRAS PESSOAIS DO USUÁRIO:\n${rulesText}\n\nÚLTIMAS 10 DECISÕES DO DIÁRIO:\n${diaryText}\n===\n`;
 
         const omniscient = formatOmniscientContextForPrompt(
           threadRes.data.contexto as unknown as OmniscientContext | null,

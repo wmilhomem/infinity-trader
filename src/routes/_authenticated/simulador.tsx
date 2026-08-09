@@ -40,6 +40,7 @@ import { AppShell } from "@/components/AppShell";
 import { ScorePanel } from "@/components/ScorePanel";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
+import { useCaminho } from "@/lib/use-caminho";
 import { FLOW_OPERAR_KEY, type FluxoRetomada } from "@/components/FluxoOperarModal";
 import type { Perna } from "@/lib/payoff";
 import { payoffCurve, summary } from "@/lib/payoff";
@@ -294,7 +295,10 @@ function Simulador() {
     erro: "",
     risco: "",
   });
-  const [instrumento, setInstrumento] = useState<Instrumento>("opcoes");
+  const { caminho } = useCaminho();
+  const [instrumento, setInstrumento] = useState<Instrumento>(() =>
+    caminho === "futuros" ? "futuro" : "opcoes",
+  );
   const [mercadoFuturo, setMercadoFuturo] = useState<MercadoFuturo>("WIN");
   const [direcaoFuturo, setDirecaoFuturo] = useState<DirecaoFuturo | null>(null);
   const [stopPontos, setStopPontos] = useState<number | null>(null);

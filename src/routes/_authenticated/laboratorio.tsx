@@ -1,9 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { FlaskConical, Scale } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { useCaminho } from "@/lib/use-caminho";
 import { HipoteseMap, type FiltroHipotese } from "@/components/laboratorio/HipoteseMap";
 import { FichaCard } from "@/components/laboratorio/FichaCard";
 import { FichaDetalhe } from "@/components/laboratorio/FichaDetalhe";
@@ -43,6 +44,7 @@ export const Route = createFileRoute("/_authenticated/laboratorio")({
 
 function Laboratorio() {
   const navigate = useNavigate();
+  const { caminho } = useCaminho();
   const { ficha: fichaParam } = Route.useSearch();
   const [filtro, setFiltro] = useState<FiltroHipotese>("todas");
   const [fichaAberta, setFichaAberta] = useState<string | null>(fichaParam ?? null);
@@ -109,6 +111,25 @@ function Laboratorio() {
 
   return (
     <AppShell title="Laboratório de Estratégias">
+      {caminho === "futuros" && (
+        <div className="mb-6 rounded-xl border border-border bg-card p-5">
+          <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            <FlaskConical size={13} /> Opções · outro mercado
+          </div>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            Este laboratório pertence ao mundo das <span className="text-foreground">opções</span> —
+            calls e puts, com gregas e payoff. Seu caminho é o day trade (WIN/WDO): o que importa
+            para você está no simulador de futuros (dimensionamento, stop, margem e ajuste diário).
+            O conteúdo abaixo fica disponível se quiser explorar o outro mercado.
+          </p>
+          <Link
+            to="/simulador"
+            className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+          >
+            Ir para o simulador de futuros →
+          </Link>
+        </div>
+      )}
       <div className="space-y-8">
         <section>
           <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-primary">

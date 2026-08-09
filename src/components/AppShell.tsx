@@ -1,10 +1,14 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { CopilotBubble } from "@/components/copilot/CopilotBubble";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { useAtualizarCaminho, useCaminho } from "@/lib/use-caminho";
+import { CAMINHO_INFO, CAMINHOS } from "@/lib/caminho";
+import { cn } from "@/lib/utils";
 import {
   BookOpen,
   Calculator,
+  ChevronDown,
   ClipboardList,
   FlaskConical,
   Home,
@@ -24,6 +28,62 @@ const NAV = [
   { to: "/revisao", label: "Revisão", icon: LineChart },
   { to: "/copilot", label: "Copilot", icon: MessageCircle },
 ] as const;
+
+function SeletorCaminho() {
+  const { caminho, carregando } = useCaminho();
+  const atualizar = useAtualizarCaminho();
+  const [aberto, setAberto] = useState(false);
+  if (carregando) return null;
+  return (
+    <div className="relative shrink-0">
+      <button
+        onClick={() => setAberto((v) => !v)}
+        className="flex items-center gap-2 rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-accent"
+        aria-label="Trocar caminho de mercado"
+      >
+        <span className="text-muted-foreground">Caminho:</span>
+        <span>{CAMINHO_INFO[caminho].label}</span>
+        <ChevronDown size={12} className={cn("transition-transform", aberto && "rotate-180")} />
+      </button>
+      {aberto && (
+        <>
+          <button
+            className="fixed inset-0 z-40 cursor-default"
+            onClick={() => setAberto(false)}
+            aria-label="Fechar seletor"
+          />
+          <div className="absolute right-0 z-50 mt-1 w-60 rounded-md border border-border bg-card p-1 shadow-lg">
+            {CAMINHOS.map((c) => (
+              <button
+                key={c}
+                onClick={() => {
+                  void atualizar(c).then((ok) => {
+                    if (!ok) return;
+                    setAberto(false);
+                  });
+                }}
+                className={cn(
+                  "flex w-full items-start justify-between gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-accent",
+                  c === caminho && "text-primary",
+                )}
+              >
+                <span>
+                  <span className="font-semibold">{CAMINHO_INFO[c].label}</span>
+                  <span className="block text-[11px] text-muted-foreground">
+                    {CAMINHO_INFO[c].desc}
+                  </span>
+                </span>
+                {c === caminho && (
+                  <span className="mt-1.5 inline-block size-2 shrink-0 rounded-full bg-primary" />
+                )}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 export function AppShell({ children, title }: { children: ReactNode; title?: string }) {
   const router = useRouter();
@@ -63,8 +123,9 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
         </button>
       </aside>
       <main className="flex-1 min-w-0">
-        <header className="border-b border-border bg-card/30 px-6 py-4 backdrop-blur">
+        <header className="flex items-center justify-between gap-4 border-b border-border bg-card/30 px-6 py-4 backdrop-blur">
           <h1 className="text-lg font-semibold">{title}</h1>
+          <SeletorCaminho />
         </header>
         <div className="p-6 max-w-6xl">{children}</div>
         {/* mobile nav */}

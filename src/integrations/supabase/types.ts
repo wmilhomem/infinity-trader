@@ -518,6 +518,7 @@ export type Database = {
       };
       profiles: {
         Row: {
+          caminho: string;
           created_at: string;
           email: string | null;
           id: string;
@@ -532,6 +533,7 @@ export type Database = {
           xp_total: number;
         };
         Insert: {
+          caminho?: string;
           created_at?: string;
           email?: string | null;
           id: string;
@@ -546,6 +548,7 @@ export type Database = {
           xp_total?: number;
         };
         Update: {
+          caminho?: string;
           created_at?: string;
           email?: string | null;
           id?: string;
