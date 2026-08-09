@@ -407,12 +407,15 @@ function Landing() {
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {MODULOS.map((m, i) => (
             <Reveal key={m.verbo} delay={i * 60}>
-              <div className="h-full glass-panel rounded-2xl p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40">
-                <m.icon size={20} className="text-primary" />
-                <div className="mt-4 text-2xl font-bold tracking-tight">{m.verbo}</div>
-                <p className="mt-1 text-[15px] text-muted-foreground">{m.desc}</p>
-              </div>
+              <Tilt3D>
+                <div className="h-full overflow-hidden glass-panel rounded-2xl p-6 transition-colors hover:border-primary/40">
+                  <m.icon size={20} className="text-primary" />
+                  <div className="mt-4 text-2xl font-bold tracking-tight">{m.verbo}</div>
+                  <p className="mt-1 text-[15px] text-muted-foreground">{m.desc}</p>
+                </div>
+              </Tilt3D>
             </Reveal>
+
           ))}
         </div>
       </section>
