@@ -262,7 +262,7 @@ function Landing() {
 
         <div className="mt-12 grid gap-4 md:grid-cols-2">
           <Reveal>
-            <div className="h-full rounded-2xl border border-border bg-card p-7">
+            <div className="h-full glass-panel rounded-2xl p-7">
               <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Hoje
               </div>
@@ -318,7 +318,7 @@ function Landing() {
                     <etapa.icon size={20} />
                   </div>
                 </div>
-                <div className="flex-1 rounded-2xl border border-border bg-card px-6 py-4">
+                <div className="flex-1 glass-panel rounded-2xl px-6 py-4">
                   <div className="font-semibold">{etapa.titulo}</div>
                   <p className="text-sm text-muted-foreground">{etapa.desc}</p>
                 </div>
@@ -346,7 +346,7 @@ function Landing() {
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {PERGUNTAS.map((q, i) => (
             <Reveal key={q} delay={i * 70}>
-              <div className="h-full rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40">
+              <div className="h-full glass-panel rounded-2xl p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40">
                 <MessageCircleQuestion size={18} className="text-primary" />
                 <p className="mt-4 text-lg leading-snug">{q}</p>
               </div>
@@ -375,7 +375,7 @@ function Landing() {
             {DIA.map((m, i) => (
               <Reveal key={m.titulo} delay={i * 60}>
                 <div className="flex items-stretch gap-3">
-                  <div className="flex w-56 flex-col rounded-2xl border border-border bg-card p-5">
+                  <div className="flex w-56 flex-col glass-panel rounded-2xl p-5">
                     <div className="text-2xl">{m.emoji}</div>
                     <div className="mt-3 font-semibold leading-snug">{m.titulo}</div>
                     <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{m.desc}</p>
@@ -404,7 +404,7 @@ function Landing() {
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {MODULOS.map((m, i) => (
             <Reveal key={m.verbo} delay={i * 60}>
-              <div className="h-full rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40">
+              <div className="h-full glass-panel rounded-2xl p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40">
                 <m.icon size={20} className="text-primary" />
                 <div className="mt-4 text-2xl font-bold tracking-tight">{m.verbo}</div>
                 <p className="mt-1 text-[15px] text-muted-foreground">{m.desc}</p>
@@ -426,7 +426,7 @@ function Landing() {
         <div className="mt-12 grid gap-4 md:grid-cols-2">
           {PILARES.map((p, i) => (
             <Reveal key={p.titulo} delay={i * 70}>
-              <div className="h-full rounded-2xl border border-border bg-card p-7">
+              <div className="h-full glass-panel rounded-2xl p-7">
                 <div className="font-mono text-xs text-primary">0{i + 1}</div>
                 <div className="mt-3 text-xl font-semibold tracking-tight">{p.titulo}</div>
                 <p className="mt-2 leading-relaxed text-muted-foreground">{p.desc}</p>
@@ -462,7 +462,7 @@ function Landing() {
         <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {ENCONTRA.map((item, i) => (
             <Reveal key={item} delay={i * 45}>
-              <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-5 py-4 text-[15px]">
+              <div className="flex items-center gap-3 glass-panel rounded-xl px-5 py-4 text-[15px]">
                 <Check size={16} className="shrink-0 text-success" />
                 {item}
               </div>
@@ -478,7 +478,7 @@ function Landing() {
         </Reveal>
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           <Reveal>
-            <div className="h-full rounded-2xl border border-border bg-card p-8">
+            <div className="h-full glass-panel rounded-2xl p-8">
               <Sprout size={20} className="text-primary" />
               <div className="mt-4 text-2xl font-bold tracking-tight">Nunca operou</div>
               <p className="mt-3 leading-relaxed text-muted-foreground">
@@ -491,7 +491,7 @@ function Landing() {
             </div>
           </Reveal>
           <Reveal delay={100}>
-            <div className="h-full rounded-2xl border border-border bg-card p-8">
+            <div className="h-full glass-panel rounded-2xl p-8">
               <TrendingUp size={20} className="text-primary" />
               <div className="mt-4 text-2xl font-bold tracking-tight">Já opera</div>
               <p className="mt-3 leading-relaxed text-muted-foreground">
