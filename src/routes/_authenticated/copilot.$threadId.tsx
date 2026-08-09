@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
-import { Headphones, Mic, Send, Volume2, VolumeX } from "lucide-react";
+import { Headphones, Mic, Send, Volume2, VolumeX, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useSpeechInput } from "@/hooks/useSpeechInput";
@@ -26,7 +26,6 @@ function ChatThread() {
   const [lendoId, setLendoId] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const baseFalaRef = useRef("");
   const vozAtivaRef = useRef(false);
 
   const profileQ = useQuery({
@@ -65,16 +64,13 @@ function ChatThread() {
   const {
     disponivel: vozDisponivel,
     gravando: gravandoVoz,
+    interim: interimVoz,
     erro: erroVoz,
     iniciar,
     parar,
+    cancelar,
   } = useSpeechInput({
-    onInterim: (t) => setInput(baseFalaRef.current ? `${baseFalaRef.current} ${t}` : t),
-    onFinal: (t) => {
-      const texto = (baseFalaRef.current ? `${baseFalaRef.current} ${t}` : t).trim();
-      setInput(texto);
-      if (texto && vozAtivaRef.current) void send(texto);
-    },
+    onFinal: (t) => void send(t),
   });
   const speechOut = useSpeechOutput();
 
@@ -101,37 +97,11 @@ function ChatThread() {
     inputRef.current?.focus();
   }, [threadId]);
 
-  useEffect(() => {
-    const alvoTexto = (el: EventTarget | null) => {
-      const t = el as HTMLElement | null;
-      if (!t) return false;
-      return t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable;
-    };
-    const onDown = (e: KeyboardEvent) => {
-      if (e.code !== "Space" || e.repeat || !vozDisponivel) return;
-      if (alvoTexto(e.target)) return;
-      e.preventDefault();
-      baseFalaRef.current = input;
-      iniciar();
-    };
-    const onUp = (e: KeyboardEvent) => {
-      if (e.code !== "Space") return;
-      parar();
-    };
-    window.addEventListener("keydown", onDown);
-    window.addEventListener("keyup", onUp);
-    return () => {
-      window.removeEventListener("keydown", onDown);
-      window.removeEventListener("keyup", onUp);
-    };
-  }, [vozDisponivel, iniciar, parar, input]);
-
   async function send(texto?: string) {
     const text = (texto ?? input).trim();
     if (!text || loading) return;
     speechOut.parar();
     setInput("");
-    baseFalaRef.current = "";
     const userMsg: Msg = { role: "user", content: text };
     const nextMsgs = [...messages, userMsg];
     setMessages(nextMsgs);
@@ -177,11 +147,6 @@ function ChatThread() {
     qc.invalidateQueries({ queryKey: ["profile"] });
   }
 
-  function iniciarFala() {
-    baseFalaRef.current = input;
-    iniciar();
-  }
-
   return (
     <AppShell title={thread.data?.titulo ?? "Conversa"}>
       <div className="flex h-[calc(100vh-8rem)] flex-col">
@@ -211,7 +176,8 @@ function ChatThread() {
           {messages.length === 0 && !loading && (
             <div className="rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
               Pergunte sobre uma lição, uma simulação ou uma decisão do seu diário.
-              {vozDisponivel && " Você também pode falar: segure o microfone ou a tecla Espaço."}
+              {vozDisponivel &&
+                " Você também pode falar: toque no microfone, fale e toque em parar quando terminar."}
             </div>
           )}
           {messages.map((m, i) => (
@@ -246,52 +212,65 @@ function ChatThread() {
           ))}
           {loading && <div className="text-sm text-muted-foreground italic">Pensando…</div>}
         </div>
-        {erroVoz && <div className="pb-2 text-xs text-loss">{erroVoz}</div>}
-        <div className="border-t border-border pt-3 flex gap-2 items-end">
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                void send();
-              }
-            }}
-            placeholder="Pergunte alguma coisa…"
-            rows={2}
-            className="flex-1 rounded-md border border-border bg-input px-3 py-2 text-sm resize-none"
-          />
-          {vozDisponivel && (
-            <button
-              onMouseDown={(e) => {
-                e.preventDefault();
-                iniciarFala();
-              }}
-              onMouseUp={parar}
-              onMouseLeave={parar}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                iniciarFala();
-              }}
-              onTouchEnd={parar}
-              title="Segure para falar (ou segure Espaço)"
-              className={`rounded-md p-3 transition-colors ${
-                gravandoVoz
-                  ? "bg-loss/20 text-loss animate-pulse"
-                  : "bg-accent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Mic size={16} />
-            </button>
+        <div className="border-t border-border pt-3">
+          {erroVoz && <div className="pb-2 text-xs text-loss">{erroVoz}</div>}
+          {gravandoVoz ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={cancelar}
+                title="Cancelar gravação"
+                className="rounded-md bg-accent p-3 text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <X size={16} />
+              </button>
+              <div className="flex flex-1 items-center gap-2 rounded-md border border-loss/40 bg-loss/10 px-3 py-2 text-sm text-foreground">
+                <Mic size={14} className="shrink-0 animate-pulse text-loss" />
+                <span className="truncate">
+                  {interimVoz ? `Ouvindo: ${interimVoz}` : "Ouvindo…"}
+                </span>
+              </div>
+              <button
+                onClick={parar}
+                title="Parar e enviar"
+                className="rounded-md bg-primary p-3 text-primary-foreground"
+              >
+                <Send size={16} />
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2 items-end">
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    void send();
+                  }
+                }}
+                placeholder="Pergunte alguma coisa…"
+                rows={2}
+                className="flex-1 rounded-md border border-border bg-input px-3 py-2 text-sm resize-none"
+              />
+              {vozDisponivel && (
+                <button
+                  onClick={iniciar}
+                  title="Falar"
+                  className="rounded-md bg-accent p-3 text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <Mic size={16} />
+                </button>
+              )}
+              <button
+                onClick={() => void send()}
+                disabled={loading || !input.trim()}
+                className="rounded-md bg-primary p-3 text-primary-foreground disabled:opacity-40"
+              >
+                <Send size={16} />
+              </button>
+            </div>
           )}
-          <button
-            onClick={() => void send()}
-            disabled={loading || !input.trim()}
-            className="rounded-md bg-primary p-3 text-primary-foreground disabled:opacity-40"
-          >
-            <Send size={16} />
-          </button>
         </div>
       </div>
     </AppShell>

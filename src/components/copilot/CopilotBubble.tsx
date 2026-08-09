@@ -2,7 +2,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
-import { MessageCircle, Mic, Send } from "lucide-react";
+import { MessageCircle, Mic, Send, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSpeechInput } from "@/hooks/useSpeechInput";
@@ -31,16 +31,10 @@ export function CopilotBubble() {
   const [threadId, setThreadId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const baseFalaRef = useRef("");
   const moduloIdRef = useRef<string | null>(null);
 
   const speechIn = useSpeechInput({
-    onInterim: (t) => setInput(baseFalaRef.current ? `${baseFalaRef.current} ${t}` : t),
-    onFinal: (t) => {
-      const texto = (baseFalaRef.current ? `${baseFalaRef.current} ${t}` : t).trim();
-      setInput(texto);
-      if (texto) void enviar(texto);
-    },
+    onFinal: (t) => void enviar(t),
   });
 
   useEffect(() => {
@@ -74,7 +68,6 @@ export function CopilotBubble() {
     const text = (textoOverride ?? input).trim();
     if (!text || loading || !modulo) return;
     setInput("");
-    baseFalaRef.current = "";
     const userMsg: Msg = { role: "user", content: text };
     const proximas = [...messages, userMsg];
     setMessages(proximas);
@@ -182,54 +175,63 @@ export function CopilotBubble() {
 
           {speechIn.erro && <div className="px-4 pb-1 text-[11px] text-loss">{speechIn.erro}</div>}
 
-          <div className="flex items-end gap-2 border-t border-border px-4 py-3">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  void enviar();
-                }
-              }}
-              placeholder="Pergunte…"
-              rows={1}
-              className="flex-1 resize-none rounded-md border border-border bg-input px-3 py-2 text-xs"
-            />
-            {speechIn.disponivel && (
+          {speechIn.gravando ? (
+            <div className="flex items-center gap-2 border-t border-border px-4 py-3">
               <button
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  baseFalaRef.current = input;
-                  speechIn.iniciar();
-                }}
-                onMouseUp={speechIn.parar}
-                onMouseLeave={speechIn.parar}
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  baseFalaRef.current = input;
-                  speechIn.iniciar();
-                }}
-                onTouchEnd={speechIn.parar}
-                title="Segure para falar"
-                className={`rounded-md p-2.5 transition-colors ${
-                  speechIn.gravando
-                    ? "bg-loss/20 text-loss animate-pulse"
-                    : "bg-accent text-muted-foreground hover:text-foreground"
-                }`}
+                onClick={speechIn.cancelar}
+                title="Cancelar gravação"
+                className="rounded-md bg-accent p-2.5 text-muted-foreground transition-colors hover:text-foreground"
               >
-                <Mic size={15} />
+                <X size={15} />
               </button>
-            )}
-            <button
-              onClick={() => void enviar()}
-              disabled={loading || !input.trim()}
-              className="rounded-md bg-primary p-2.5 text-primary-foreground disabled:opacity-40"
-            >
-              <Send size={15} />
-            </button>
-          </div>
+              <div className="flex min-w-0 flex-1 items-center gap-1.5 rounded-md border border-loss/40 bg-loss/10 px-3 py-2 text-xs text-foreground">
+                <Mic size={13} className="shrink-0 animate-pulse text-loss" />
+                <span className="truncate">
+                  {speechIn.interim ? `Ouvindo: ${speechIn.interim}` : "Ouvindo…"}
+                </span>
+              </div>
+              <button
+                onClick={speechIn.parar}
+                title="Parar e enviar"
+                className="rounded-md bg-primary p-2.5 text-primary-foreground"
+              >
+                <Send size={15} />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-end gap-2 border-t border-border px-4 py-3">
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    void enviar();
+                  }
+                }}
+                placeholder="Pergunte…"
+                rows={1}
+                className="flex-1 resize-none rounded-md border border-border bg-input px-3 py-2 text-xs"
+              />
+              {speechIn.disponivel && (
+                <button
+                  onClick={speechIn.iniciar}
+                  title="Falar"
+                  className="rounded-md bg-accent p-2.5 text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <Mic size={15} />
+                </button>
+              )}
+              <button
+                onClick={() => void enviar()}
+                disabled={loading || !input.trim()}
+                className="rounded-md bg-primary p-2.5 text-primary-foreground disabled:opacity-40"
+              >
+                <Send size={15} />
+              </button>
+            </div>
+          )}
 
           {threadId && (
             <div className="border-t border-border px-4 py-2.5">
