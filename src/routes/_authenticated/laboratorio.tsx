@@ -1,12 +1,20 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { FlaskConical } from "lucide-react";
+import { z } from "zod";
+import { FlaskConical, Scale } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { HipoteseMap, type FiltroHipotese } from "@/components/laboratorio/HipoteseMap";
 import { FichaCard } from "@/components/laboratorio/FichaCard";
 import { FichaDetalhe } from "@/components/laboratorio/FichaDetalhe";
-import { FICHAS_ESTRATEGIAS, FLOW_LAB_KEY, getFicha } from "@/lib/fichas-estrategias";
+import { CompararFichas } from "@/components/laboratorio/CompararFichas";
+import {
+  FICHAS_ESTRATEGIAS,
+  FLOW_LAB_KEY,
+  getFicha,
+  montarOrigem,
+  selecionarFichas,
+} from "@/lib/fichas-estrategias";
 import { fichasPorHipotese } from "@/lib/fichas-estrategias";
 import { PRESETS_ESTRATEGIA } from "@/lib/presets-estrategias";
 import { summary } from "@/lib/payoff";
@@ -29,13 +37,17 @@ export const Route = createFileRoute("/_authenticated/laboratorio")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  validateSearch: z.object({ ficha: z.string().optional() }),
   component: Laboratorio,
 });
 
 function Laboratorio() {
   const navigate = useNavigate();
+  const { ficha: fichaParam } = Route.useSearch();
   const [filtro, setFiltro] = useState<FiltroHipotese>("todas");
-  const [fichaAberta, setFichaAberta] = useState<string | null>(null);
+  const [fichaAberta, setFichaAberta] = useState<string | null>(fichaParam ?? null);
+  const [selecionadas, setSelecionadas] = useState<string[]>([]);
+  const [comparando, setComparando] = useState(false);
 
   const contagens = useMemo(() => {
     const c: Record<string, number> = { todas: FICHAS_ESTRATEGIAS.length };
@@ -55,16 +67,37 @@ function Laboratorio() {
   }, []);
 
   const ficha = fichaAberta ? (getFicha(fichaAberta) ?? null) : null;
+  const fichasComparadas = useMemo(() => selecionarFichas(selecionadas), [selecionadas]);
+
+  function abrirFicha(id: string) {
+    setFichaAberta(id);
+    navigate({ to: "/laboratorio", search: { ficha: id }, replace: true });
+  }
+
+  function fecharFicha() {
+    setFichaAberta(null);
+    navigate({ to: "/laboratorio", search: {}, replace: true });
+  }
+
+  function toggleSelecao(id: string) {
+    setSelecionadas((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : prev.length >= 3 ? prev : [...prev, id],
+    );
+  }
 
   function simular(id: string) {
     const f = getFicha(id);
     if (!f) return;
+    const origem = montarOrigem(id);
     try {
       sessionStorage.setItem(
         FLOW_LAB_KEY,
         JSON.stringify({
           preset: f.preset,
           tese: `Laboratório: hipótese de ${f.hipotese}. Ficha "${f.nome}" — ${f.expressa}`,
+          fichaId: origem?.fichaId,
+          fichaNome: origem?.fichaNome,
+          hipotese: origem?.hipotese,
         }),
       );
     } catch {
@@ -87,12 +120,39 @@ function Laboratorio() {
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
             Comece pela sua hipótese: o que você acredita que o mercado vai fazer dentro do seu
             prazo? O laboratório organiza as estruturas que <strong>expressam</strong> cada hipótese
-            — com risco, retorno e breakevens na mesa. Nenhuma ficha é recomendação pessoal: o mapa
-            é seu, a decisão também. Se você ainda não tem hipótese, estude as fichas em "Todas".
+            — com risco, retorno e breakevens na mesa. Selecione 2 ou 3 fichas para compará-las lado
+            a lado antes de levar ao simulador. Nenhuma ficha é recomendação pessoal: o mapa é seu,
+            a decisão também.
           </p>
         </section>
 
         <HipoteseMap selecionada={filtro} contagens={contagens} onChange={setFiltro} />
+
+        {selecionadas.length > 0 && (
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-primary/40 bg-primary/5 p-3">
+            <div className="flex items-center gap-2 text-sm">
+              <Scale size={15} className="text-primary" />
+              <span>
+                Comparação: <b>{selecionadas.length}</b> de 3 fichas
+              </span>
+            </div>
+            <div className="ml-auto flex gap-2">
+              <button
+                onClick={() => setSelecionadas([])}
+                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold hover:bg-accent transition-colors"
+              >
+                Limpar
+              </button>
+              <button
+                onClick={() => setComparando(true)}
+                disabled={selecionadas.length < 2}
+                className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40 transition-colors"
+              >
+                Comparar lado a lado
+              </button>
+            </div>
+          </div>
+        )}
 
         <section className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -114,7 +174,9 @@ function Laboratorio() {
                 key={f.id}
                 ficha={f}
                 stats={statsPorFicha[f.id]}
-                onAbrir={() => setFichaAberta(f.id)}
+                selecionada={selecionadas.includes(f.id)}
+                onToggleSelecao={() => toggleSelecao(f.id)}
+                onAbrir={() => abrirFicha(f.id)}
                 onSimular={() => simular(f.id)}
               />
             ))}
@@ -124,8 +186,23 @@ function Laboratorio() {
         <FichaDetalhe
           ficha={ficha}
           aberta={!!ficha}
-          onFechar={() => setFichaAberta(null)}
+          onFechar={fecharFicha}
           onSimular={() => ficha && simular(ficha.id)}
+        />
+
+        <CompararFichas
+          fichas={fichasComparadas}
+          stats={statsPorFicha}
+          aberta={comparando}
+          onFechar={() => setComparando(false)}
+          onAbrirFicha={(id) => {
+            setComparando(false);
+            abrirFicha(id);
+          }}
+          onSimular={(id) => {
+            setComparando(false);
+            simular(id);
+          }}
         />
       </div>
     </AppShell>

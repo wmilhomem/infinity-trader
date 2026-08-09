@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
-import { Check, X } from "lucide-react";
+import { Check, FlaskConical, X } from "lucide-react";
 import type { Perna } from "@/lib/payoff";
 import { interpretar } from "@/engines/simulation-interpreter";
 import { validarRegras, type Regra } from "@/engines/rule-engine";
@@ -15,6 +15,7 @@ import { buildDecisionSnapshot } from "@/engines/decision-snapshot";
 import { lerSnapshotCognitivo } from "@/engines/decision-memory-reader";
 import { recomendarMissao } from "@/engines/missoes";
 import { preverTamanhoPosicao } from "@/engines/behavior-forecast";
+import { lerOrigem } from "@/lib/fichas-estrategias";
 import type { DiaryEntry } from "@/engines/types";
 import type { Json } from "@/integrations/supabase/types";
 import { ScorePanel } from "@/components/ScorePanel";
@@ -88,6 +89,7 @@ function Diario() {
       return data;
     },
   });
+  const origem = useMemo(() => lerOrigem(preSim.data?.origem), [preSim.data]);
   const memorias = useQuery({
     queryKey: ["memorias"],
     queryFn: async () => {
@@ -322,6 +324,20 @@ function Diario() {
               <div className="mb-3 rounded-md border border-primary/40 bg-primary/10 p-3 text-xs leading-snug">
                 <div className="font-semibold text-primary">{interpretacao.nome}</div>
                 <p className="mt-1 text-muted-foreground">{interpretacao.resumo}</p>
+              </div>
+            )}
+            {origem && (
+              <div className="mb-3 flex flex-wrap items-center gap-2 rounded-md border border-chart-2/40 bg-chart-2/10 p-3 text-xs">
+                <Link
+                  to="/laboratorio"
+                  search={{ ficha: origem.fichaId }}
+                  className="flex items-center gap-1.5 font-semibold text-chart-2 hover:underline"
+                >
+                  <FlaskConical size={13} /> Origem: Laboratório de Estratégias
+                </Link>
+                <span className="text-muted-foreground">
+                  · {origem.fichaNome} (hipótese {origem.hipotese})
+                </span>
               </div>
             )}
             <div className="space-y-3">

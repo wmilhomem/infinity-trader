@@ -44,7 +44,7 @@ import { FLOW_OPERAR_KEY, type FluxoRetomada } from "@/components/FluxoOperarMod
 import type { Perna } from "@/lib/payoff";
 import { payoffCurve, summary } from "@/lib/payoff";
 import { PRESETS_ESTRATEGIA } from "@/lib/presets-estrategias";
-import { FLOW_LAB_KEY } from "@/lib/fichas-estrategias";
+import { FLOW_LAB_KEY, montarOrigem, type OrigemFicha } from "@/lib/fichas-estrategias";
 import { interpretar } from "@/engines/simulation-interpreter";
 import { explicarRiscos } from "@/engines/risk-explainer";
 import { validarRegras, regrasQuePedemConfirmacao, type Regra } from "@/engines/rule-engine";
@@ -291,12 +291,20 @@ function Simulador() {
     try {
       const raw = sessionStorage.getItem(FLOW_LAB_KEY);
       if (!raw) return null;
-      const p = JSON.parse(raw) as { preset?: string; tese?: string };
+      const p = JSON.parse(raw) as {
+        preset?: string;
+        tese?: string;
+        fichaId?: string;
+        fichaNome?: string;
+        hipotese?: string;
+      };
       return p && p.preset && PRESETS[p.preset] ? p : null;
     } catch {
       return null;
     }
   }, []);
+
+  const origemRef = useRef<OrigemFicha | null>(null);
 
   useEffect(() => {
     if (!labBridge) return;
@@ -307,6 +315,8 @@ function Simulador() {
     if (motivoLab) {
       setTesePartes((t) => ({ ...t, motivo: motivoLab }));
     }
+    origemRef.current =
+      typeof labBridge.fichaId === "string" ? montarOrigem(labBridge.fichaId) : null;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [labBridge]);
 
@@ -599,6 +609,7 @@ function Simulador() {
         tipo_estrategia: leitura.nome,
         ativo,
         preco_atual: centro,
+        origem: origemRef.current as Json | null,
         pernas: pernas as unknown as Json,
       })
       .select()

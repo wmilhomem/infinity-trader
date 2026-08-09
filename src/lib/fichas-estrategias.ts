@@ -531,3 +531,55 @@ export function fichasPorHipotese(hipotese: HipoteseEstrategia | "todas"): Ficha
   if (hipotese === "todas") return FICHAS_ESTRATEGIAS;
   return FICHAS_ESTRATEGIAS.filter((f) => f.hipotese === hipotese);
 }
+
+export type OrigemFicha = {
+  modulo: "laboratorio";
+  fichaId: string;
+  fichaNome: string;
+  hipotese: HipoteseEstrategia;
+};
+
+/** Origem estruturada de uma ficha, persistida na simulação para o diário/replay. */
+export function montarOrigem(fichaId: string): OrigemFicha | null {
+  const f = getFicha(fichaId);
+  if (!f) return null;
+  return { modulo: "laboratorio", fichaId: f.id, fichaNome: f.nome, hipotese: f.hipotese };
+}
+
+/** Comparação: até 3 fichas válidas, sem duplicatas. */
+export function selecionarFichas(ids: string[]): FichaEstrategia[] {
+  const vistas = new Set<string>();
+  const resultado: FichaEstrategia[] = [];
+  for (const id of ids) {
+    if (vistas.has(id)) continue;
+    vistas.add(id);
+    const f = getFicha(id);
+    if (f) resultado.push(f);
+    if (resultado.length >= 3) break;
+  }
+  return resultado;
+}
+
+/** Lê a origem persistida em uma simulação (Json da coluna origem). */
+export function lerOrigem(raw: unknown): OrigemFicha | null {
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Record<string, unknown>;
+  if (o.modulo !== "laboratorio") return null;
+  if (typeof o.fichaId !== "string" || typeof o.fichaNome !== "string") return null;
+  if (typeof o.hipotese !== "string") return null;
+  if (!(HIPOTESES_VALIDAS as readonly string[]).includes(o.hipotese)) return null;
+  return {
+    modulo: "laboratorio",
+    fichaId: o.fichaId,
+    fichaNome: o.fichaNome,
+    hipotese: o.hipotese as HipoteseEstrategia,
+  };
+}
+
+const HIPOTESES_VALIDAS: HipoteseEstrategia[] = [
+  "alta",
+  "baixa",
+  "lateral",
+  "volatilidade",
+  "gestao",
+];

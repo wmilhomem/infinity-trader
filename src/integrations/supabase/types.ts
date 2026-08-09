@@ -593,6 +593,7 @@ export type Database = {
           ativo: string | null;
           created_at: string;
           id: string;
+          origem: Json | null;
           pernas: Json;
           preco_atual: number | null;
           tipo_estrategia: string;
@@ -602,6 +603,7 @@ export type Database = {
           ativo?: string | null;
           created_at?: string;
           id?: string;
+          origem?: Json | null;
           pernas: Json;
           preco_atual?: number | null;
           tipo_estrategia: string;
@@ -611,6 +613,7 @@ export type Database = {
           ativo?: string | null;
           created_at?: string;
           id?: string;
+          origem?: Json | null;
           pernas?: Json;
           preco_atual?: number | null;
           tipo_estrategia?: string;

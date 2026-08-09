@@ -1,4 +1,4 @@
-import { BookOpen, FlaskConical } from "lucide-react";
+import { BookOpen, Check, FlaskConical } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { FichaEstrategia } from "@/lib/fichas-estrategias";
 import { getLesson } from "@/lib/lessons";
@@ -19,11 +19,15 @@ const NATUREZA_LABEL = {
 export function FichaCard({
   ficha,
   stats,
+  selecionada = false,
+  onToggleSelecao,
   onAbrir,
   onSimular,
 }: {
   ficha: FichaEstrategia;
   stats: StatsFicha;
+  selecionada?: boolean;
+  onToggleSelecao: () => void;
   onAbrir: () => void;
   onSimular: () => void;
 }) {
@@ -36,13 +40,32 @@ export function FichaCard({
   const breakeven = stats.breakevens.length ? stats.breakevens.map((b) => brl(b)).join(" · ") : "—";
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/50">
+    <div
+      className={cn(
+        "flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/50",
+        selecionada && "border-primary bg-primary/5",
+      )}
+    >
       <div className="flex items-start justify-between gap-2">
         <div>
           <h3 className="font-semibold leading-tight">{ficha.nome}</h3>
           <p className="mt-0.5 text-xs text-muted-foreground">{ficha.resumo}</p>
         </div>
-        <FlaskConical size={16} className="mt-0.5 shrink-0 text-primary" />
+        <div className="flex items-center gap-1.5">
+          <FlaskConical size={16} className="text-primary" />
+          <button
+            onClick={onToggleSelecao}
+            title={selecionada ? "Remover da comparação" : "Adicionar à comparação"}
+            className={cn(
+              "grid size-6 place-items-center rounded-full border transition-colors",
+              selecionada
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground hover:border-primary/60",
+            )}
+          >
+            {selecionada && <Check size={13} />}
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-1.5">
