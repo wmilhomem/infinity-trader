@@ -24,6 +24,8 @@ import {
   X,
 } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
+import { Tilt3D } from "@/components/landing/Tilt3D";
+import { HeroScene } from "@/components/landing/HeroScene";
 
 export const Route = createFileRoute("/")({
   head: () => ({
