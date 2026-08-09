@@ -45,6 +45,20 @@ import type { Perna } from "@/lib/payoff";
 import { payoffCurve, summary } from "@/lib/payoff";
 import { PRESETS_ESTRATEGIA } from "@/lib/presets-estrategias";
 import { FLOW_LAB_KEY, montarOrigem, type OrigemFicha } from "@/lib/fichas-estrategias";
+import {
+  CONTRATOS_FUTUROS,
+  calcularContratos,
+  curvaFuturo,
+  interpretarFuturo,
+  lucroPorPonto,
+  margemEstimada,
+  precoStop,
+  riscoPorContrato,
+  riscoReal as riscoRealFuturo,
+  type DirecaoFuturo,
+  type MercadoFuturo,
+  type TradeFuturo,
+} from "@/lib/futuros";
 import { interpretar } from "@/engines/simulation-interpreter";
 import { explicarRiscos } from "@/engines/risk-explainer";
 import { validarRegras, regrasQuePedemConfirmacao, type Regra } from "@/engines/rule-engine";
@@ -101,14 +115,27 @@ const PRESET_LABEL: Record<string, string> = Object.fromEntries(
 
 type Crenca = "subir" | "cair" | "lateral" | "aprender";
 type Forca = "pouco" | "medio" | "muito";
-type Etapa = "crenca" | "forca" | "risco" | "decisao";
+type Instrumento = "opcoes" | "futuro";
+type Etapa = "crenca" | "forca" | "stop" | "risco" | "decisao";
 
-const ETAPAS: { k: Etapa; rotulo: string }[] = [
+const ETAPAS_OPCOES: { k: Etapa; rotulo: string }[] = [
   { k: "crenca", rotulo: "Direção" },
   { k: "forca", rotulo: "Força" },
   { k: "risco", rotulo: "Risco" },
   { k: "decisao", rotulo: "Decisão" },
 ];
+
+const ETAPAS_FUTURO: { k: Etapa; rotulo: string }[] = [
+  { k: "crenca", rotulo: "Direção" },
+  { k: "stop", rotulo: "Stop" },
+  { k: "risco", rotulo: "Risco" },
+  { k: "decisao", rotulo: "Decisão" },
+];
+
+const STOP_PRESETS: Record<MercadoFuturo, number[]> = {
+  WIN: [100, 300, 600],
+  WDO: [50, 100, 200],
+};
 
 const CRENCAS: {
   k: Crenca;
@@ -267,6 +294,14 @@ function Simulador() {
     erro: "",
     risco: "",
   });
+  const [instrumento, setInstrumento] = useState<Instrumento>("opcoes");
+  const [mercadoFuturo, setMercadoFuturo] = useState<MercadoFuturo>("WIN");
+  const [direcaoFuturo, setDirecaoFuturo] = useState<DirecaoFuturo | null>(null);
+  const [stopPontos, setStopPontos] = useState<number | null>(null);
+  const [stopCustom, setStopCustom] = useState("");
+  const [entradaFuturo, setEntradaFuturo] = useState(CONTRATOS_FUTUROS.WIN.precoRef);
+  const [contratosManual, setContratosManual] = useState<number | null>(null);
+  const [tecnicoFuturo, setTecnicoFuturo] = useState(false);
 
   const fluxo = useMemo<FluxoRetomada | null>(() => {
     try {
@@ -320,13 +355,55 @@ function Simulador() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [labBridge]);
 
+  const ETAPAS = instrumento === "opcoes" ? ETAPAS_OPCOES : ETAPAS_FUTURO;
   const etapaIdx = ETAPAS.findIndex((e) => e.k === etapa);
   const aprendizado = crenca === "aprender";
   const orcamentoEfetivo = orcamento ?? 300;
   const direcao = crenca ?? "subir";
 
+  const trade = useMemo<TradeFuturo | null>(() => {
+    if (instrumento !== "futuro" || !direcaoFuturo || !stopPontos || stopPontos <= 0) return null;
+    const valorPonto = CONTRATOS_FUTUROS[mercadoFuturo].valorPonto;
+    const n = contratosManual ?? calcularContratos(orcamentoEfetivo, stopPontos, valorPonto);
+    return {
+      mercado: mercadoFuturo,
+      direcao: direcaoFuturo,
+      entrada: entradaFuturo,
+      stop: stopPontos,
+      contratos: n,
+    };
+  }, [
+    instrumento,
+    direcaoFuturo,
+    stopPontos,
+    orcamentoEfetivo,
+    contratosManual,
+    mercadoFuturo,
+    entradaFuturo,
+  ]);
+
+  const leituraFuturo = useMemo(() => (trade ? interpretarFuturo(trade) : null), [trade]);
+
+  function trocarInstrumento(i: Instrumento) {
+    if (i === instrumento) return;
+    recomecar();
+    setInstrumento(i);
+    setMercadoFuturo("WIN");
+    setEntradaFuturo(CONTRATOS_FUTUROS.WIN.precoRef);
+    setTecnicoFuturo(false);
+  }
+
+  function montarFuturo() {
+    setContratosManual(null);
+    setCheck({});
+    setConfirmacoes({});
+    setTesePartes({ motivo: "", expectativa: "", erro: "", risco: "" });
+    setEtapa("decisao");
+  }
+
   function montar() {
     if (!crenca) return;
+    if (instrumento === "futuro") return montarFuturo();
     const f = forca ?? "medio";
     const { preset: p, porque: pq } = estruturar(crenca, f);
     setPreset(p);
@@ -361,6 +438,11 @@ function Simulador() {
     setConfirmacoes({});
     setTesePartes({ motivo: "", expectativa: "", erro: "", risco: "" });
     setTecnico(false);
+    setDirecaoFuturo(null);
+    setStopPontos(null);
+    setStopCustom("");
+    setContratosManual(null);
+    setTecnicoFuturo(false);
   }
 
   const curve = useMemo(() => payoffCurve(pernas, centro, 0.3, 101), [pernas, centro]);
@@ -412,7 +494,18 @@ function Simulador() {
       .join(" ");
   }, [tesePartes]);
 
-  const riscoReal = Math.abs(Math.min(0, stats.perdaMax));
+  const riscoReal =
+    instrumento === "futuro"
+      ? trade
+        ? riscoRealFuturo(trade)
+        : 0
+      : Math.abs(Math.min(0, stats.perdaMax));
+  const alertasVisiveis = useMemo(
+    () => (instrumento === "futuro" ? [] : alertas),
+    [instrumento, alertas],
+  );
+  const leituraVisivel =
+    instrumento === "futuro" ? (leituraFuturo as ReturnType<typeof interpretar>) : leitura;
   const checklistEmocional = useMemo(
     () => [
       { k: "perda" as const, label: `Aceito perder até ${brl(riscoReal)} nesta operação` },
@@ -433,11 +526,11 @@ function Simulador() {
         simulou: true,
         tese,
         checklist: Object.fromEntries(checklistEmocional.map((c) => [c.k, !!check[c.k]])),
-        alertas,
-        interpretacao: leitura,
+        alertas: alertasVisiveis,
+        interpretacao: leituraVisivel,
         disciplinaHistorica,
       }),
-    [tese, check, checklistEmocional, alertas, leitura, disciplinaHistorica],
+    [tese, check, checklistEmocional, alertasVisiveis, leituraVisivel, disciplinaHistorica],
   );
 
   const checkOk = checklistEmocional.every((c) => check[c.k]);
@@ -521,17 +614,6 @@ function Simulador() {
     };
   }, []);
 
-  // Observação de mercado: o provedor entrega o quote e o pipeline o audita.
-  useEffect(() => {
-    let vivo = true;
-    mercado.fetchQuote(ativo).then((q) => {
-      if (vivo) setQuote(q);
-    });
-    return () => {
-      vivo = false;
-    };
-  }, [ativo, centro, fonte, mercado]);
-
   // B3 ao vivo: o simulador ancora no mercado real (spot e IV observados).
   useEffect(() => {
     if (fonte !== "live" || !quote) return;
@@ -546,6 +628,7 @@ function Simulador() {
   }, [fonte, quote]);
 
   useEffect(() => {
+    if (instrumento === "futuro") return;
     inputRef.current = {
       pernas,
       centro,
@@ -565,6 +648,7 @@ function Simulador() {
     };
     runSimulationPipeline(osBus, inputRef.current);
   }, [
+    instrumento,
     pernas,
     centro,
     ativo,
@@ -578,6 +662,18 @@ function Simulador() {
     disciplinaHistorica,
     historico.data,
   ]);
+
+  // Observação de mercado: o provedor entrega o quote e o pipeline o audita.
+  useEffect(() => {
+    if (instrumento === "futuro") return;
+    let vivo = true;
+    mercado.fetchQuote(ativo).then((q) => {
+      if (vivo) setQuote(q);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, [ativo, centro, fonte, mercado, instrumento]);
 
   async function perguntarCopilot() {
     if (!contexto) return;
@@ -602,15 +698,21 @@ function Simulador() {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
     const respostas = Object.fromEntries(checklistEmocional.map((c) => [c.k, !!check[c.k]]));
+    const nome =
+      instrumento === "futuro" ? (leituraFuturo?.nome ?? "Operação futura") : leitura.nome;
+    const ativoSalvo = instrumento === "futuro" ? (trade?.mercado ?? "WIN") : ativo;
+    const precoSalvo = instrumento === "futuro" ? (trade?.entrada ?? 0) : centro;
+    const pernasSalvas =
+      instrumento === "futuro" && trade ? (trade as unknown as Json) : (pernas as unknown as Json);
     const { data, error } = await supabase
       .from("simulations")
       .insert({
         user_id: u.user.id,
-        tipo_estrategia: leitura.nome,
-        ativo,
-        preco_atual: centro,
+        tipo_estrategia: nome,
+        ativo: ativoSalvo,
+        preco_atual: precoSalvo,
         origem: origemRef.current as Json | null,
-        pernas: pernas as unknown as Json,
+        pernas: pernasSalvas,
       })
       .select()
       .single();
@@ -625,15 +727,19 @@ function Simulador() {
     await supabase.from("timeline_events").insert({
       user_id: u.user.id,
       tipo: "simulacao",
-      titulo: `Simulou ${leitura.nome} em ${ativo}`,
-      descricao: leitura.resumo,
-      meta: { simulation_id: data.id, score: score.score, risco: leitura.risco } as Json,
+      titulo: `Simulou ${nome} em ${ativoSalvo}`,
+      descricao: leituraVisivel?.resumo ?? "",
+      meta: {
+        simulation_id: data.id,
+        score: score.score,
+        risco: leituraVisivel?.risco ?? null,
+      } as Json,
     });
 
     try {
       sessionStorage.setItem(`sim-tese:${data.id}`, JSON.stringify({ tese, checklist: respostas }));
       sessionStorage.removeItem(FLOW_OPERAR_KEY);
-      if (quote) {
+      if (instrumento === "opcoes" && quote) {
         sessionStorage.setItem(
           `sim-quote:${data.id}`,
           JSON.stringify({
@@ -657,22 +763,28 @@ function Simulador() {
   function proximo() {
     if (etapa === "crenca") {
       if (aprendizado) return montar();
-      return setEtapa("forca");
+      return setEtapa(instrumento === "futuro" ? "stop" : "forca");
     }
-    if (etapa === "forca") return setEtapa("risco");
+    if (etapa === "forca" || etapa === "stop") return setEtapa("risco");
     if (etapa === "risco") return montar();
   }
 
   function voltar() {
-    if (etapa === "forca") return setEtapa("crenca");
-    if (etapa === "risco") return setEtapa("forca");
+    if (etapa === "forca" || etapa === "stop") return setEtapa("crenca");
+    if (etapa === "risco") return setEtapa(instrumento === "futuro" ? "stop" : "forca");
     if (etapa === "decisao") {
       setEtapa(aprendizado ? "crenca" : "risco");
     }
   }
 
   const podeContinuar =
-    etapa === "crenca" ? crenca !== null : etapa === "forca" ? forca !== null : orcamento !== null;
+    etapa === "crenca"
+      ? crenca !== null
+      : etapa === "forca"
+        ? forca !== null
+        : etapa === "stop"
+          ? (stopPontos ?? 0) > 0
+          : orcamento !== null;
 
   return (
     <AppShell title="Simulador de decisão">
@@ -682,12 +794,36 @@ function Simulador() {
             <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
               {etapa === "decisao" ? "Operação montada" : `Pergunta ${etapaIdx + 1} de 3`}
             </div>
-            <button
-              onClick={recomecar}
-              className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
-            >
-              <RotateCcw size={12} /> Recomeçar
-            </button>
+            <div className="flex items-center gap-2">
+              <div className="flex shrink-0 rounded-lg border border-border bg-background p-0.5 text-[11px] font-medium">
+                <button
+                  onClick={() => trocarInstrumento("opcoes")}
+                  className={`rounded-md px-2.5 py-1 transition-colors ${
+                    instrumento === "opcoes"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Opções
+                </button>
+                <button
+                  onClick={() => trocarInstrumento("futuro")}
+                  className={`rounded-md px-2.5 py-1 transition-colors ${
+                    instrumento === "futuro"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Futuros WIN/WDO
+                </button>
+              </div>
+              <button
+                onClick={recomecar}
+                className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
+              >
+                <RotateCcw size={12} /> Recomeçar
+              </button>
+            </div>
           </div>
           <div className="grid grid-cols-4 gap-1.5">
             {ETAPAS.map((e, i) => {
@@ -711,12 +847,39 @@ function Simulador() {
 
         {etapa !== "decisao" && (
           <div key={etapa} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-            {etapa === "crenca" && <PassoCrenca crenca={crenca} onSelect={setCrenca} />}
+            {etapa === "crenca" && (
+              <PassoCrenca
+                crenca={crenca}
+                onSelect={(c) => {
+                  setCrenca(c);
+                  if (c === "subir") setDirecaoFuturo("comprado");
+                  if (c === "cair") setDirecaoFuturo("vendido");
+                }}
+                instrumento={instrumento}
+              />
+            )}
             {etapa === "forca" && <PassoForca forca={forca} onSelect={setForca} crenca={crenca} />}
+            {etapa === "stop" && (
+              <PassoStop
+                mercado={mercadoFuturo}
+                stop={stopPontos}
+                custom={stopCustom}
+                onSelect={(v) => {
+                  setStopPontos(v);
+                  setStopCustom(String(v));
+                }}
+                onCustom={(v) => {
+                  setStopCustom(v);
+                  const n = Math.round(Number(v));
+                  setStopPontos(Number.isFinite(n) && n > 0 ? n : null);
+                }}
+              />
+            )}
             {etapa === "risco" && (
               <PassoRisco
                 orcamento={orcamento}
                 custom={orcamentoCustom}
+                instrumento={instrumento}
                 onSelect={setOrcamento}
                 onCustom={(v) => {
                   setOrcamentoCustom(v);
@@ -767,115 +930,145 @@ function Simulador() {
 
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
               <div className="min-w-0 space-y-6">
-                <CardOperacao
-                  porque={porque}
-                  leituraNome={leitura.nome}
-                  leituraRisco={leitura.risco}
-                  leituraComplexidade={leitura.complexidade}
-                  leituraResumo={leitura.resumo}
-                  objetivoLabel={leitura.objetivoLabel}
-                  stats={stats}
-                  leitura={leitura}
-                  crenca={direcao}
-                  forca={forca ?? "medio"}
-                  orcamentoEfetivo={orcamentoEfetivo}
-                  riscoReal={riscoReal}
-                  aprendizado={aprendizado}
-                />
+                {instrumento === "opcoes" && (
+                  <CardOperacao
+                    porque={porque}
+                    leituraNome={leitura.nome}
+                    leituraRisco={leitura.risco}
+                    leituraComplexidade={leitura.complexidade}
+                    leituraResumo={leitura.resumo}
+                    objetivoLabel={leitura.objetivoLabel}
+                    stats={stats}
+                    leitura={leitura}
+                    crenca={direcao}
+                    forca={forca ?? "medio"}
+                    orcamentoEfetivo={orcamentoEfetivo}
+                    riscoReal={riscoReal}
+                    aprendizado={aprendizado}
+                  />
+                )}
 
-                <NarrativaEstrutura passos={passosNarrativa} />
+                {instrumento === "futuro" && trade && (
+                  <CardOperacaoFuturo
+                    trade={trade}
+                    porqueFuturo={`Você aceita perder até ${brl(orcamentoEfetivo)}. Com o stop de ${trade.stop} pontos (R$ ${riscoPorContrato(trade.stop, CONTRATOS_FUTUROS[trade.mercado].valorPonto).toFixed(2)} por contrato), o cálculo mecânico diz: contratos = ${brl(orcamentoEfetivo)} ÷ (${trade.stop} pts × R$ ${CONTRATOS_FUTUROS[trade.mercado].valorPonto.toFixed(2)}) = ${trade.contratos}. Nada de adivinhar tamanho: o risco define o tamanho, nunca o contrário.`}
+                  />
+                )}
 
-                <PernasExplicadas pernas={pernas} ativo={ativo} />
+                {instrumento === "opcoes" && <NarrativaEstrutura passos={passosNarrativa} />}
 
-                <GraficoEducativo pernas={pernas} centro={centro} ativo={ativo} leitura={leitura} />
+                {instrumento === "opcoes" && <PernasExplicadas pernas={pernas} ativo={ativo} />}
 
-                {contexto && <OsStatusBar contexto={contexto} />}
+                {instrumento === "opcoes" && (
+                  <GraficoEducativo
+                    pernas={pernas}
+                    centro={centro}
+                    ativo={ativo}
+                    leitura={leitura}
+                  />
+                )}
 
-                <div className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-4">
-                  <div className="min-w-0">
-                    <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                      Fonte de dados
+                {instrumento === "futuro" && trade && <GraficoFuturo trade={trade} />}
+
+                {contexto && instrumento === "opcoes" && <OsStatusBar contexto={contexto} />}
+
+                {instrumento === "opcoes" && (
+                  <div className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-4">
+                    <div className="min-w-0">
+                      <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                        Fonte de dados
+                      </div>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                        {fonte === "mock"
+                          ? "Sandbox didático: cenários estáveis para aprender sem surpresas."
+                          : "B3 ao vivo: spot e volatilidade reais; book real quando a fonte expõe, chain modelada com transparência."}{" "}
+                        O sinal DADOS mostra o veredito da auditoria.
+                      </p>
                     </div>
-                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                      {fonte === "mock"
-                        ? "Sandbox didático: cenários estáveis para aprender sem surpresas."
-                        : "B3 ao vivo: spot e volatilidade reais; book real quando a fonte expõe, chain modelada com transparência."}{" "}
-                      O sinal DADOS mostra o veredito da auditoria.
-                    </p>
+                    <div className="flex shrink-0 rounded-xl border border-border bg-background p-0.5 text-xs font-medium">
+                      <button
+                        onClick={() => setFonte("mock")}
+                        className={`rounded-lg px-3 py-1.5 transition-colors ${
+                          fonte === "mock"
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Sandbox
+                      </button>
+                      <button
+                        onClick={() => setFonte("live")}
+                        className={`rounded-lg px-3 py-1.5 transition-colors ${
+                          fonte === "live"
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        B3 ao vivo
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex shrink-0 rounded-xl border border-border bg-background p-0.5 text-xs font-medium">
-                    <button
-                      onClick={() => setFonte("mock")}
-                      className={`rounded-lg px-3 py-1.5 transition-colors ${
-                        fonte === "mock"
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      Sandbox
-                    </button>
-                    <button
-                      onClick={() => setFonte("live")}
-                      className={`rounded-lg px-3 py-1.5 transition-colors ${
-                        fonte === "live"
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      B3 ao vivo
-                    </button>
+                )}
+
+                {contexto && instrumento === "opcoes" && (
+                  <DecisionCards contexto={contexto} alertas={alertas} />
+                )}
+
+                {instrumento === "opcoes" && (
+                  <CenarioTempo
+                    pernas={pernas}
+                    centro={centro}
+                    ativo={ativo}
+                    dias={dias}
+                    iv={iv}
+                    onDias={(d) =>
+                      osBus.dispatchAction({
+                        type: "TIME_TRAVEL_REQUESTED",
+                        payload: { targetDTE: d },
+                      })
+                    }
+                    onIv={(v) =>
+                      osBus.dispatchAction({ type: "IV_LEVEL_REQUESTED", payload: { targetIV: v } })
+                    }
+                  />
+                )}
+
+                {instrumento === "opcoes" && (
+                  <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
+                    <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                      <Sparkles size={14} /> O que pode acontecer
+                    </div>
+                    <ul className="mt-4 space-y-3">
+                      {riscos.map((r, i) => (
+                        <li key={i} className="flex items-start gap-3 text-[15px] leading-relaxed">
+                          <span
+                            className={`mt-1.5 size-2 shrink-0 rounded-full ${
+                              r.tom === "ruim"
+                                ? "bg-loss"
+                                : r.tom === "bom"
+                                  ? "bg-success"
+                                  : "bg-muted-foreground"
+                            }`}
+                          />
+                          <span>
+                            <span className="font-medium">{r.cenario}</span>
+                            <span className="text-muted-foreground"> — {r.consequencia}</span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
+                )}
 
-                {contexto && <DecisionCards contexto={contexto} alertas={alertas} />}
+                {instrumento === "futuro" && trade && <CenariosFuturo trade={trade} />}
 
-                <CenarioTempo
-                  pernas={pernas}
-                  centro={centro}
-                  ativo={ativo}
-                  dias={dias}
-                  iv={iv}
-                  onDias={(d) =>
-                    osBus.dispatchAction({
-                      type: "TIME_TRAVEL_REQUESTED",
-                      payload: { targetDTE: d },
-                    })
-                  }
-                  onIv={(v) =>
-                    osBus.dispatchAction({ type: "IV_LEVEL_REQUESTED", payload: { targetIV: v } })
-                  }
-                />
-
-                <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
-                  <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                    <Sparkles size={14} /> O que pode acontecer
-                  </div>
-                  <ul className="mt-4 space-y-3">
-                    {riscos.map((r, i) => (
-                      <li key={i} className="flex items-start gap-3 text-[15px] leading-relaxed">
-                        <span
-                          className={`mt-1.5 size-2 shrink-0 rounded-full ${
-                            r.tom === "ruim"
-                              ? "bg-loss"
-                              : r.tom === "bom"
-                                ? "bg-success"
-                                : "bg-muted-foreground"
-                          }`}
-                        />
-                        <span>
-                          <span className="font-medium">{r.cenario}</span>
-                          <span className="text-muted-foreground"> — {r.consequencia}</span>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <CardDozeAnos
-                  analogia={leitura.analogia}
-                  objetivo={leitura.objetivo}
-                  licaoSlug={leitura.licaoSlug}
-                />
+                {instrumento === "opcoes" && (
+                  <CardDozeAnos
+                    analogia={leitura.analogia}
+                    objetivo={leitura.objetivo}
+                    licaoSlug={leitura.licaoSlug}
+                  />
+                )}
 
                 <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
                   <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
@@ -957,23 +1150,53 @@ function Simulador() {
                   </div>
                 </div>
 
-                <DetalhesTecnicos
-                  aberto={tecnico}
-                  onToggle={() => setTecnico((v) => !v)}
-                  pernas={pernas}
-                  ativo={ativo}
-                  centro={centro}
-                  preset={preset}
-                  onPreset={loadPreset}
-                  onAtivo={setAtivo}
-                  onCentro={setCentro}
-                  onPernas={dispatchPernas}
-                  updatePerna={updatePerna}
-                  pedemConfirmacao={pedemConfirmacao}
-                  confirmacoes={confirmacoes}
-                  setConfirmacoes={setConfirmacoes}
-                  alertas={alertas}
-                />
+                {instrumento === "opcoes" && (
+                  <DetalhesTecnicos
+                    aberto={tecnico}
+                    onToggle={() => setTecnico((v) => !v)}
+                    pernas={pernas}
+                    ativo={ativo}
+                    centro={centro}
+                    preset={preset}
+                    onPreset={loadPreset}
+                    onAtivo={setAtivo}
+                    onCentro={setCentro}
+                    onPernas={dispatchPernas}
+                    updatePerna={updatePerna}
+                    pedemConfirmacao={pedemConfirmacao}
+                    confirmacoes={confirmacoes}
+                    setConfirmacoes={setConfirmacoes}
+                    alertas={alertas}
+                  />
+                )}
+
+                {instrumento === "futuro" && trade && (
+                  <DetalhesTecnicosFuturo
+                    aberto={tecnicoFuturo}
+                    onToggle={() => setTecnicoFuturo((v) => !v)}
+                    trade={trade}
+                    mercado={mercadoFuturo}
+                    onMercado={(m) => {
+                      setMercadoFuturo(m);
+                      setEntradaFuturo(CONTRATOS_FUTUROS[m].precoRef);
+                      setContratosManual(null);
+                      setStopPontos(null);
+                      setStopCustom("");
+                    }}
+                    direcaoFuturo={direcaoFuturo}
+                    onDirecao={setDirecaoFuturo}
+                    entrada={entradaFuturo}
+                    onEntrada={setEntradaFuturo}
+                    stop={stopPontos}
+                    onStop={(v) => {
+                      setStopPontos(v);
+                      setStopCustom(String(v));
+                    }}
+                    contratos={trade.contratos}
+                    onContratos={setContratosManual}
+                    calculado={trade.contratos}
+                  />
+                )}
 
                 <ScorePanel score={score} />
 
@@ -991,12 +1214,16 @@ function Simulador() {
                 )}
               </div>
 
-              <CopilotPanel
-                pernas={pernas}
-                ativo={ativo}
-                leitura={leitura}
-                onAbrir={perguntarCopilot}
-              />
+              {instrumento === "opcoes" && (
+                <CopilotPanel
+                  pernas={pernas}
+                  ativo={ativo}
+                  leitura={leitura}
+                  onAbrir={perguntarCopilot}
+                />
+              )}
+
+              {instrumento === "futuro" && trade && <CopilotFuturo trade={trade} />}
             </div>
           </div>
         )}
@@ -1008,10 +1235,13 @@ function Simulador() {
 function PassoCrenca({
   crenca,
   onSelect,
+  instrumento,
 }: {
   crenca: Crenca | null;
   onSelect: (c: Crenca) => void;
+  instrumento: Instrumento;
 }) {
+  const cartoes = instrumento === "futuro" ? CRENCAS.filter((c) => c.k !== "lateral") : CRENCAS;
   return (
     <div className="mx-auto max-w-3xl">
       <div className="text-center">
@@ -1020,12 +1250,20 @@ function PassoCrenca({
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-muted-foreground">
           Não precisa acertar. Essa resposta define{" "}
-          <span className="text-foreground">qual estrutura faz sentido</span> — não qual lucro você
-          terá. O simulador monta e explica o resto.
+          <span className="text-foreground">qual lado do mercado faz sentido</span> — não qual lucro
+          você terá. O simulador monta e explica o resto.
         </p>
       </div>
+      {instrumento === "futuro" && (
+        <div className="mt-6 rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm leading-relaxed text-muted-foreground">
+          <div className="font-semibold text-primary">Por que não existe “parado” aqui</div>
+          No futuro não há estrutura para ganhar com lateralização: ou você tem direção, ou não há
+          operação. Se hoje não há direção, ficar de fora também é uma decisão — e o simulador
+          respeita isso.
+        </div>
+      )}
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        {CRENCAS.map((c) => {
+        {cartoes.map((c) => {
           const Icon = c.icone;
           const ativo = crenca === c.k;
           return (
@@ -1050,7 +1288,13 @@ function PassoCrenca({
                   {c.risco}
                 </span>
               </div>
-              <div className="mt-4 text-lg font-semibold">{c.titulo}</div>
+              <div className="mt-4 text-lg font-semibold">
+                {instrumento === "futuro" && c.k === "subir"
+                  ? "Comprar (comprado)"
+                  : instrumento === "futuro" && c.k === "cair"
+                    ? "Vender (vendido)"
+                    : c.titulo}
+              </div>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{c.desc}</p>
               <p className="mt-3 text-xs text-muted-foreground">{c.exemplo}</p>
             </button>
@@ -1118,14 +1362,105 @@ function PassoForca({
   );
 }
 
+function PassoStop({
+  mercado,
+  stop,
+  custom,
+  onSelect,
+  onCustom,
+}: {
+  mercado: MercadoFuturo;
+  stop: number | null;
+  custom: string;
+  onSelect: (v: number) => void;
+  onCustom: (v: string) => void;
+}) {
+  const c = CONTRATOS_FUTUROS[mercado];
+  return (
+    <div className="mx-auto max-w-3xl">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold tracking-tight md:text-4xl">
+          Se você estiver errado, em quantos pontos você admite o erro?
+        </h2>
+        <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-muted-foreground">
+          Este é o seu stop: o lugar onde a sua hipótese morreu. O tamanho da posição será calculado
+          a partir dele — quem define o risco é você, não o mercado.
+        </p>
+      </div>
+      <div className="mt-8 grid grid-cols-3 gap-3">
+        {STOP_PRESETS[mercado].map((v) => {
+          const ativo = stop === v;
+          return (
+            <button
+              key={v}
+              onClick={() => onSelect(v)}
+              className={`rounded-2xl border p-5 text-center transition-all ${
+                ativo
+                  ? "border-primary bg-primary/10 ring-2 ring-primary/30"
+                  : "border-border bg-card hover:border-primary/50"
+              }`}
+            >
+              <div className="text-xl font-bold">{v}</div>
+              <div className="mt-0.5 text-[11px] text-muted-foreground">pontos</div>
+              <div className="mt-2 font-mono text-xs text-muted-foreground">
+                = R$ {riscoPorContrato(v, c.valorPonto).toFixed(2)}/contrato
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      <div className="mt-4 rounded-2xl border border-dashed border-border bg-card/50 p-5">
+        <label className="block text-sm">
+          Outro stop? Escolha você (em pontos):
+          <div className="mt-2 flex items-center gap-2">
+            <input
+              type="number"
+              min={c.tick}
+              step={c.tick}
+              value={custom}
+              onChange={(e) => onCustom(e.target.value)}
+              placeholder={`ex.: ${STOP_PRESETS[mercado][1]}`}
+              className="w-32 rounded-lg border border-border bg-input px-3 py-2 font-mono text-sm"
+            />
+            <span className="text-xs text-muted-foreground">
+              Lembra: o stop define quanto cada contrato pode custar.
+            </span>
+          </div>
+        </label>
+      </div>
+      <div className="mt-6 rounded-2xl border border-border bg-card p-5 text-xs leading-relaxed text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <span>
+            {mercado}: 1 ponto ={" "}
+            <span className="font-mono text-foreground">R$ {c.valorPonto.toFixed(2)}</span>
+          </span>
+          <span>
+            tick mínimo:{" "}
+            <span className="font-mono text-foreground">
+              {c.tick} pts = R$ {c.valorTick.toFixed(2)}
+            </span>
+          </span>
+        </div>
+        <p className="mt-2">
+          O stop não é garantia de execução exata: em notícia forte o preço pode pular o seu nível
+          (slippage). Você decide onde ele fica — e o simulador dimensiona para caber no risco que
+          você aceita.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function PassoRisco({
   orcamento,
   custom,
+  instrumento,
   onSelect,
   onCustom,
 }: {
   orcamento: number | null;
   custom: string;
+  instrumento: Instrumento;
   onSelect: (v: number) => void;
   onCustom: (v: string) => void;
 }) {
@@ -1138,8 +1473,9 @@ function PassoRisco({
           Quanto dinheiro você aceita perder se estiver errado?
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-[15px] text-muted-foreground">
-          Esse é o valor que você coloca em risco — e nunca mais. A estrutura será dimensionada para
-          caber dentro dele.
+          {instrumento === "futuro"
+            ? "Esse é o valor que você coloca em risco — e nunca mais. O tamanho em contratos será calculado para caber dentro dele."
+            : "Esse é o valor que você coloca em risco — e nunca mais. A estrutura será dimensionada para caber dentro dele."}
         </p>
       </div>
       <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -1203,11 +1539,479 @@ function PassoRisco({
           />
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          Esse número vira o teto da estrutura: lucro é consequência, perda é sempre limitada por
-          esse valor.
+          {instrumento === "futuro"
+            ? "Esse número vira o teto da posição: o tamanho é consequência, a perda é sempre limitada por esse valor."
+            : "Esse número vira o teto da estrutura: lucro é consequência, perda é sempre limitada por esse valor."}
         </p>
       </div>
     </div>
+  );
+}
+
+function CardOperacaoFuturo({ trade, porqueFuturo }: { trade: TradeFuturo; porqueFuturo: string }) {
+  const c = CONTRATOS_FUTUROS[trade.mercado];
+  const leitura = interpretarFuturo(trade);
+  const comprado = trade.direcao === "comprado";
+  return (
+    <div className="rounded-2xl border-2 border-primary/40 bg-primary/5 p-6 md:p-8">
+      <div className="text-[11px] font-semibold uppercase tracking-widest text-primary">
+        Essa é a operação que construímos
+      </div>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <h3 className="text-2xl font-bold tracking-tight md:text-3xl">{leitura.nome}</h3>
+        <span className="rounded-full bg-primary/20 px-2.5 py-1 text-[11px] font-medium text-primary">
+          Risco médio
+        </span>
+        <span className="rounded-full bg-accent px-2.5 py-1 text-[11px] text-muted-foreground">
+          direcional · {comprado ? "comprado" : "vendido"}
+        </span>
+      </div>
+      <p className="mt-4 text-[15px] leading-relaxed">{porqueFuturo}</p>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+            Risco máximo
+          </div>
+          <div className="mt-1 font-mono text-lg font-bold text-loss">
+            {brl(riscoRealFuturo(trade))}
+          </div>
+          <div className="mt-0.5 text-[10px] text-muted-foreground">
+            {trade.stop} pts × R$ {c.valorPonto.toFixed(2)} × {trade.contratos}
+          </div>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+            Lucro por ponto
+          </div>
+          <div className="mt-1 font-mono text-lg font-bold text-success">
+            {brl(lucroPorPonto(trade))}
+          </div>
+          <div className="mt-0.5 text-[10px] text-muted-foreground">sem teto</div>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Stop</div>
+          <div className="mt-1 font-mono text-lg font-bold">{trade.stop} pts</div>
+          <div className="mt-0.5 text-[10px] text-muted-foreground">
+            {comprado ? "abaixo" : "acima"} de {precoStop(trade).toLocaleString("pt-BR")} pts
+          </div>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Tamanho</div>
+          <div className="mt-1 font-mono text-lg font-bold">
+            {trade.contratos} {trade.contratos === 1 ? "contrato" : "contratos"}
+          </div>
+          <div className="mt-0.5 text-[10px] text-muted-foreground">
+            margem ≈ {brl(margemEstimada(trade))}
+          </div>
+        </div>
+      </div>
+
+      <p className="mt-5 border-t border-primary/20 pt-4 text-sm leading-relaxed text-muted-foreground">
+        {leitura.resumo}
+      </p>
+    </div>
+  );
+}
+
+function GraficoFuturo({ trade }: { trade: TradeFuturo }) {
+  const curve = useMemo(() => curvaFuturo(trade), [trade]);
+  const comprado = trade.direcao === "comprado";
+  const stopAbs = precoStop(trade);
+  return (
+    <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          A história do seu dinheiro
+        </div>
+        <div className="flex flex-wrap items-center gap-3 text-[10px] text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <span className="inline-block size-2 rounded-full bg-[oklch(0.78_0.17_65)]" /> entrada
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block size-2 rounded-full bg-success" /> ganho
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block size-2 rounded-full bg-loss" /> stop
+          </span>
+        </div>
+      </div>
+      <div className="mt-4 h-72">
+        <ResponsiveContainer>
+          <AreaChart data={curve}>
+            <defs>
+              <linearGradient id="pgf" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="oklch(0.72 0.18 155)" stopOpacity={0.6} />
+                <stop offset="50%" stopColor="oklch(0.72 0.18 155)" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid stroke="rgba(255,255,255,0.05)" />
+            <XAxis
+              dataKey="preco"
+              tick={{ fontSize: 11, fill: "rgba(255,255,255,0.6)" }}
+              tickFormatter={(v: number) => v.toLocaleString("pt-BR")}
+            />
+            <YAxis tick={{ fontSize: 11, fill: "rgba(255,255,255,0.6)" }} />
+            <Tooltip
+              contentStyle={{ background: "#1e293b", border: "1px solid #334155", fontSize: 12 }}
+              formatter={(v: number) => [brl(v), "Resultado"]}
+              labelFormatter={(l) => `Preço: ${Number(l).toLocaleString("pt-BR")} pts`}
+            />
+            <ReferenceLine y={0} stroke="rgba(255,255,255,0.3)" />
+            <ReferenceLine
+              x={trade.entrada}
+              stroke="oklch(0.78 0.17 65)"
+              strokeDasharray="4 4"
+              label={{
+                value: "entrada",
+                position: "top",
+                fill: "oklch(0.78 0.17 65)",
+                fontSize: 11,
+              }}
+            />
+            <ReferenceLine
+              x={stopAbs}
+              stroke="oklch(0.63 0.24 27)"
+              strokeDasharray="4 4"
+              label={{ value: "stop", position: "top", fill: "oklch(0.63 0.24 27)", fontSize: 11 }}
+            />
+            <Area
+              type="monotone"
+              dataKey="resultado"
+              stroke={comprado ? "oklch(0.72 0.18 155)" : "oklch(0.78 0.17 65)"}
+              fill="url(#pgf)"
+              baseValue={0}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+      <ul className="mt-4 space-y-2.5">
+        <li className="flex items-start gap-2.5 text-sm leading-relaxed">
+          <span className="mt-1.5 size-2 shrink-0 rounded-full bg-success" />
+          <span className="text-muted-foreground">
+            {comprado
+              ? `Cada ponto acima da entrada vale ${brl(lucroPorPonto(trade))} — sem teto.`
+              : `Cada ponto abaixo da entrada vale ${brl(lucroPorPonto(trade))} — sem teto.`}
+          </span>
+        </li>
+        <li className="flex items-start gap-2.5 text-sm leading-relaxed">
+          <span className="mt-1.5 size-2 shrink-0 rounded-full bg-loss" />
+          <span className="text-muted-foreground">
+            {comprado
+              ? `Se o preço cair até ${stopAbs.toLocaleString("pt-BR")} pontos, o stop é tocado: perda máxima de ${brl(riscoRealFuturo(trade))}.`
+              : `Se o preço subir até ${stopAbs.toLocaleString("pt-BR")} pontos, o stop é tocado: perda máxima de ${brl(riscoRealFuturo(trade))}.`}
+          </span>
+        </li>
+        <li className="flex items-start gap-2.5 text-sm leading-relaxed">
+          <span className="mt-1.5 size-2 shrink-0 rounded-full bg-muted-foreground" />
+          <span className="text-muted-foreground">
+            Sem stop, esta reta não teria limite — por isso o stop faz parte do tamanho, não é um
+            detalhe.
+          </span>
+        </li>
+      </ul>
+    </div>
+  );
+}
+
+function CenariosFuturo({ trade }: { trade: TradeFuturo }) {
+  const comprado = trade.direcao === "comprado";
+  const c = CONTRATOS_FUTUROS[trade.mercado];
+  const itens: { tom: "ruim" | "bom" | "neutro"; cenario: string; consequencia: string }[] = [
+    {
+      tom: "ruim",
+      cenario: "O stop é tocado",
+      consequencia: `${trade.mercado} anda contra você até ${trade.stop} pontos: a perda chega a ${brl(riscoRealFuturo(trade))} — o valor exato que você aceitou antes de entrar.`,
+    },
+    {
+      tom: "bom",
+      cenario: "Anda a favor",
+      consequencia: `Cada ponto a favor vale ${brl(lucroPorPonto(trade))}. Sem teto: quanto mais andar na sua direção, mais você ganha.`,
+    },
+    {
+      tom: "neutro",
+      cenario: "Fica parado",
+      consequencia: `No futuro não há theta — não há perda só por esperar. Mas o ajuste diário liquida a posição todo pregão, e cada dia parado é custo de oportunidade.`,
+    },
+    {
+      tom: "neutro",
+      cenario: "Pula o stop",
+      consequencia: `Em notícia forte, o preço pode saltar o seu nível e a saída sair pior que o planejado (slippage). Por isso o risco nunca ocupa o capital inteiro.`,
+    },
+  ];
+  return (
+    <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
+      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <Sparkles size={14} /> O que pode acontecer
+      </div>
+      <ul className="mt-4 space-y-3">
+        {itens.map((r, i) => (
+          <li key={i} className="flex items-start gap-3 text-[15px] leading-relaxed">
+            <span
+              className={`mt-1.5 size-2 shrink-0 rounded-full ${
+                r.tom === "ruim"
+                  ? "bg-loss"
+                  : r.tom === "bom"
+                    ? "bg-success"
+                    : "bg-muted-foreground"
+              }`}
+            />
+            <span>
+              <span className="font-medium">{r.cenario}</span>
+              <span className="text-muted-foreground"> — {r.consequencia}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-4 border-t border-border pt-3 text-xs leading-relaxed text-muted-foreground">
+        {comprado ? "Você compra" : "Você vende"} a variação direta de {trade.mercado}: o resultado
+        é liquidado em dinheiro todo fim de pregão (ajuste diário), mesmo sem fechar a posição.
+      </p>
+    </div>
+  );
+}
+
+function DetalhesTecnicosFuturo({
+  aberto,
+  onToggle,
+  trade,
+  mercado,
+  onMercado,
+  direcaoFuturo,
+  onDirecao,
+  entrada,
+  onEntrada,
+  stop,
+  onStop,
+  contratos,
+  onContratos,
+  calculado,
+}: {
+  aberto: boolean;
+  onToggle: () => void;
+  trade: TradeFuturo;
+  mercado: MercadoFuturo;
+  onMercado: (m: MercadoFuturo) => void;
+  direcaoFuturo: DirecaoFuturo | null;
+  onDirecao: (d: DirecaoFuturo) => void;
+  entrada: number;
+  onEntrada: (v: number) => void;
+  stop: number | null;
+  onStop: (v: number) => void;
+  contratos: number;
+  onContratos: (v: number) => void;
+  calculado: number;
+}) {
+  const c = CONTRATOS_FUTUROS[mercado];
+  const riscoAtual = riscoRealFuturo(trade);
+  return (
+    <div className="rounded-2xl border border-border bg-card">
+      <button
+        onClick={onToggle}
+        className="flex w-full items-center justify-between gap-2 p-5 text-left"
+      >
+        <span className="flex items-center gap-2 text-sm font-semibold">
+          <Settings2 size={15} className="text-muted-foreground" />
+          Detalhes técnicos <span className="text-muted-foreground">(opcional)</span>
+        </span>
+        {aberto ? (
+          <ChevronUp size={15} className="text-muted-foreground" />
+        ) : (
+          <ChevronDown size={15} className="text-muted-foreground" />
+        )}
+      </button>
+      {aberto && (
+        <div className="space-y-4 border-t border-border p-5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted-foreground">Mercado</span>
+            {(Object.keys(CONTRATOS_FUTUROS) as MercadoFuturo[]).map((m) => (
+              <button
+                key={m}
+                onClick={() => onMercado(m)}
+                className={`rounded-full border px-3 py-1 text-xs ${
+                  mercado === m
+                    ? "border-primary bg-primary/20 text-primary"
+                    : "border-border hover:bg-accent"
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted-foreground">Direção</span>
+            <button
+              onClick={() => onDirecao("comprado")}
+              className={`rounded-full border px-3 py-1 text-xs ${
+                direcaoFuturo === "comprado"
+                  ? "border-primary bg-primary/20 text-primary"
+                  : "border-border hover:bg-accent"
+              }`}
+            >
+              Comprado (compra)
+            </button>
+            <button
+              onClick={() => onDirecao("vendido")}
+              className={`rounded-full border px-3 py-1 text-xs ${
+                direcaoFuturo === "vendido"
+                  ? "border-primary bg-primary/20 text-primary"
+                  : "border-border hover:bg-accent"
+              }`}
+            >
+              Vendido (venda)
+            </button>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <label className="text-xs text-muted-foreground">
+              Entrada (pontos)
+              <input
+                type="number"
+                step={c.tick}
+                value={entrada}
+                onChange={(e) => onEntrada(+e.target.value || 0)}
+                className="mt-1 w-full rounded-md border border-border bg-input px-2 py-1 font-mono text-sm"
+              />
+            </label>
+            <label className="text-xs text-muted-foreground">
+              Stop (pontos)
+              <input
+                type="number"
+                step={c.tick}
+                min={c.tick}
+                value={stop ?? ""}
+                onChange={(e) => {
+                  const n = +e.target.value;
+                  onStop(Number.isFinite(n) && n > 0 ? n : 0);
+                }}
+                className="mt-1 w-full rounded-md border border-border bg-input px-2 py-1 font-mono text-sm"
+              />
+            </label>
+            <label className="text-xs text-muted-foreground">
+              Contratos
+              <input
+                type="number"
+                min={1}
+                value={contratos}
+                onChange={(e) => onContratos(Math.max(1, Math.round(+e.target.value || 1)))}
+                className="mt-1 w-full rounded-md border border-border bg-input px-2 py-1 font-mono text-sm"
+              />
+            </label>
+          </div>
+
+          <div className="rounded-lg border border-border bg-background p-4 text-xs leading-relaxed">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground">
+              <span>
+                Calculado pela sua regra:{" "}
+                <span className="font-mono text-foreground">{calculado} contratos</span>
+              </span>
+              <span>
+                {contratos !== calculado && (
+                  <span className="text-loss">
+                    risco real agora: {brl(riscoAtual)} (diferente do planejado)
+                  </span>
+                )}
+                {contratos === calculado && (
+                  <span>
+                    risco real: <span className="font-mono text-foreground">{brl(riscoAtual)}</span>
+                  </span>
+                )}
+              </span>
+              <span>
+                margem estimada:{" "}
+                <span className="font-mono text-foreground">{brl(margemEstimada(trade))}</span>
+              </span>
+            </div>
+            <p className="mt-2 text-muted-foreground">
+              {c.descricao} Margem mínima B3: {brl(c.margemMinima)}/contrato em day trade — sua
+              corretora pode exigir mais. Margem é garantia do ajuste diário, não é perda.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CopilotFuturo({ trade }: { trade: TradeFuturo }) {
+  const [aberto, setAberto] = useState<string | null>(null);
+  const c = CONTRATOS_FUTUROS[trade.mercado];
+  const perguntas: { k: string; q: string; a: string }[] = [
+    {
+      k: "formula",
+      q: "Por que o tamanho é calculado assim?",
+      a: `Contratos = risco ÷ (stop em pontos × valor do ponto). No seu caso: risco ${brl(riscoRealFuturo(trade))} ÷ (${trade.stop} pts × R$ ${c.valorPonto.toFixed(2)}) = ${trade.contratos} contratos. O risco que você aceitou vira o teto do tamanho: se o stop for tocado, a perda é a que você definiu antes de entrar. Quem define o tamanho é o seu risco, nunca o achismo.`,
+    },
+    {
+      k: "margem",
+      q: "O que é a margem?",
+      a: `É a garantia que a corretora retém para cobrir o ajuste diário — não é perda e não é custo. Cada contrato de ${trade.mercado} exige no mínimo ${brl(c.margemMinima)} (valor B3; sua corretora pode exigir mais). Se o ajuste consumir a margem, a corretora faz chamada de margem para você aportar.`,
+    },
+    {
+      k: "ajuste",
+      q: "O que é o ajuste diário?",
+      a: 'Todo fim de pregão o resultado da sua posição é liquidado na conta: ganhou, credita; perdeu, debita. No futuro não dá para "segurar até recuperar" como numa ação — o mercado cobra todos os dias. É por isso que o stop e o tamanho importam tanto aqui.',
+    },
+    {
+      k: "slippage",
+      q: "E se o preço pular o meu stop?",
+      a: "Em notícia forte, o preço pode saltar o seu nível e a saída sai pior que o planejado (slippage). Por isso o dimensionamento nunca ocupa o seu risco inteiro em um único trade: sobra espaço para o inesperado.",
+    },
+    {
+      k: "teto",
+      q: "O lucro tem teto?",
+      a: `Não. Futuro é direcional puro: cada ponto a favor vale ${brl(lucroPorPonto(trade))}, sem limite. O inverso também é verdade — sem stop, a perda não tem teto. Por isso o stop faz parte do tamanho, não é um detalhe.`,
+    },
+    {
+      k: "horario",
+      q: "Quando posso operar?",
+      a: "O pregão do mini índice e do minidólar vai das 9h às 18h. Fora dele não há negociação — e notícias fora do horário podem abrir o preço longe do seu stop (gap na abertura), outra razão para não arriscar o capital inteiro.",
+    },
+  ];
+  return (
+    <aside className="lg:sticky lg:top-24 h-fit space-y-4">
+      <div className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-primary">
+          <HelpCircle size={14} /> Copilot — seu mentor
+        </div>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Eu não escolho por você. Só explico, na hora, o que cada coisa significa nesta operação.
+        </p>
+        <div className="mt-4 space-y-2">
+          {perguntas.map((p) => (
+            <div key={p.k} className="rounded-xl border border-border bg-card">
+              <button
+                onClick={() => setAberto(aberto === p.k ? null : p.k)}
+                className="flex w-full items-start gap-2 px-4 py-3 text-left text-sm"
+              >
+                <MessageCircle size={14} className="mt-0.5 shrink-0 text-primary" />
+                <span className="flex-1 leading-snug">{p.q}</span>
+                {aberto === p.k ? (
+                  <ChevronUp size={14} className="mt-0.5 shrink-0 text-muted-foreground" />
+                ) : (
+                  <ChevronDown size={14} className="mt-0.5 shrink-0 text-muted-foreground" />
+                )}
+              </button>
+              {aberto === p.k && (
+                <p className="border-t border-border px-4 py-3 text-[13px] leading-relaxed text-muted-foreground">
+                  {p.a}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="rounded-2xl border border-border bg-card p-5 text-sm leading-relaxed text-muted-foreground">
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest">
+          <Wallet size={14} /> Lembrete
+        </div>
+        <p className="mt-2">
+          O resultado já está decidido antes de você apertar o botão. A bolsa só entrega o gráfico
+          que você já viu aqui — e o ajuste diário cobra todo pregão.
+        </p>
+      </div>
+    </aside>
   );
 }
 

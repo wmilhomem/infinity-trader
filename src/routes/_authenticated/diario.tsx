@@ -16,6 +16,7 @@ import { lerSnapshotCognitivo } from "@/engines/decision-memory-reader";
 import { recomendarMissao } from "@/engines/missoes";
 import { preverTamanhoPosicao } from "@/engines/behavior-forecast";
 import { lerOrigem } from "@/lib/fichas-estrategias";
+import { interpretarFuturo, lerFuturo, riscoReal as riscoRealFuturo } from "@/lib/futuros";
 import type { DiaryEntry } from "@/engines/types";
 import type { Json } from "@/integrations/supabase/types";
 import { ScorePanel } from "@/components/ScorePanel";
@@ -90,6 +91,7 @@ function Diario() {
     },
   });
   const origem = useMemo(() => lerOrigem(preSim.data?.origem), [preSim.data]);
+  const tradeFuturo = useMemo(() => lerFuturo(preSim.data?.pernas), [preSim.data]);
   const memorias = useQuery({
     queryKey: ["memorias"],
     queryFn: async () => {
@@ -324,6 +326,18 @@ function Diario() {
               <div className="mb-3 rounded-md border border-primary/40 bg-primary/10 p-3 text-xs leading-snug">
                 <div className="font-semibold text-primary">{interpretacao.nome}</div>
                 <p className="mt-1 text-muted-foreground">{interpretacao.resumo}</p>
+              </div>
+            )}
+            {tradeFuturo && (
+              <div className="mb-3 rounded-md border border-chart-2/40 bg-chart-2/10 p-3 text-xs leading-snug">
+                <div className="font-semibold text-chart-2">
+                  {interpretarFuturo(tradeFuturo).nome}
+                </div>
+                <p className="mt-1 text-muted-foreground">
+                  {tradeFuturo.contratos} {tradeFuturo.contratos === 1 ? "contrato" : "contratos"} ·
+                  stop {tradeFuturo.stop} pts · risco máximo R${" "}
+                  {riscoRealFuturo(tradeFuturo).toFixed(2)}
+                </p>
               </div>
             )}
             {origem && (
