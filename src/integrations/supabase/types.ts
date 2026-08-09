@@ -418,24 +418,42 @@ export type Database = {
         Row: {
           attempts: number
           completed_at: string | null
+          explicacao_coerente: boolean | null
           lesson_slug: string
+          missao_correta: boolean | null
+          missao_explicacao: string | null
+          missao_opcao: number | null
           quiz_score: number | null
+          transferencia_correta: boolean | null
+          transferencia_opcao: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           attempts?: number
           completed_at?: string | null
+          explicacao_coerente?: boolean | null
           lesson_slug: string
+          missao_correta?: boolean | null
+          missao_explicacao?: string | null
+          missao_opcao?: number | null
           quiz_score?: number | null
+          transferencia_correta?: boolean | null
+          transferencia_opcao?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           attempts?: number
           completed_at?: string | null
+          explicacao_coerente?: boolean | null
           lesson_slug?: string
+          missao_correta?: boolean | null
+          missao_explicacao?: string | null
+          missao_opcao?: number | null
           quiz_score?: number | null
+          transferencia_correta?: boolean | null
+          transferencia_opcao?: number | null
           updated_at?: string
           user_id?: string
         }
