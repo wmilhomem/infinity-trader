@@ -138,11 +138,18 @@ function Eyebrow({ n, children }: { n: string; children: React.ReactNode }) {
 
 function Landing() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
+    <div className="grain relative min-h-screen overflow-hidden bg-background text-foreground">
+      {/* fundo: malha técnica + auroras */}
+      <div className="pointer-events-none absolute inset-0 grid-mesh opacity-[0.5] [mask-image:radial-gradient(90%_60%_at_50%_0%,#000,transparent)]" />
       <div
-        className="pointer-events-none absolute -top-56 left-1/2 h-[560px] w-[900px] -translate-x-1/2 rounded-full opacity-[0.13] blur-3xl"
+        className="zat-aurora pointer-events-none absolute -top-64 left-1/2 h-[620px] w-[1000px] -translate-x-1/2 rounded-full opacity-[0.18] blur-[110px]"
         style={{ background: "radial-gradient(closest-side, oklch(0.78 0.17 65), transparent)" }}
       />
+      <div
+        className="zat-aurora pointer-events-none absolute top-[70vh] -left-40 h-[520px] w-[720px] rounded-full opacity-[0.10] blur-[120px]"
+        style={{ background: "radial-gradient(closest-side, oklch(0.72 0.18 155), transparent)" }}
+      />
+
 
       <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Link to="/" className="flex items-center gap-2">
