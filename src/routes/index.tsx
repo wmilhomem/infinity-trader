@@ -227,7 +227,7 @@ function Landing() {
       </section>
 
       {/* CENA 3D */}
-      <section className="relative z-10 -mt-4 px-6">
+      <section className="relative z-10 -mt-10 px-6">
         <HeroScene />
       </section>
 

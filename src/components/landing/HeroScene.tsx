@@ -35,7 +35,7 @@ export function HeroScene() {
     >
       {/* halo */}
       <div
-        className="absolute left-1/2 top-1/2 h-[420px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-[90px]"
+        className="absolute left-1/2 top-1/2 h-[420px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 blur-[80px]"
         style={{
           background:
             "radial-gradient(closest-side, color-mix(in oklab, var(--primary) 45%, transparent), transparent)",
@@ -52,7 +52,7 @@ export function HeroScene() {
       >
         {/* piso em perspectiva */}
         <div
-          className="absolute bottom-2 left-1/2 h-[300px] w-[820px] -translate-x-1/2 opacity-[0.35]"
+          className="absolute bottom-2 left-1/2 h-[300px] w-[820px] -translate-x-1/2 opacity-[0.55]"
           style={{
             transform: "rotateX(72deg) translateZ(-120px)",
             transformStyle: "preserve-3d",
@@ -66,7 +66,7 @@ export function HeroScene() {
 
         {/* anel orbital */}
         <div
-          className="absolute left-1/2 top-1/2 size-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/25 md:size-[440px]"
+          className="absolute left-1/2 top-1/2 size-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/35 md:size-[440px]"
           style={{ transform: "rotateX(74deg) translateZ(30px)", animation: "zat-spin 26s linear infinite" }}
         >
           <span className="absolute -top-1 left-1/2 size-2 -translate-x-1/2 rounded-full bg-primary shadow-[0_0_18px_2px_color-mix(in_oklab,var(--primary)_70%,transparent)]" />
