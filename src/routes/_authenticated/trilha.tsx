@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { LESSONS, NIVEIS } from "@/lib/lessons";
+import { LESSONS, NIVEIS, NIVEIS_DESC, nivelLabel, type LessonNivel } from "@/lib/lessons";
 import { getLessonMeta } from "@/lib/lesson-meta";
 import { ArrowRight, Check, Clock, Lock, Play } from "lucide-react";
 
@@ -16,7 +16,7 @@ function NivelBoxes({
   doneInNivel,
   totalInNivel,
 }: {
-  nivel: number;
+  nivel: LessonNivel;
   doneInNivel: number;
   totalInNivel: number;
 }) {
@@ -25,7 +25,7 @@ function NivelBoxes({
   return (
     <div className="flex items-center gap-2">
       <span className="text-[11px] font-semibold uppercase tracking-widest text-primary">
-        Nível {nivel}
+        {nivelLabel(nivel)}
       </span>
       <span className="flex gap-[3px]" aria-hidden>
         {Array.from({ length: boxes }).map((_, i) => (
@@ -52,17 +52,21 @@ function Trilha() {
   });
 
   const done = new Set((q.data ?? []).filter((p) => p.completed_at).map((p) => p.lesson_slug));
-  const byNivel = LESSONS.reduce<Record<number, typeof LESSONS>>((acc, l) => {
-    (acc[l.nivel] ??= []).push(l);
-    return acc;
-  }, {});
+  const byNivel = LESSONS.reduce<Record<LessonNivel, typeof LESSONS>>(
+    (acc, l) => {
+      (acc[l.nivel] ??= []).push(l);
+      return acc;
+    },
+    { 1: [], 2: [], 3: [], 4: [], 5: [], pratica: [] },
+  );
   const proxima = LESSONS.find((l) => !done.has(l.slug));
   const proximaMeta = proxima ? getLessonMeta(proxima.slug) : null;
 
   return (
     <AppShell title="Trilha">
       <p className="mb-6 text-sm text-muted-foreground">
-        {LESSONS.length} lições. 80% no quiz destrava a próxima etapa do ciclo de decisão.
+        {LESSONS.length} lições. Estruturas expressam hipóteses — nunca recomendações. 80% no quiz
+        destrava a próxima etapa do ciclo de decisão.
       </p>
 
       <div className="mb-8 rounded-2xl border border-border bg-card p-6">
@@ -109,20 +113,21 @@ function Trilha() {
       )}
 
       {Object.entries(byNivel).map(([nivel, lessons]) => {
+        const n = nivel as LessonNivel;
         const doneInNivel = lessons.filter((l) => done.has(l.slug)).length;
+        const ehPratica = n === "pratica";
         return (
-          <section key={nivel} className="mb-8">
+          <section key={n} className="mb-8">
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <div className="grid size-7 place-items-center rounded-md bg-primary/20 font-mono text-sm font-bold text-primary">
-                {nivel}
+                {ehPratica ? "P" : n}
               </div>
-              <h2 className="font-semibold">{NIVEIS[Number(nivel) as keyof typeof NIVEIS]}</h2>
+              <div>
+                <h2 className="font-semibold">{NIVEIS[n]}</h2>
+                <p className="text-xs text-muted-foreground">{NIVEIS_DESC[n]}</p>
+              </div>
               <div className="ml-auto">
-                <NivelBoxes
-                  nivel={Number(nivel)}
-                  doneInNivel={doneInNivel}
-                  totalInNivel={lessons.length}
-                />
+                <NivelBoxes nivel={n} doneInNivel={doneInNivel} totalInNivel={lessons.length} />
               </div>
             </div>
             <div className="grid gap-2">
@@ -156,8 +161,8 @@ function Trilha() {
         );
       })}
       <div className="rounded-md border border-dashed border-border p-4 text-xs text-muted-foreground">
-        <Lock size={12} className="mr-1 inline" /> Mais lições (Gregas, Iron Condor, Tributação
-        avançada) chegam nas próximas releases. Todo o loop de decisão já funciona.
+        <Lock size={12} className="mr-1 inline" /> Mais estruturas (Calendar Spread, venda a
+        descoberto, diagonal) chegam nas próximas releases. O loop de decisão completo já funciona.
       </div>
     </AppShell>
   );

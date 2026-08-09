@@ -123,6 +123,20 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
       "Comprador luta contra o tempo",
     ],
   },
+  "volatilidade-e-vega": {
+    objetivo: "Separar o preço da direção do preço da ansiedade antes de pagar um prêmio.",
+    tempoMin: 8,
+    erroComum: {
+      titulo: "Achar que prêmio caro é direção certa",
+      texto:
+        "Prêmio caro costuma ser IV alta: o mercado já sabe do evento. Depois do evento, o IV crush derrete o prêmio mesmo com o ativo parado.",
+    },
+    resumoPontos: [
+      "IV mede tamanho do movimento esperado, não direção",
+      "Comprar antes do evento é pagar a ansiedade no pico",
+      "IV crush derrete o prêmio depois do evento",
+    ],
+  },
   "compra-a-seco": {
     objetivo: "Definir quanto do seu capital pode virar pó numa compra a seco.",
     tempoMin: 7,
@@ -142,6 +156,20 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
       texto:
         "Se o ativo disparar, você é chamado a entregar as ações no strike. Aceite esse desfecho antes de montar.",
     },
+  },
+  "protective-put": {
+    objetivo: "Manter a tese de alta e comprar um piso para a queda com uma put.",
+    tempoMin: 8,
+    erroComum: {
+      titulo: "Avaliar o prêmio do seguro pelo preço, não pelo prejuízo evitado",
+      texto:
+        "Proteção se avalia pela queda que ela evita, não pelo custo do prêmio. Seguro caro é melhor que catástrofe sem teto.",
+    },
+    resumoPontos: [
+      "Ações + put comprada = piso definido",
+      "O upside continua ilimitado (menos o prêmio)",
+      "O strike do seguro é a queda que você não aguenta",
+    ],
   },
   rolagem: {
     objetivo: "Reconhecer quando rolar é gestão e quando é fuga do prejuízo.",
@@ -197,6 +225,93 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
       texto: "Tamanho de posição se define pela perda aceitável, nunca pelo ganho imaginado.",
     },
   },
+  straddle: {
+    objetivo: "Montar uma compra de movimento sem opinião de direção, sabendo o custo total.",
+    tempoMin: 8,
+    erroComum: {
+      titulo: "Comprar straddle na véspera de evento com IV alta",
+      texto:
+        "O straddle compra movimento; antes do evento você paga a ansiedade no pico e o IV crush derruba o prêmio mesmo se o ativo andar.",
+    },
+    resumoPontos: [
+      "Compra call + put no mesmo strike",
+      "Breakevens = strike ± custo total",
+      "Exige movimento maior que o custo, em qualquer direção",
+    ],
+  },
+  strangle: {
+    objetivo:
+      "Expressar a mesma hipótese de movimento do straddle com custo menor — e exigência maior.",
+    tempoMin: 8,
+    erroComum: {
+      titulo: "Achar que strangle é um straddle 'com desconto'",
+      texto:
+        "Não é: exige movimento maior. Se o movimento for médio, o straddle alcança e o strangle não.",
+    },
+    resumoPontos: [
+      "Compra call + put OTM",
+      "Custo menor, breakevens mais longe",
+      "Compensa quando o movimento é grande de verdade",
+    ],
+  },
+  "iron-condor": {
+    objetivo: "Vender um range com risco travado quando a hipótese é lateralização.",
+    tempoMin: 8,
+    erroComum: {
+      titulo: "Montar condor esperando movimento grande",
+      texto:
+        "O condor é venda de movimento: lucra com calmaria. Se a sua hipótese é fuga do range, o condor é a estrutura errada — mesmo com crédito bom.",
+    },
+    resumoPontos: [
+      "Vende call/put OTM com proteção de cada lado",
+      "Lucro máximo = crédito; perda máxima = largura − crédito",
+      "Hipótese: o ativo fica dentro do range",
+    ],
+  },
+  "comparar-estruturas-de-alta": {
+    objetivo: "Escolher entre CALL, trava e coberta comparando distribuições — não direção.",
+    tempoMin: 9,
+    erroComum: {
+      titulo: "Escolher pela direção sozinha",
+      texto:
+        "'Vai subir' não escolhe estrutura: custo, perda máxima, upside e tempo escolhem. Sem comparar as três, você escolhe no escuro.",
+    },
+    resumoPontos: [
+      "Hipótese primeiro, estrutura depois",
+      "CALL: upside ilimitado, prêmio cheio",
+      "Trava: débito menor, lucro limitado",
+      "Coberta: exige ações, coleta theta, abre mão do extremo",
+    ],
+  },
+  "comparar-estruturas-neutras": {
+    objetivo: "Distinguir compra de movimento (straddle/strangle) de venda de movimento (condor).",
+    tempoMin: 9,
+    erroComum: {
+      titulo: "Tratar todas as estruturas neutras como iguais",
+      texto:
+        "Straddle/strangle e condor apostam em lados opostos da mesma incerteza: movimento versus calmaria. Escolher o errado é operar contra a própria hipótese.",
+    },
+    resumoPontos: [
+      "Straddle: compra movimento, custo alto",
+      "Strangle: compra movimento, custo menor, exige mais",
+      "Iron condor: vende movimento, recebe crédito, risco travado",
+    ],
+  },
+  "gestao-da-decisao": {
+    objetivo:
+      "Rodar o ciclo completo: hipótese → estratégias → comparação → risco → regras → simulação → decisão → registro → revisão.",
+    tempoMin: 9,
+    erroComum: {
+      titulo: "Começar pela estrutura",
+      texto:
+        "Escolher a chave antes de conhecer a porta: estrutura sem hipótese é receita, não decisão. A hipótese vem primeiro.",
+    },
+    resumoPontos: [
+      "Estratégia é conhecimento; decisão é aplicação",
+      "Estruturas expressam hipóteses — nunca recomendações",
+      "A revisão avalia o processo, não o resultado",
+    ],
+  },
   "tributacao-basica": {
     objetivo: "Saber quanto do seu lucro é do governo antes de comemorar.",
     tempoMin: 6,
@@ -229,7 +344,7 @@ export function getLessonMeta(slug: string): LessonMeta {
 
 /** Identidade visual por nível — cada capítulo tem sua própria cor. */
 export const NIVEL_THEME: Record<
-  number,
+  number | "pratica",
   { accent: string; bg: string; border: string; ring: string; nome: string }
 > = {
   1: {
@@ -237,34 +352,41 @@ export const NIVEL_THEME: Record<
     bg: "bg-success/10",
     border: "border-success/40",
     ring: "bg-success",
-    nome: "Fundamentos",
+    nome: "Entender",
   },
   2: {
     accent: "text-chart-2",
     bg: "bg-chart-2/10",
     border: "border-chart-2/40",
     ring: "bg-chart-2",
-    nome: "Mecânica",
+    nome: "Pensar",
   },
   3: {
     accent: "text-primary",
     bg: "bg-primary/10",
     border: "border-primary/40",
     ring: "bg-primary",
-    nome: "Operação",
+    nome: "Construir",
   },
   4: {
     accent: "text-loss",
     bg: "bg-loss/10",
     border: "border-loss/40",
     ring: "bg-loss",
-    nome: "Estruturas",
+    nome: "Comparar",
   },
   5: {
     accent: "text-primary",
     bg: "bg-primary/10",
     border: "border-primary/40",
     ring: "bg-primary",
-    nome: "Tributação",
+    nome: "Decidir",
+  },
+  pratica: {
+    accent: "text-chart-3",
+    bg: "bg-chart-3/10",
+    border: "border-chart-3/40",
+    ring: "bg-chart-3",
+    nome: "Prática",
   },
 };

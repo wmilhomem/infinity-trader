@@ -10,6 +10,8 @@ import { LessonProgress } from "@/components/lessons/LessonProgress";
 import { LessonHero } from "@/components/lessons/LessonHero";
 import { LessonProblem } from "@/components/lessons/LessonProblem";
 import { ConceptCard } from "@/components/lessons/ConceptCard";
+import { ComparativoCard } from "@/components/lessons/ComparativoCard";
+import { CenariosCard } from "@/components/lessons/CenariosCard";
 import { DiagramCard } from "@/components/lessons/DiagramCard";
 import { AnalogyCard } from "@/components/lessons/AnalogyCard";
 import { WarningCard } from "@/components/lessons/WarningCard";
@@ -33,6 +35,8 @@ type Step =
   | { kind: "problema" }
   | { kind: "conceito"; i: number }
   | { kind: "diagrama" }
+  | { kind: "comparativo" }
+  | { kind: "cenarios" }
   | { kind: "ideia" }
   | { kind: "erro" }
   | { kind: "pratica" }
@@ -43,6 +47,8 @@ type Step =
 const CHIPS: { rotulo: string; kind: Step["kind"] }[] = [
   { rotulo: "Problema", kind: "problema" },
   { rotulo: "Conceitos", kind: "conceito" },
+  { rotulo: "Comparar", kind: "comparativo" },
+  { rotulo: "Cenários", kind: "cenarios" },
   { rotulo: "Ideia", kind: "ideia" },
   { rotulo: "Erro", kind: "erro" },
   { rotulo: "Prática", kind: "pratica" },
@@ -84,6 +90,8 @@ function LicaoPage() {
       out.push({ kind: "conceito", i });
       if (i === 0 && meta.visual && meta.visual !== "none") out.push({ kind: "diagrama" });
     });
+    if (lesson.comparativo) out.push({ kind: "comparativo" });
+    if (lesson.cenarios && lesson.cenarios.length > 0) out.push({ kind: "cenarios" });
     out.push({ kind: "ideia" }, { kind: "erro" }, { kind: "pratica" }, { kind: "missao" });
     lesson.quiz.forEach((_, i) => out.push({ kind: "quiz", i }));
     out.push({ kind: "fim" });
@@ -267,17 +275,21 @@ function LicaoPage() {
           ? `Conceito ${(step as { i: number }).i + 1} de ${lesson.conceitos.length}`
           : step?.kind === "diagrama"
             ? "Veja acontecendo"
-            : step?.kind === "ideia"
-              ? "A grande ideia"
-              : step?.kind === "erro"
-                ? "Erro clássico"
-                : step?.kind === "pratica"
-                  ? "Na prática"
-                  : step?.kind === "missao"
-                    ? "Missão"
-                    : step?.kind === "quiz"
-                      ? `Questão ${(step as { i: number }).i + 1} de ${lesson.quiz.length}`
-                      : "Encerramento";
+            : step?.kind === "comparativo"
+              ? "Comparar estruturas"
+              : step?.kind === "cenarios"
+                ? "Comportamento em cenários"
+                : step?.kind === "ideia"
+                  ? "A grande ideia"
+                  : step?.kind === "erro"
+                    ? "Erro clássico"
+                    : step?.kind === "pratica"
+                      ? "Na prática"
+                      : step?.kind === "missao"
+                        ? "Missão"
+                        : step?.kind === "quiz"
+                          ? `Questão ${(step as { i: number }).i + 1} de ${lesson.quiz.length}`
+                          : "Encerramento";
 
   const proximoLabel =
     step?.kind === "hero"
@@ -327,6 +339,14 @@ function LicaoPage() {
           )}
 
           {step?.kind === "diagrama" && <DiagramCard kind={meta.visual ?? "none"} />}
+
+          {step?.kind === "comparativo" && lesson.comparativo && (
+            <ComparativoCard comparativo={lesson.comparativo} />
+          )}
+
+          {step?.kind === "cenarios" && lesson.cenarios && (
+            <CenariosCard cenarios={lesson.cenarios} />
+          )}
 
           {step?.kind === "ideia" && <AnalogyCard texto={lesson.analogia} />}
 

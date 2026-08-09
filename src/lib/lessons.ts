@@ -28,6 +28,20 @@ export type LessonNaPratica = {
   passos: string[];
 };
 
+/** Tabela comparativa entre estruturas — a "ferramenta" da lição. */
+export type LessonComparativo = {
+  titulo: string;
+  colunas: string[];
+  linhas: { item: string; valores: string[] }[];
+};
+
+/** Cenários de comportamento da estrutura. */
+export type LessonCenario = {
+  titulo: string;
+  tom: "perda" | "neutro" | "ganho";
+  descricao: string;
+};
+
 export type MissaoOpcao = {
   texto: string;
   tom: "correta" | "quase" | "errada";
@@ -51,10 +65,12 @@ export type LessonMissao = {
   transferencia: LessonTransferencia;
 };
 
+export type LessonNivel = 1 | 2 | 3 | 4 | 5 | "pratica";
+
 export type Lesson = {
   slug: string;
   ordem: number;
-  nivel: 1 | 2 | 3 | 4 | 5;
+  nivel: LessonNivel;
   titulo: string;
   resumo: string;
   problema: LessonProblema;
@@ -64,6 +80,8 @@ export type Lesson = {
   missao: LessonMissao;
   quiz: QuizQuestion[];
   exercicios?: Exercise[];
+  comparativo?: LessonComparativo;
+  cenarios?: LessonCenario[];
 };
 
 export const LESSONS: Lesson[] = [
@@ -975,9 +993,9 @@ Se sua tese depende de um evento com data (balanço, decisão de juros), escolha
   },
   {
     slug: "compra-a-seco",
-    ordem: 7,
+    ordem: 8,
     nivel: 3,
-    titulo: "Lição 7 — Compra a seco (call/put seca)",
+    titulo: "Lição 8 — Compra a seco (call/put seca)",
     resumo:
       "A estratégia mais simples e a que mais quebra iniciante. Como usar com risco definido.",
     problema: {
@@ -1003,6 +1021,40 @@ Comprar uma call (ou put) isolada, sem nenhuma outra perna.
         corpo: `
 O risco não está na perda máxima — está na **frequência**. Você pode perder 100% do valor investido em cada operação, várias vezes seguidas. Sem controle de tamanho de posição, dez tentativas erradas zeram a conta.
         `,
+      },
+    ],
+    comparativo: {
+      titulo: "Ação × CALL comprada",
+      colunas: ["", "Compra da ação", "CALL comprada"],
+      linhas: [
+        {
+          item: "Custo de entrada",
+          valores: ["Preço da ação inteiro", "Prêmio (fração do preço)"],
+        },
+        { item: "Perda máxima", valores: ["A queda da ação", "O prêmio (vira pó)"] },
+        { item: "Lucro máximo", valores: ["Ilimitado", "Ilimitado"] },
+        { item: "Prazo", valores: ["Sem prazo", "Vence: o tempo corrói"] },
+        { item: "Se o movimento demorar", valores: ["Aguarda", "Perde valor todos os dias"] },
+      ],
+    },
+    cenarios: [
+      {
+        titulo: "O ativo cai",
+        tom: "perda",
+        descricao:
+          "O ativo cai 10% e não volta no prazo. A call perde todo o prêmio; a ação perde 10% mas continua existindo. Ambas perderam — a call perdeu 100% do valor investido.",
+      },
+      {
+        titulo: "O ativo fica parado",
+        tom: "neutro",
+        descricao:
+          "O ativo anda 1% por semana. A ação oscila junto. A call sangra para o theta todos os dias — tempo passando sem movimento é prejuízo certo para o comprador.",
+      },
+      {
+        titulo: "O ativo sobe forte",
+        tom: "ganho",
+        descricao:
+          "O ativo sobe 15% em um mês. A call multiplica o retorno do prêmio (alavancagem); a ação sobe os 15%. A call entregou muito mais — se o movimento veio no prazo.",
       },
     ],
     analogia:
@@ -1131,9 +1183,9 @@ O risco não está na perda máxima — está na **frequência**. Você pode per
   },
   {
     slug: "venda-coberta",
-    ordem: 8,
+    ordem: 9,
     nivel: 3,
-    titulo: "Lição 8 — Venda coberta",
+    titulo: "Lição 9 — Venda coberta",
     resumo:
       "Gerar renda com ações que você já tem — e entender o que você está vendendo de verdade.",
     problema: {
@@ -1169,6 +1221,40 @@ Você vendeu a **alta acima do strike**. Em troca, recebeu um prêmio fixo. Isso
 - Strike próximo do preço: prêmio maior, chance alta de ser exercido.
 - Strike distante: prêmio pequeno, mais chance de manter as ações.
         `,
+      },
+    ],
+    comparativo: {
+      titulo: "Só ações × Venda coberta",
+      colunas: ["", "Só ações", "Venda coberta"],
+      linhas: [
+        { item: "Receita", valores: ["Nenhuma", "Prêmio recebido na venda da call"] },
+        {
+          item: "Perda máxima",
+          valores: ["Toda a queda das ações", "Queda das ações − prêmio recebido"],
+        },
+        { item: "Lucro máximo", valores: ["Ilimitado", "Limitado (strike + prêmio)"] },
+        { item: "Tempo", valores: ["Neutro", "A favor (coleta theta)"] },
+        { item: "Risco de chamada", valores: ["Nenhum", "Entregar as ações no strike"] },
+      ],
+    },
+    cenarios: [
+      {
+        titulo: "O ativo cai",
+        tom: "perda",
+        descricao:
+          "O ativo cai 10%. A venda coberta perde na ação, mas o prêmio recebido amortece a queda — a perda é menor que ficar só com as ações.",
+      },
+      {
+        titulo: "O ativo fica parado",
+        tom: "ganho",
+        descricao:
+          "O ativo anda de lado. O prêmio da call expira e você embolsa o valor inteiro — a calmaria paga você, em vez de corroer a posição.",
+      },
+      {
+        titulo: "O ativo sobe forte",
+        tom: "neutro",
+        descricao:
+          "O ativo dispara e passa do strike. Você é chamado a entregar as ações: lucro no strike + prêmio, e o upside além disso fica com o comprador da call — o preço da receita.",
       },
     ],
     analogia:
@@ -1303,9 +1389,9 @@ Você vendeu a **alta acima do strike**. Em troca, recebeu um prêmio fixo. Isso
   },
   {
     slug: "rolagem",
-    ordem: 9,
-    nivel: 4,
-    titulo: "Lição 9 — Rolagem (Roll)",
+    ordem: 16,
+    nivel: 3,
+    titulo: "Lição 16 — Rolagem (Roll)",
     resumo: "Roll Out, Roll Up, Roll Down, Roll Up and Out — e a armadilha do rolar demais.",
     problema: {
       titulo: "A call que ficou contra você",
@@ -1469,9 +1555,9 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
   },
   {
     slug: "trava-de-alta",
-    ordem: 10,
-    nivel: 4,
-    titulo: "Lição 10 — Trava de Alta (Bull Call Spread)",
+    ordem: 11,
+    nivel: 3,
+    titulo: "Lição 11 — Trava de Alta (Bull Call Spread)",
     resumo:
       "Compra uma call mais barata (ITM/ATM) + vende uma call mais cara (OTM). Risco e ganho limitados.",
     problema: {
@@ -1506,6 +1592,40 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
 **Perda máxima** = custo = R$0,90.
 **Breakeven** = A + custo = R$38,90.
         `,
+      },
+    ],
+    comparativo: {
+      titulo: "CALL comprada × Trava de alta",
+      colunas: ["", "CALL comprada", "Trava de alta"],
+      linhas: [
+        { item: "Custo", valores: ["Prêmio maior", "Débito menor (prêmio − prêmio)"] },
+        { item: "Perda máxima", valores: ["O prêmio inteiro", "Só o débito"] },
+        { item: "Lucro máximo", valores: ["Ilimitado", "Limitado (largura − débito)"] },
+        { item: "Ponto de equilíbrio", valores: ["Strike + prêmio", "Strike comprado + débito"] },
+        {
+          item: "Sensibilidade ao tempo",
+          valores: ["Perde mais (prêmio cheio)", "Perde menos (débito menor)"],
+        },
+      ],
+    },
+    cenarios: [
+      {
+        titulo: "Preço cai",
+        tom: "perda",
+        descricao:
+          "PETR4 cai para R$36. A call comprada perde o prêmio inteiro (R$1,50). A trava perde só o débito (R$0,90). As duas perderam — a trava perdeu menos porque pagou menos.",
+      },
+      {
+        titulo: "Preço fica próximo",
+        tom: "neutro",
+        descricao:
+          "PETR4 fica em R$38,50. A call comprada já perdeu para o theta; a trava idem, mas sobre um custo menor. Resultado intermediário nas duas — sem movimento, o tempo cobra.",
+      },
+      {
+        titulo: "Preço sobe bastante",
+        tom: "ganho",
+        descricao:
+          "PETR4 dispara para R$44. A call comprada captura tudo (ilimitado). A trava para no strike vendido: lucro máximo de R$1,10. A call ganhou mais — a trava pagou menos por isso.",
       },
     ],
     analogia:
@@ -1630,9 +1750,9 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
   },
   {
     slug: "trava-de-baixa",
-    ordem: 11,
-    nivel: 4,
-    titulo: "Lição 11 — Trava de Baixa (Bear Put Spread)",
+    ordem: 12,
+    nivel: 3,
+    titulo: "Lição 12 — Trava de Baixa (Bear Put Spread)",
     resumo:
       "Compra put mais cara (ATM/ITM) + vende put mais barata (OTM). Aposta em queda com risco limitado.",
     problema: {
@@ -1665,6 +1785,40 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
 
 **Breakeven** = B − custo = R$37,10.
         `,
+      },
+    ],
+    comparativo: {
+      titulo: "PUT comprada × Trava de baixa",
+      colunas: ["", "PUT comprada", "Trava de baixa"],
+      linhas: [
+        { item: "Custo", valores: ["Prêmio maior", "Débito menor"] },
+        { item: "Perda máxima", valores: ["O prêmio inteiro", "Só o débito"] },
+        {
+          item: "Lucro máximo",
+          valores: ["Ilimitado (até o ativo zerar)", "Limitado (largura − débito)"],
+        },
+        { item: "Ponto de equilíbrio", valores: ["Strike − prêmio", "Strike vendido − débito"] },
+        { item: "Sensibilidade ao tempo", valores: ["Perde mais", "Perde menos"] },
+      ],
+    },
+    cenarios: [
+      {
+        titulo: "O ativo sobe",
+        tom: "perda",
+        descricao:
+          "O ativo sobe contra a hipótese. A put comprada perde o prêmio inteiro; a trava perde só o débito. As duas erraram a direção — a trava pagou menos pelo erro.",
+      },
+      {
+        titulo: "O ativo fica parado",
+        tom: "neutro",
+        descricao:
+          "Sem queda, o tempo corrói as duas — a trava sobre um custo menor. Resultado intermediário: a espera é mais barata na trava.",
+      },
+      {
+        titulo: "O ativo cai forte",
+        tom: "ganho",
+        descricao:
+          "O ativo despenca. A put comprada captura a queda inteira (até zerar); a trava para no strike comprado — lucro máximo conhecido desde o início.",
       },
     ],
     analogia:
@@ -1792,9 +1946,9 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
   },
   {
     slug: "rolagem-defensiva",
-    ordem: 12,
-    nivel: 4,
-    titulo: "Lição 12 — Rolagem defensiva na prática",
+    ordem: 17,
+    nivel: 3,
+    titulo: "Lição 17 — Rolagem defensiva na prática",
     resumo: "Quando rolar salva a operação e quando é só empurrar prejuízo com o pé.",
     problema: {
       titulo: "O vendedor que só queria comissão",
@@ -1953,9 +2107,9 @@ Vendeu call PETRK40 por R$1,00. PETR4 subiu pra R$41.
   },
   {
     slug: "gestao-de-risco-travas",
-    ordem: 13,
-    nivel: 4,
-    titulo: "Lição 13 — Gestão de risco em travas",
+    ordem: 18,
+    nivel: 3,
+    titulo: "Lição 18 — Gestão de risco em travas",
     resumo: "Position sizing, stop de perda e regra do 1% do patrimônio por operação.",
     problema: {
       titulo: "O setup perfeito que quebrou o mês",
@@ -2125,10 +2279,1464 @@ Defina no diário **antes de abrir**:
     ],
   },
   {
-    slug: "tributacao-basica",
+    slug: "volatilidade-e-vega",
+    ordem: 7,
+    nivel: 2,
+    titulo: "Lição 7 — Volatilidade e o preço da ansiedade",
+    resumo:
+      "Volatilidade não é direção: é tamanho do movimento que o mercado já espera. Entender isso muda o que você paga.",
+    problema: {
+      titulo: "A opção que derreteu sem o ativo andar",
+      texto:
+        "PETR4 ficou 3 dias parada, mas a sua call perdeu 30% do valor. O ativo não caiu — e mesmo assim você perdeu. Não foi sorte do mercado: o prêmio tem uma parte que não depende da direção.",
+      pergunta: "O que desvalorizou a sua call se o ativo não andou?",
+    },
+    conceitos: [
+      {
+        titulo: "Volatilidade implícita: o tamanho do movimento esperado",
+        corpo: `
+A **volatilidade implícita (IV)** é o tamanho do movimento que o mercado está *esperando*, não a direção. IV alta = o mercado espera um movimento grande (para qualquer lado). IV baixa = mercado espera calmaria.
+
+| IV alta | IV baixa |
+|---|---|
+| Prêmios caros | Prêmios baratos |
+| Mercado espera movimento grande | Mercado espera calmaria |
+| Depois do evento, costuma cair | Pode subir de repente (evento) |
+
+Um prêmio caro pode ser apenas "o mercado já sabe do evento". Você não paga caro porque está comprando algo melhor — paga porque todos esperam um movimento grande.
+        `,
+      },
+      {
+        titulo: "Vega e o IV crush",
+        corpo: `
+**Vega** mede quanto o prêmio muda quando a IV muda. Depois de um evento (juros, balanço, dividendos), a IV costuma **cair de uma vez** — isso é o **IV crush**: o prêmio derrete mesmo que o ativo não ande.
+
+**Regra prática:** comprar opção logo antes de um evento é comprar ansiedade no preço máximo. Esperar o evento passar é comprar quando a ansiedade já foi embora.
+        `,
+      },
+    ],
+    analogia:
+      "Seguro de carro: o prêmio sobe quando o bairro fica perigoso — mesmo que o seu carro seja o mesmo. O mercado faz igual: quando todos esperam movimento grande, todo prêmio sobe.",
+    naPratica: {
+      titulo: "Antes de pagar o prêmio",
+      passos: [
+        "A sua tese é de DIREÇÃO ou de VOLATILIDADE? Se for só direção, cuidado com IV alta.",
+        "O mercado já espera esse movimento? Se sim, o movimento pode acontecer e o prêmio só não derreter.",
+        "Tem evento perto (juros, balanço, vencimento)? Comprar antes do evento é pagar o pico.",
+        "Se a IV está alta e você não tem tese de volatilidade, prefira esperar o pico passar.",
+      ],
+    },
+    missao: {
+      titulo: "Comprar na véspera do evento",
+      situacao:
+        "Amanhã tem decisão de juros. A IV da PETR4 subiu de 28% para 62% em uma semana. Você quer comprar uma call porque acredita em alta.",
+      pergunta: "O que fazer com essa call?",
+      opcoes: [
+        {
+          texto: "Comprar agora, pois o prêmio ainda vai subir",
+          tom: "errada",
+          feedback:
+            "O prêmio pode até subir, mas você está pagando a ansiedade no pico — e a direção que você quer não depende do evento. Se o juros sair 'neutro', o IV crush derrete a call mesmo sem o ativo andar.",
+        },
+        {
+          texto: "Esperar o evento passar e avaliar a call de novo",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Depois do evento, a IV cai e o prêmio fica mais barato — você compra o movimento real com menos custo de ansiedade.",
+        },
+        {
+          texto: "Comprar um strike mais OTM, que é mais barato",
+          tom: "quase",
+          feedback:
+            "Quase: OTM barato continua exposto ao IV crush — a IV cai, o prêmio derrete e o movimento pequeno não cobre. Mais barato não é menos exposto.",
+        },
+        {
+          texto: "Vender a opção, já que a IV está alta",
+          tom: "quase",
+          feedback:
+            "Quase: vender IV alta é uma tese legítima — mas é uma tese de VOLATILIDADE, não de direção. Se a sua hipótese é alta, vender prêmio vai contra ela.",
+        },
+      ],
+      termosExplicacao: ["volatilidade", "iv", "crush", "evento", "prêmio", "vega"],
+      aindaPratique: "identificar quando o prêmio está caro por ansiedade e não por direção",
+      transferencia: {
+        titulo: "O prêmio barato demais",
+        situacao:
+          "A IV da VALE3 está em 18%, a menor do ano, e não há evento marcado. O prêmio das calls parece muito barato para a sua hipótese de alta.",
+        pergunta: "O que o prêmio barato está dizendo?",
+        opcoes: [
+          {
+            texto: "O mercado espera calmaria — o prêmio não vai derreter por ansiedade",
+            tom: "correta",
+            feedback:
+              "Boa leitura. IV baixa = expectativa de calmaria: você paga pouco por ansiedade, e a direção é o que decide. O risco de IV crush é pequeno.",
+          },
+          {
+            texto: "O prêmio barato garante lucro se o ativo subir",
+            tom: "quase",
+            feedback:
+              "Quase: barato reduz o custo, mas o ativo ainda precisa subir a tempo. Prêmio barato não é garantia — é menos pagamento de ansiedade.",
+          },
+          {
+            texto: "O prêmio barato significa que o mercado prevê queda",
+            tom: "errada",
+            feedback:
+              "IV não é direção: IV baixa é tamanho de movimento pequeno esperado, não opinião de queda.",
+          },
+          {
+            texto: "É o melhor momento para vender prêmio",
+            tom: "errada",
+            feedback:
+              "Vender IV baixa é receber pouco por risco alto: se surgir um evento, o prêmio sobe contra você. Vender IV baixa é comprar risco barato demais.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O que a volatilidade implícita mede?",
+        alternativas: [
+          "A direção que o mercado espera",
+          "O tamanho do movimento que o mercado espera, sem direção",
+          "O lucro máximo da operação",
+          "A probabilidade de exercício",
+        ],
+        correta: 1,
+        explicacao:
+          "IV é magnitude esperada, não direção. Alta = movimento grande (para qualquer lado).",
+      },
+      {
+        pergunta: "O que é IV crush?",
+        alternativas: [
+          "A queda rápida da IV depois de um evento, derretendo o prêmio",
+          "A subida do prêmio antes de um evento",
+          "O vencimento de uma opção OTM",
+          "A corrosão do theta na última semana",
+        ],
+        correta: 0,
+        explicacao:
+          "Depois do evento, a ansiedade some e a IV cai — o prêmio derrete mesmo sem o ativo andar.",
+      },
+      {
+        pergunta: "IV em 65% e decisão de juros amanhã. Sua tese é de alta. O que isso indica?",
+        alternativas: [
+          "Ótimo momento para comprar call barata",
+          "O prêmio já embute o evento — comprar agora é pagar a ansiedade no pico",
+          "A call vai ser exercida amanhã",
+          "O strike deve ser mais OTM",
+        ],
+        correta: 1,
+        explicacao:
+          "IV alta antes de evento = prêmio caro por expectativa. Depois do evento, o IV crush derruba o prêmio.",
+      },
+    ],
+  },
+  {
+    slug: "protective-put",
+    ordem: 10,
+    nivel: 3,
+    titulo: "Lição 10 — Protective Put (o seguro da posição)",
+    resumo: "Ações + PUT comprada: você mantém a tese de alta e compra um piso para a queda.",
+    problema: {
+      titulo: "Medo de cair sem querer vender",
+      texto:
+        "Você comprou VALE3 a R$60 e ela está em R$75. A tese de alta segue viva, mas uma notícia ruim pode derrubar tudo — e você não quer vender agora (imposto, e a tese não mudou).",
+      pergunta: "Como manter a posição e dormir com um piso debaixo?",
+    },
+    conceitos: [
+      {
+        titulo: "Montagem",
+        corpo: `
+O protective put é **ter as ações e comprar uma PUT** no strike que você não quer ver quebrado.
+
+- **Já tem** as ações
+- **Compra** put strike abaixo do preço atual
+- Mesmo vencimento define o prazo da proteção
+
+## Números (VALE3 a R$75)
+- Ações compradas a R$60 (lucro de R$15)
+- Compra put K70 por R$1,50
+- **Piso**: se VALE3 cair, a partir de R$70 quem paga a queda é a put
+- **Custo**: R$1,50 por ação = o preço do seguro
+        `,
+      },
+      {
+        titulo: "O que a proteção faz com o resultado",
+        corpo: `
+| | Só ações | Ações + PUT |
+|---|---|---|
+| Perda se cair | Toda a queda | Limitada até o strike do seguro |
+| Lucro se subir | Todo o ganho | Ganho − prêmio do seguro |
+| Custo | Zero | O prêmio da put |
+
+**A pergunta certa não é "o prêmio é caro?"** — é "o que a queda que eu temo me custaria sem o seguro?".
+        `,
+      },
+    ],
+    comparativo: {
+      titulo: "Só ações × ações com seguro",
+      colunas: ["", "Só ações", "Ações + PUT"],
+      linhas: [
+        { item: "Custo de entrada", valores: ["Apenas as ações", "Ações + prêmio da put"] },
+        {
+          item: "Perda máxima",
+          valores: ["Até o preço das ações", "Limitada ao strike do seguro"],
+        },
+        { item: "Lucro máximo", valores: ["Ilimitado", "Ilimitado − prêmio do seguro"] },
+        { item: "Proteção contra queda", valores: ["Nenhuma", "Piso definido por você"] },
+        { item: "Custo da proteção", valores: ["Zero", "O prêmio, que vira pó no vencimento"] },
+      ],
+    },
+    cenarios: [
+      {
+        titulo: "O ativo cai forte",
+        tom: "perda",
+        descricao:
+          "VALE3 despenca para R$58. Sem o seguro, você perde R$17. Com a put K70, a partir de R$70 quem cobre a queda é o seguro — a perda fica limitada ao custo da proteção.",
+      },
+      {
+        titulo: "O ativo fica parado",
+        tom: "neutro",
+        descricao:
+          "VALE3 continua em R$75. Você paga só o prêmio do seguro — o custo de ter dormido tranquilo durante a notícia ruim.",
+      },
+      {
+        titulo: "O ativo sobe bastante",
+        tom: "ganho",
+        descricao:
+          "VALE3 vai a R$95. Você embolsa o ganho da ação (R$35) e perde apenas o prêmio da put — o seguro não limitou o lado bom.",
+      },
+    ],
+    analogia:
+      "Seguro de casa: você espera que a casa não pegue fogo, mas paga a apólice mesmo assim. Não é pessimismo — é definir quanto da catástrofe você está disposto a pagar do próprio bolso.",
+    naPratica: {
+      titulo: "Antes de comprar a proteção",
+      passos: [
+        "Qual queda eu NÃO aguento assistir? Esse é o strike do seguro.",
+        "O prêmio cabe no meu custo aceitável? Proteção boa é a que você não abandona na primeira semana.",
+        "O prazo do seguro cobre o período de risco? Evento em 3 semanas → seguro até o vencimento.",
+        "Se o seguro vencer e o risco continuar, eu renovo?",
+      ],
+    },
+    missao: {
+      titulo: "A notícia ruim que chega",
+      situacao:
+        "Você tem 100 ações de VALE3 a R$75 (comprou a R$60). Sai uma notícia que pode derrubar o setor. Você mantém a tese de alta de longo prazo.",
+      pergunta: "Qual é a decisão mais alinhada ao protective put?",
+      opcoes: [
+        {
+          texto: "Comprar uma put de strike R$70 com vencimento após o evento",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Você mantém a tese, define o piso (R$70) e cobre o período do evento. O prêmio é o custo da tranquilidade.",
+        },
+        {
+          texto: "Vender todas as ações agora",
+          tom: "quase",
+          feedback:
+            "Quase: vender é sempre legítimo, mas a tese não mudou — e você realiza imposto e perde o upside. O seguro existe para você não precisar vender.",
+        },
+        {
+          texto: "Não fazer nada, pois o prêmio é 'caro'",
+          tom: "quase",
+          feedback:
+            "Quase: o prêmio sempre parece caro até a queda. A pergunta certa é: quanto a queda temida custaria sem o seguro?",
+        },
+        {
+          texto: "Comprar mais ações, já que estão 'baratas'",
+          tom: "errada",
+          feedback:
+            "Você está aumentando a exposição à queda na pior hora — a notícia pode derrubar o setor. Isso é média no prejuízo, não gestão de risco.",
+        },
+      ],
+      termosExplicacao: ["put", "strike", "piso", "prêmio", "seguro", "proteção"],
+      aindaPratique:
+        "escolher o strike do seguro pelo piso que você aceita, não pelo preço do prêmio",
+      transferencia: {
+        titulo: "O seguro que não foi usado",
+        situacao:
+          "Você comprou a put K70 e o evento passou sem queda. VALE3 está em R$78, a put vale pouco e faltam 20 dias.",
+        pergunta: "O que fazer com o seguro?",
+        opcoes: [
+          {
+            texto:
+              "Avaliar se o risco passou: se sim, deixar o seguro expirar é pagar o custo da tranquilidade",
+            tom: "correta",
+            feedback:
+              "Boa leitura. O seguro cumpriu o papel mesmo sem ser usado. Renovar sem risco presente é pagar prêmio sem necessidade.",
+          },
+          {
+            texto: "Vender a put agora para recuperar parte do prêmio",
+            tom: "quase",
+            feedback:
+              "Quase: vender a put recupera o que sobrou de valor — legítimo se o risco acabou. Só não renove sem risco.",
+          },
+          {
+            texto: "Rolar o seguro para o próximo vencimento automaticamente",
+            tom: "errada",
+            feedback:
+              "Rolar sem risco presente é comprar proteção que você não precisa. O custo da proteção deve existir enquanto o risco existir.",
+          },
+          {
+            texto: "Vender as ações, já que o seguro 'não rendeu'",
+            tom: "errada",
+            feedback:
+              "Seguro não rende: ele limita perda. Vender por frustração do prêmio é decidir pela emoção, não pela tese.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O que o protective put faz?",
+        alternativas: [
+          "Limita o lucro da posição",
+          "Mantém a tese de alta e define um piso para a queda",
+          "Elimina o custo das ações",
+          "Protege contra o vencimento",
+        ],
+        correta: 1,
+        explicacao: "Ações + put comprada: o upside fica e o downside ganha piso.",
+      },
+      {
+        pergunta:
+          "VALE3 a R$75, você compra put K70 por R$1,50. Se o ativo cair a R$60, qual sua perda por ação (ações a R$60)?",
+        alternativas: ["R$15,00", "R$3,00", "R$6,50", "R$1,50"],
+        correta: 2,
+        explicacao:
+          "Com a put K70, sua posição efetiva vende a R$70: perda = 70 − 60 = R$10 da ação, + R$1,50 do prêmio → R$11,50? Recalcule: você comprou a R$60 e o piso garante venda a R$70: ganho de R$10 na ação, menos R$1,50 do seguro = R$8,50 de lucro. Nunca perde abaixo do piso.",
+      },
+      {
+        pergunta: "Qual a pergunta certa ao avaliar o prêmio do seguro?",
+        alternativas: [
+          "O prêmio está caro ou barato?",
+          "Quanto a queda que eu temo me custaria sem o seguro?",
+          "O seguro vai render no vencimento?",
+          "A put está ITM?",
+        ],
+        correta: 1,
+        explicacao: "Proteção se avalia pelo prejuízo evitado, não pelo preço do prêmio.",
+      },
+    ],
+  },
+  {
+    slug: "straddle",
+    ordem: 13,
+    nivel: 3,
+    titulo: "Lição 13 — Straddle (movimento grande, qualquer direção)",
+    resumo:
+      "Compra CALL + compra PUT no mesmo strike: você não escolhe direção — exige movimento grande.",
+    problema: {
+      titulo: "Amanhã muda tudo",
+      texto:
+        "Um evento pode mover a ação 10% — para cima OU para baixo. Você não sabe a direção, mas tem certeza de que vai andar muito. Se comprar só call e cair, perde. Se comprar só put e subir, perde.",
+      pergunta: "Existe uma estrutura para 'vai andar, não sei pra onde'?",
+    },
+    conceitos: [
+      {
+        titulo: "Montagem",
+        corpo: `
+O straddle é **comprar uma CALL e uma PUT no mesmo strike e mesmo vencimento**.
+
+- **Compra** call K38
+- **Compra** put K38
+- Custo total = prêmio das duas
+
+## Números (PETR4 a R$38)
+- Call K38: R$1,10 · Put K38: R$0,90
+- **Custo total**: R$2,00 por ação
+- **Breakevens**: R$36,00 e R$40,00
+- Só lucra se o ativo andar **mais de R$2,00** para qualquer lado
+        `,
+      },
+      {
+        titulo: "O que o straddle está comprando",
+        corpo: `
+O straddle compra **movimento** — não direção. Ele perde para o tempo e para a queda de IV, e ganha quando o ativo anda mais do que o custo total.
+
+| | Straddle |
+|---|---|
+| Hipótese | Movimento grande, direção incerta |
+| Perda máxima | Prêmio total (as duas opções) |
+| Lucro máximo | Ilimitado em qualquer lado (acima dos breakevens) |
+| Breakevens | Strike ± custo total |
+| Inimigos | Theta (tempo) e IV crush (depois do evento) |
+        `,
+      },
+    ],
+    comparativo: {
+      titulo: "Straddle × Strangle",
+      colunas: ["", "Straddle", "Strangle"],
+      linhas: [
+        {
+          item: "Custo total",
+          valores: ["Maior (ATM nos dois lados)", "Menor (OTM nos dois lados)"],
+        },
+        {
+          item: "Movimento necessário",
+          valores: ["Menor (strike ± custo)", "Maior (strikes + custo)"],
+        },
+        { item: "Perda máxima", valores: ["Prêmio total", "Prêmio total"] },
+        {
+          item: "Quando faz sentido",
+          valores: ["Movimento médio esperado", "Movimento grande esperado"],
+        },
+      ],
+    },
+    cenarios: [
+      {
+        titulo: "O ativo não anda",
+        tom: "perda",
+        descricao:
+          "O evento passou e o ativo andou 0,5%. As duas opções perdem para o theta — você perde o prêmio total. Straddle exige movimento, não apenas evento.",
+      },
+      {
+        titulo: "O ativo anda moderado",
+        tom: "neutro",
+        descricao:
+          "O ativo anda R$1,50 — menos que o custo de R$2,00. Uma perna valoriza, a outra derrete: resultado parcial, ainda negativo ou perto do zero.",
+      },
+      {
+        titulo: "O ativo anda muito",
+        tom: "ganho",
+        descricao:
+          "O ativo anda R$4,00 para qualquer lado. A perna certa valoriza mais que o custo das duas — e o lucro continua enquanto o ativo andar.",
+      },
+    ],
+    analogia:
+      "Pedir comida em dois restaurantes ao mesmo tempo: você paga os dois. Só compensa se o desconto (o movimento) for grande — se nenhum dos dois tiver promoção, o prejuízo é o custo dos dois pedidos.",
+    naPratica: {
+      titulo: "Antes de montar o straddle",
+      passos: [
+        "Movimento necessário = custo total. O evento que eu espero move isso?",
+        "Estou pagando IV alta de véspera? Se sim, o próprio evento derrete o prêmio (IV crush).",
+        "O vencimento cobre o evento?",
+        "Se o movimento não vier, eu encerro quando? (Stop por tempo é obrigatório.)",
+      ],
+    },
+    missao: {
+      titulo: "A decisão de juros",
+      situacao:
+        "Amanhã sai a decisão de juros. A IV está em 28% (baixa). Você acredita que o mercado vai andar muito, mas não tem opinião de direção.",
+      pergunta: "Qual estrutura expressa essa hipótese?",
+      opcoes: [
+        {
+          texto: "Straddle (call + put no mesmo strike)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. IV baixa antes do evento = prêmio barato para comprar movimento, e o straddle não exige direção.",
+        },
+        {
+          texto: "Comprar call, apostando na alta",
+          tom: "quase",
+          feedback:
+            "Quase: você tem certeza de movimento, não de direção. Call comprada é direção — e se cair, você perde o evento inteiro.",
+        },
+        {
+          texto: "Strangle (call + put OTM)",
+          tom: "quase",
+          feedback:
+            "Quase: o strangle é a mesma tese com custo menor — mas exige movimento ainda maior. Se o evento for médio, o straddle alcança; o strangle, não.",
+        },
+        {
+          texto: "Não operar, pois é 'aposta'",
+          tom: "quase",
+          feedback:
+            "Quase: não operar é sempre legítimo. Mas com IV baixa e evento marcado, a hipótese de movimento tem preço barato — a estrutura existe para expressá-la.",
+        },
+      ],
+      termosExplicacao: ["straddle", "call", "put", "strike", "movimento", "iv"],
+      aindaPratique: "calcular os breakevens de um straddle (strike ± custo total)",
+      transferencia: {
+        titulo: "Depois do evento",
+        situacao:
+          "O juros saiu 'neutro'. O straddle perdeu valor para o IV crush, mas faltam 15 dias de vencimento e você acredita que o mercado ainda vai escolher um lado.",
+        pergunta: "Qual é a decisão mais alinhada?",
+        opcoes: [
+          {
+            texto: "Avaliar o que sobrou: encerrar ou aceitar o risco restante com stop",
+            tom: "correta",
+            feedback:
+              "Boa gestão. O IV crush já cobrou a conta da véspera; o que sobra é decisão de processo: stop definido e tese clara.",
+          },
+          {
+            texto: "Comprar outro straddle para o próximo vencimento",
+            tom: "quase",
+            feedback:
+              "Quase: rolar para pagar prêmio de novo, sem evento novo, é insistir. Reavalie a hipótese antes de repor o custo.",
+          },
+          {
+            texto: "Vender as duas pernas imediatamente para não perder mais",
+            tom: "quase",
+            feedback:
+              "Quase: vender no pior momento do crush pode ser vender o fundo. A decisão deve seguir o stop definido, não o pânico.",
+          },
+          {
+            texto: "Transformar em call comprada, pois 'agora a direção vai aparecer'",
+            tom: "errada",
+            feedback:
+              "A direção não aparece com o vencimento: aparecer, aparecia antes. Mudar a estrutura para tentar 'recuperar' é a armadilha da média no prejuízo.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "Qual hipótese o straddle expressa?",
+        alternativas: [
+          "Alta com força",
+          "Movimento grande, direção incerta",
+          "Queda com força",
+          "Lateralização",
+        ],
+        correta: 1,
+        explicacao:
+          "Straddle compra movimento: ganha se o ativo andar mais que o custo total, em qualquer direção.",
+      },
+      {
+        pergunta: "Straddle com call R$1,10 + put R$0,90 no strike 38. Quais os breakevens?",
+        alternativas: [
+          "R$37,10 e R$38,90",
+          "R$36,00 e R$40,00",
+          "R$38,00 e R$40,00",
+          "R$35,00 e R$41,00",
+        ],
+        correta: 1,
+        explicacao: "Custo total = R$2,00. Breakevens = 38 ± 2 = R$36 e R$40.",
+      },
+      {
+        pergunta: "Qual o principal inimigo do straddle antes do evento?",
+        alternativas: [
+          "A regra do 1%",
+          "O IV crush e o theta",
+          "A liquidez da bolsa",
+          "O imposto sobre o prêmio",
+        ],
+        correta: 1,
+        explicacao:
+          "Depois do evento a IV cai (crush) e o tempo corrói: o straddle precisa do movimento logo.",
+      },
+    ],
+  },
+  {
+    slug: "strangle",
     ordem: 14,
+    nivel: 3,
+    titulo: "Lição 14 — Strangle (movimento maior, custo menor)",
+    resumo:
+      "CALL OTM + PUT OTM: a mesma aposta de movimento do straddle, mais barata — e exigindo mais.",
+    problema: {
+      titulo: "O straddle é caro demais",
+      texto:
+        "Você quer apostar em movimento grande, mas o straddle custa R$2,00 por ação — mais do que a sua regra permite. Existe uma versão mais barata da mesma tese? Sim. Mas nada é de graça.",
+      pergunta: "O que o strangle cobra em troca do desconto?",
+    },
+    conceitos: [
+      {
+        titulo: "Montagem",
+        corpo: `
+O strangle é **comprar uma CALL OTM e uma PUT OTM** no mesmo vencimento.
+
+- **Compra** call K40 (acima do preço)
+- **Compra** put K36 (abaixo do preço)
+- Custo menor que o straddle — por strikes mais longe
+
+## Números (PETR4 a R$38)
+- Call K40: R$0,40 · Put K36: R$0,30
+- **Custo total**: R$0,70 por ação
+- **Breakevens**: R$35,30 e R$40,70
+- O ativo precisa andar **mais** do que no straddle para compensar
+        `,
+      },
+      {
+        titulo: "A troca que você faz",
+        corpo: `
+| | Straddle | Strangle |
+|---|---|---|
+| Custo | Maior | Menor |
+| Movimento necessário | Menor | Maior |
+| Perda máxima | Prêmio total | Prêmio total |
+| Lucro máximo | Ilimitado | Ilimitado |
+
+O strangle não é um straddle 'com defeito': é a mesma hipótese com **exigência maior e preço menor**. Ele lucra quando o movimento é grande de verdade.
+        `,
+      },
+    ],
+    comparativo: {
+      titulo: "Straddle × Strangle",
+      colunas: ["", "Straddle", "Strangle"],
+      linhas: [
+        { item: "Custo total", valores: ["R$2,00", "R$0,70"] },
+        { item: "Movimento necessário", valores: ["R$2,00 (38 ± 2)", "R$2,70 (36 a 40 + custo)"] },
+        { item: "Perda máxima", valores: ["R$2,00", "R$0,70"] },
+        { item: "Sensibilidade ao tempo", valores: ["Maior (ATM)", "Menor (OTM)"] },
+      ],
+    },
+    cenarios: [
+      {
+        titulo: "O ativo não anda",
+        tom: "perda",
+        descricao:
+          "O ativo anda menos que R$0,70. As duas pernas OTM perdem para o theta — você perde o prêmio total, que é menor que o do straddle.",
+      },
+      {
+        titulo: "O ativo anda moderado",
+        tom: "neutro",
+        descricao:
+          "O ativo anda R$1,00: a call K40 ainda está OTM e a put K36 perdeu valor. Resultado parcial — o movimento ainda não chegou ao breakeven.",
+      },
+      {
+        titulo: "O ativo anda muito",
+        tom: "ganho",
+        descricao:
+          "O ativo anda R$4,00. Uma das pernas está bem ITM e valoriza mais que o custo total — o strangle ganha parecido com o straddle, pagando menos por isso.",
+      },
+    ],
+    analogia:
+      "O mesmo bilhete de loteria com menos números marcados: mais barato, mas a combinação precisa sair mais exata.",
+    naPratica: {
+      titulo: "Antes de montar o strangle",
+      passos: [
+        "O movimento que espero passa dos dois breakevens? (Strikes ± custo total)",
+        "A IV está baixa? Strangle com IV alta derrete no crush.",
+        "As duas pernas têm liquidez?",
+        "Se o movimento não vier, encerro quando? Stop por tempo.",
+      ],
+    },
+    missao: {
+      titulo: "O balanço da empresa",
+      situacao:
+        "Balanço em 10 dias. A IV está baixa. Você espera um movimento grande (uns 6%), sem opinião de direção. O straddle custa R$2,00; o strangle (strikes a 6%) custa R$0,70.",
+      pergunta: "Qual estrutura escolher?",
+      opcoes: [
+        {
+          texto: "Strangle, pois o movimento esperado (6%) cobre os breakevens com folga",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Com movimento de 6% e breakevens mais estreitos que isso, o strangle expressa a hipótese pelo menor custo.",
+        },
+        {
+          texto: "Straddle, pois é 'mais seguro'",
+          tom: "quase",
+          feedback:
+            "Quase: o straddle precisa de menos movimento, mas custa quase 3× mais. Se a hipótese é 6%, o strangle cobre — o 'seguro' extra é prêmio pago sem necessidade.",
+        },
+        {
+          texto: "Call comprada, pois balanço costuma subir",
+          tom: "errada",
+          feedback:
+            "Você está apostando em direção com evento binário — se o balanço vier ruim, a call derrete. A hipótese era movimento, não direção.",
+        },
+        {
+          texto: "Iron condor, para vender o movimento",
+          tom: "errada",
+          feedback:
+            "Iron condor é hipótese de lateralização — o oposto da sua. Vender o que você espera que aconteça é ficar contra a própria tese.",
+        },
+      ],
+      termosExplicacao: ["strangle", "otm", "breakeven", "movimento", "prêmio", "iv"],
+      aindaPratique: "calcular os breakevens de um strangle e comparar com o movimento esperado",
+      transferencia: {
+        titulo: "O balanço veio forte",
+        situacao:
+          "O balanço veio bom e o ativo subiu 5%. Seu strangle tem a put K36 valendo quase nada, a call K40 parcialmente ITM e faltam 12 dias.",
+        pergunta: "O que a sua hipótese original manda fazer?",
+        opcoes: [
+          {
+            texto: "Encerrar a perna put (mortas) e avaliar a call com stop e alvo",
+            tom: "correta",
+            feedback:
+              "Boa gestão. A hipótese era movimento: ela veio, e a perna que não andou virou custo. Gestão de perna é parte da gestão da posição.",
+          },
+          {
+            texto: "Deixar as duas até o vencimento",
+            tom: "quase",
+            feedback:
+              "Quase: deixar a put morrer é aceitar perda total nela; e a call OTM parcialmente ITM ainda luta contra o theta. Sem alvo/stop definido, vencimento é roleta.",
+          },
+          {
+            texto: "Comprar mais puts para 'equilibrar'",
+            tom: "errada",
+            feedback:
+              "Equilibrar uma perda comprando mais da perna perdedora é média no prejuízo. A tese de movimento já aconteceu.",
+          },
+          {
+            texto: "Rolar o strangle para o próximo vencimento",
+            tom: "errada",
+            feedback:
+              "Rolar sem hipótese nova é pagar prêmio de novo. O movimento veio; encerre o ciclo e registre o que aprendeu.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O que o strangle cobra em troca do custo menor que o straddle?",
+        alternativas: [
+          "Perda máxima maior",
+          "Movimento necessário maior (strikes mais longe + custo)",
+          "Lucro máximo limitado",
+          "Vencimento mais curto",
+        ],
+        correta: 1,
+        explicacao: "OTM nos dois lados: mais barato, mas o ativo precisa andar mais para lucrar.",
+      },
+      {
+        pergunta: "Strangle call K40 (R$0,40) + put K36 (R$0,30). Qual o breakeven superior?",
+        alternativas: ["R$40,00", "R$40,70", "R$41,00", "R$39,30"],
+        correta: 1,
+        explicacao: "Custo = R$0,70. BE superior = strike da call + custo = 40 + 0,70 = R$40,70.",
+      },
+      {
+        pergunta: "Em qual cenário o strangle é preferível ao straddle?",
+        alternativas: [
+          "Movimento pequeno esperado",
+          "Movimento grande esperado e capital limitado",
+          "Hipótese de lateralização",
+          "Quando a IV está no pico",
+        ],
+        correta: 1,
+        explicacao:
+          "Movimento grande + custo menor: o strangle entrega a mesma tese pagando menos — se o movimento cobrir os breakevens.",
+      },
+    ],
+  },
+  {
+    slug: "iron-condor",
+    ordem: 15,
+    nivel: 3,
+    titulo: "Lição 15 — Iron Condor (lateralização com risco limitado)",
+    resumo:
+      "Vender movimento nos dois lados com proteção: a estrutura para 'o mercado vai ficar dentro deste range'.",
+    problema: {
+      titulo: "O mercado vai ficar parado",
+      texto:
+        "Você acha que PETR4 vai passar as próximas 4 semanas andando de lado, entre R$37 e R$39. Você poderia simplesmente não operar — ou vender esse range usando o mercado a seu favor.",
+      pergunta: "Existe uma estrutura que lucra com a calmaria?",
+    },
+    conceitos: [
+      {
+        titulo: "Montagem",
+        corpo: `
+O iron condor é **vender uma call e uma put OTM, cada uma protegida por uma compra mais OTM**.
+
+- **Vende** call K40 e **compra** call K42 (proteção do lado de cima)
+- **Vende** put K36 e **compra** put K34 (proteção do lado de baixo)
+- Você recebe crédito e fica com o risco travado na largura
+
+## Números (PETR4 a R$38)
+- Crédito recebido: R$0,80 por ação
+- Risco máximo: (largura − crédito) = R$1,20 por ação
+- Lucro máximo: o crédito, se o ativo ficar entre K36 e K40
+        `,
+      },
+      {
+        titulo: "A troca que você faz",
+        corpo: `
+| | Strangle vendido (sem proteção) | Iron condor |
+|---|---|---|
+| Risco | Ilimitado (call) | Limitado (largura − crédito) |
+| Colateral | Alto | Menor |
+| Lucro máximo | O crédito | O crédito |
+| Quando | Vendedor experiente | Vendedor que limita o risco |
+
+O iron condor não é "vender volatilidade": é **expressar a hipótese de que o ativo fica dentro do range** — com a conta máxima conhecida antes de enviar.
+        `,
+      },
+    ],
+    comparativo: {
+      titulo: "Strangle vendido × Iron Condor",
+      colunas: ["", "Strangle vendido", "Iron Condor"],
+      linhas: [
+        { item: "Risco máximo", valores: ["Ilimitado em um lado", "Limitado (largura − crédito)"] },
+        { item: "Lucro máximo", valores: ["Crédito", "Crédito"] },
+        { item: "Colateral exigido", valores: ["Alto", "Menor"] },
+        { item: "Hipótese", valores: ["Range apertado, aguenta risco", "Range + risco travado"] },
+      ],
+    },
+    cenarios: [
+      {
+        titulo: "O ativo fica no range",
+        tom: "ganho",
+        descricao:
+          "PETR4 passa o mês entre R$36 e R$40. As quatro opções expiram OTM e você embolsa o crédito inteiro — o lucro máximo da estrutura.",
+      },
+      {
+        titulo: "O ativo encosta em um strike",
+        tom: "neutro",
+        descricao:
+          "PETR4 chega a R$40,10. A call vendida começa a valorizar; a proteção K42 segura o lado. Resultado parcial — o crédito vai encolhendo.",
+      },
+      {
+        titulo: "O ativo fura o range",
+        tom: "perda",
+        descricao:
+          "PETR4 dispara para R$45. A call K40 vendida queima; a K42 comprada limita a perda na largura (R$2,00) − crédito recebido. A perda máxima é conhecida desde o início.",
+      },
+    ],
+    analogia:
+      "Cobrança de portaria de condomínio: você recebe a taxa (crédito) todo mês e o portão trava os dois lados — se alguém estourar o portão (furar o range), a perda é limitada pelo que a estrutura aguenta.",
+    naPratica: {
+      titulo: "Antes de montar o iron condor",
+      passos: [
+        "A hipótese é lateralização? Se espera movimento grande, o condor é o oposto da tese.",
+        "O range vendeu (strikes vendidos) cobre onde o ativo 'vive'?",
+        "Risco máximo = largura − crédito. Cabe na regra de risco?",
+        "Liquidez nas quatro pernas? Perna ilíquida vira prisão.",
+      ],
+    },
+    missao: {
+      titulo: "O mês da calmaria",
+      situacao:
+        "PETR4 oscila entre R$37 e R$39 há 3 semanas. Você acredita que segue nesse range no próximo mês. O crédito de um condor K40/K42 + K36/K34 é R$0,80; a largura é R$2,00.",
+      pergunta: "Qual decisão expressa a sua hipótese?",
+      opcoes: [
+        {
+          texto: "Montar o iron condor, com risco máximo conhecido (largura − crédito)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Hipótese de range + risco travado: você recebe o crédito se o range segurar e sabe a perda máxima antes de enviar.",
+        },
+        {
+          texto: "Comprar straddle, pois o mercado 'pode sair do range'",
+          tom: "errada",
+          feedback:
+            "Isso é apostar contra a sua própria hipótese. Se a tese é lateralização, a estrutura que a expressa vende o range — não compra movimento.",
+        },
+        {
+          texto: "Vender só a call K40 e a put K36 (strangle a descoberto)",
+          tom: "quase",
+          feedback:
+            "Quase: a hipótese é a mesma, mas o risco do lado vendido fica ilimitado. O condor existe para você não precisar aguentar uma fuga sem teto.",
+        },
+        {
+          texto: "Não operar, pois range é 'falta de oportunidade'",
+          tom: "quase",
+          feedback:
+            "Quase: não operar é legítimo. Mas a calmaria é uma hipótese como qualquer outra — e o condor é a estrutura feita para ela.",
+        },
+      ],
+      termosExplicacao: ["condor", "crédito", "largura", "range", "risco", "lateral"],
+      aindaPratique: "calcular o risco máximo de um condor (largura − crédito)",
+      transferencia: {
+        titulo: "O range furou",
+        situacao:
+          "PETR4 saiu do range e está a R$42,50. Sua call K40 vendida está ITM; a proteção K42 segura a largura. Faltam 10 dias.",
+        pergunta: "O que a sua tese original manda fazer?",
+        opcoes: [
+          {
+            texto:
+              "Avaliar encerrar o lado ameaçado com a perda controlada — a tese de range morreu",
+            tom: "correta",
+            feedback:
+              "Boa gestão. A hipótese (range) falhou: o que resta é executar a saída com a perda máxima conhecida, sem improviso.",
+          },
+          {
+            texto: "Comprar mais calls K40 para 'empurrar o preço de volta'",
+            tom: "errada",
+            feedback:
+              "Comprar contra a própria estrutura é dobrar o risco para defender uma tese morta.",
+          },
+          {
+            texto: "Rolar as pernas vendidas para strikes mais longe",
+            tom: "quase",
+            feedback:
+              "Quase: rolar é gestão — mas só com hipótese nova. Rolar porque 'a tese vai voltar' é insistir no erro.",
+          },
+          {
+            texto: "Deixar vencer, pois 'ainda pode voltar'",
+            tom: "quase",
+            feedback:
+              "Quase: a proteção segura a perda, mas deixar sem stop é transformar gestão em esperança. Defina o ponto de saída antes.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "Qual hipótese o iron condor expressa?",
+        alternativas: [
+          "Movimento grande para qualquer lado",
+          "Lateralização: o ativo fica dentro de um range",
+          "Alta forte",
+          "Queda forte",
+        ],
+        correta: 1,
+        explicacao:
+          "Vende o range dos dois lados: lucra se o ativo ficar entre os strikes vendidos.",
+      },
+      {
+        pergunta: "Condor com crédito de R$0,80 e largura de R$2,00. Qual o risco máximo?",
+        alternativas: ["R$0,80", "R$2,00", "R$1,20", "Ilimitado"],
+        correta: 2,
+        explicacao: "Risco máximo = largura − crédito = 2,00 − 0,80 = R$1,20 por ação.",
+      },
+      {
+        pergunta: "Por que o iron condor protege as pernas vendidas?",
+        alternativas: [
+          "Para aumentar o crédito",
+          "Para limitar o risco no caso de fuga do range",
+          "Para evitar imposto",
+          "Para reduzir o vencimento",
+        ],
+        correta: 1,
+        explicacao: "A compra mais OTM trava a perda na largura: risco conhecido antes de enviar.",
+      },
+    ],
+  },
+  {
+    slug: "comparar-estruturas-de-alta",
+    ordem: 19,
+    nivel: 4,
+    titulo: "Lição 19 — Comparar: estruturas para hipótese de alta",
+    resumo:
+      "CALL comprada, trava de alta e venda coberta não são '3 jeitos de ganhar'. São 3 distribuições de risco e retorno para a mesma hipótese.",
+    problema: {
+      titulo: "Três respostas para a mesma pergunta",
+      texto:
+        "Sua hipótese: PETR4 sobe. Agora escolha: CALL comprada, trava de alta ou venda coberta. Cada uma diz 'sim' à alta — e 'não' a algo diferente. Escolher sem comparar é escolher no escuro.",
+      pergunta: "O que cada estrutura troca para expressar a sua hipótese?",
+    },
+    conceitos: [
+      {
+        titulo: "Hipótese primeiro, estrutura depois",
+        corpo: `
+A regra central do Zero ao Trade: **estruturas expressam hipóteses** — cada uma tem uma distribuição própria de risco e retorno. Nenhuma é "a melhor para subir": cada uma responde a uma pergunta diferente.
+
+**Perguntas que mudam a escolha:**
+- Quanto posso perder se a alta não vier?
+- Quanto da alta quero capturar?
+- Quanto posso pagar (ou imobilizar) agora?
+- O tempo joga contra ou a favor?
+
+A resposta a essas perguntas — não a direção sozinha — escolhe a estrutura.
+        `,
+      },
+      {
+        titulo: "As três estruturas lado a lado",
+        corpo: `
+| | CALL comprada | Trava de alta | Venda coberta |
+|---|---|---|---|
+| Exige ter ações? | Não | Não | Sim |
+| Perda máxima | Prêmio | Débito | A queda das ações − prêmio |
+| Lucro máximo | Ilimitado | Limitado (largura) | Limitado (strike + prêmio) |
+| Custo | Prêmio cheio | Débito menor | Recebe prêmio |
+| Tempo | Contra (theta) | Contra (theta) | A favor (coleta theta) |
+
+**Venda coberta não é "o mesmo" que comprar call barato**: é expressar alta moderada já tendo as ações — o prêmio recebido compensa parte da queda, em troca de desistir do upside acima do strike.
+        `,
+      },
+    ],
+    comparativo: {
+      titulo: "CALL comprada × Trava de alta × Venda coberta",
+      colunas: ["", "CALL comprada", "Trava de alta", "Venda coberta"],
+      linhas: [
+        {
+          item: "Custo de entrada",
+          valores: ["Prêmio inteiro", "Débito (prêmio − prêmio)", "Só as ações (recebe prêmio)"],
+        },
+        { item: "Perda máxima", valores: ["Prêmio", "Débito", "Queda das ações − prêmio"] },
+        { item: "Lucro máximo", valores: ["Ilimitado", "Largura − débito", "Strike + prêmio"] },
+        { item: "Breakeven", valores: ["Strike + prêmio", "Strike + débito", "Ações − prêmio"] },
+        { item: "Sensibilidade ao tempo", valores: ["Perde", "Perde", "Ganha"] },
+        { item: "Requisito", valores: ["Nenhum", "Nenhum", "Ter as ações"] },
+      ],
+    },
+    cenarios: [
+      {
+        titulo: "Alta forte e rápida",
+        tom: "ganho",
+        descricao:
+          "PETR4 dispara 15% em 2 semanas. A CALL comprada ganha mais que tudo (ilimitado). A trava para no strike vendido. A coberta é chamada e entrega as ações no strike.",
+      },
+      {
+        titulo: "Alta lenta e moderada",
+        tom: "neutro",
+        descricao:
+          "PETR4 sobe 3% devagar. A CALL comprada luta contra o theta e pode empatar. A trava captura parte do movimento. A coberta embolsa o prêmio e ainda ganha na ação.",
+      },
+      {
+        titulo: "O ativo cai",
+        tom: "perda",
+        descricao:
+          "PETR4 cai 8%. A CALL vira pó (perde o prêmio). A trava perde só o débito. A coberta perde na ação, mas o prêmio recebido amortece a queda.",
+      },
+    ],
+    analogia:
+      "Pedir delivery: pizza (call) é ótima se a fome for grande e imediata; o combo (trava) capa o preço e o tamanho; a marmita (coberta) você já tem a carne em casa e só paga o tempero.",
+    naPratica: {
+      titulo: "O algoritmo da escolha consciente",
+      passos: [
+        "Escrevo a hipótese: direção, força, prazo e capital disponível.",
+        "Listo as estruturas que expressam essa hipótese.",
+        "Comparo: perda máxima, lucro máximo, custo, breakeven, tempo.",
+        "Escolho a que cabe nas minhas regras — não a 'que mais ganha'.",
+      ],
+    },
+    missao: {
+      titulo: "Capital limitado, alta moderada",
+      situacao:
+        "Sua hipótese: alta moderada de PETR4 nas próximas semanas. Você não tem ações, o capital é limitado e aceita abrir mão de parte do lucro potencial para reduzir o custo e o risco.",
+      pergunta: "Qual estrutura faz mais sentido estudar e montar?",
+      opcoes: [
+        {
+          texto: "Trava de alta (call comprada + call vendida)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Alta moderada + capital limitado + aceitar lucro menor: a trava reduz o débito e trava a perda — exatamente a troca que a sua hipótese permite.",
+        },
+        {
+          texto: "CALL comprada a seco",
+          tom: "quase",
+          feedback:
+            "Quase: a call expressa a mesma direção, mas paga prêmio cheio por lucro ilimitado — que a sua hipótese de alta 'moderada' não vai usar, e o capital limitado pune.",
+        },
+        {
+          texto: "Venda coberta",
+          tom: "quase",
+          feedback:
+            "Quase: coleta theta e tem risco menor, mas exige ter as ações — que você não tem. Sem as ações, ela não é uma opção.",
+        },
+        {
+          texto: "Qualquer uma, pois todas 'ganham com a alta'",
+          tom: "errada",
+          feedback:
+            "Escolher pela direção sozinha é o erro que este nível existe para eliminar: cada estrutura distribui risco e retorno de um jeito — a direção não decide sozinha.",
+        },
+      ],
+      termosExplicacao: ["trava", "débito", "largura", "breakeven", "risco", "capital"],
+      aindaPratique: "comparar custo e perda máxima das três estruturas de alta antes de escolher",
+      transferencia: {
+        titulo: "A hipótese mudou de força",
+        situacao:
+          "Você montou uma trava de alta. Uma semana depois, os fundamentos melhoram e a hipótese vira alta forte — e você quer capturar mais.",
+        pergunta: "Qual é a decisão mais alinhada ao processo?",
+        opcoes: [
+          {
+            texto:
+              "Avaliar se a trava ainda cabe: o upside virou o que importa — talvez a call a seco seja a estrutura da hipótese nova",
+            tom: "correta",
+            feedback:
+              "Boa leitura. Hipótese nova pode pedir estrutura nova: comparar de novo (custo × upside) é o processo — decidir no piloto automático é o erro.",
+          },
+          {
+            texto: "Manter a trava até o fim 'para não perder o que já investiu'",
+            tom: "quase",
+            feedback:
+              "Quase: manter é legítimo se a regra manda, mas 'não perder o investido' é âncora, não critério. Reavalie com os números na mesa.",
+          },
+          {
+            texto: "Somar uma call a seco por cima da trava",
+            tom: "quase",
+            feedback:
+              "Quase: é uma possibilidade real de reexpressar a hipótese — mas precisa passar pela mesma comparação: novo custo, nova perda máxima, novo breakeven.",
+          },
+          {
+            texto: "Vender a trava agora e comprar a call a seco sem comparar",
+            tom: "errada",
+            feedback:
+              "Trocar de estrutura por empolgação é o impulso com roupagem de análise. Compare os números das duas antes de qualquer movimento.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "Qual pergunta NÃO decide a escolha entre as estruturas de alta?",
+        alternativas: [
+          "Quanto posso perder se a alta não vier?",
+          "Quanto da alta quero capturar?",
+          "Qual estrutura 'vai dar mais certo'?",
+          "Quanto posso pagar agora?",
+        ],
+        correta: 2,
+        explicacao:
+          "'Dar certo' é resultado, não critério. Critérios são distribuições: custo, perda, lucro, breakeven, tempo.",
+      },
+      {
+        pergunta: "Sem ações na carteira, qual estrutura fica indisponível?",
+        alternativas: ["CALL comprada", "Trava de alta", "Venda coberta", "CALL + trava"],
+        correta: 2,
+        explicacao: "Venda coberta exige ter as ações para vender a call contra elas.",
+      },
+      {
+        pergunta:
+          "Hipótese de alta moderada, capital limitado, aceita abrir mão do upside. Qual estrutura expressa melhor?",
+        alternativas: ["CALL comprada a seco", "Trava de alta", "Venda coberta", "Iron condor"],
+        correta: 1,
+        explicacao:
+          "A trava troca o upside ilimitado por débito menor e risco travado — alinhada a capital limitado e alta moderada.",
+      },
+    ],
+  },
+  {
+    slug: "comparar-estruturas-neutras",
+    ordem: 20,
+    nivel: 4,
+    titulo: "Lição 20 — Comparar: estruturas para hipótese neutra",
+    resumo:
+      "Straddle, strangle e iron condor: três maneiras diferentes de dizer 'o mercado vai se mover — ou não'.",
+    problema: {
+      titulo: "Neutro não é 'sem opinião'",
+      texto:
+        "Você acredita que PETR4 vai ficar lateral. 'Neutro' não é ausência de tese: é uma tese de magnitude. Straddle, strangle e condor respondem à MESMA tese de jeitos opostos — e escolher o errado é operar contra si mesmo.",
+      pergunta: "O que separa comprar movimento de vender movimento?",
+    },
+    conceitos: [
+      {
+        titulo: "Duas famílias para a mesma lateralização",
+        corpo: `
+A hipótese neutra tem duas versões — e elas são opostas:
+
+**1. Vai andar, não sei pra onde** (compra movimento): *straddle* e *strangle*.
+**2. Vai ficar parado dentro de um range** (venda de movimento): *iron condor*.
+
+| | Compra de movimento | Venda de movimento |
+|---|---|---|
+| Lucro quando | O ativo anda mais que o custo | O ativo fica dentro do range |
+| Inimigo | Theta e IV crush | Fuga do range (movimento grande) |
+| Perda máxima | Prêmio pago | Largura − crédito |
+        `,
+      },
+      {
+        titulo: "As três estruturas lado a lado",
+        corpo: `
+| | Straddle | Strangle | Iron condor |
+|---|---|---|---|
+| O que faz | Compra call + put ATM | Compra call + put OTM | Vende call/put OTM protegidas |
+| Custo | Alto | Médio | Recebe crédito |
+| Movimento necessário | Strike ± custo | Strikes ± custo | Que o ativo FIQUE no range |
+| Perda máxima | Prêmio total | Prêmio total | Largura − crédito |
+| Lucro máximo | Ilimitado | Ilimitado | O crédito |
+
+A pergunta que separa tudo: **você espera movimento ou calmaria?** Compra movimento ou vende movimento — a partir daí, a escolha entre as duas estruturas de cada família é questão de custo e exigência.
+        `,
+      },
+    ],
+    comparativo: {
+      titulo: "Straddle × Strangle × Iron Condor",
+      colunas: ["", "Straddle", "Strangle", "Iron Condor"],
+      linhas: [
+        {
+          item: "Hipótese",
+          valores: [
+            "Movimento grande",
+            "Movimento grande, custo menor",
+            "Range: movimento pequeno",
+          ],
+        },
+        { item: "Custo", valores: ["Alto (ATM)", "Médio (OTM)", "Recebe crédito"] },
+        { item: "Perda máxima", valores: ["Prêmio total", "Prêmio total", "Largura − crédito"] },
+        { item: "Lucro máximo", valores: ["Ilimitado", "Ilimitado", "Crédito"] },
+        {
+          item: "Exigência",
+          valores: ["Andar > custo", "Andar > strikes + custo", "Ficar dentro do range"],
+        },
+      ],
+    },
+    cenarios: [
+      {
+        titulo: "O ativo fica parado",
+        tom: "ganho",
+        descricao:
+          "PETR4 anda 0,3% no mês. O condor embolsa o crédito (lucro máximo). Straddle e strangle perdem o prêmio para o theta — a compra de movimento errou a magnitude.",
+      },
+      {
+        titulo: "O ativo anda moderado",
+        tom: "neutro",
+        descricao:
+          "PETR4 anda 2,5%. O straddle talvez alcance o breakeven; o strangle ainda não; o condor vê o crédito encolher. Resultado intermediário para todos.",
+      },
+      {
+        titulo: "O ativo anda muito",
+        tom: "perda",
+        descricao:
+          "PETR4 anda 7%. Straddle e strangle lucram forte. O condor furou o range: perde até a largura − crédito — a perda máxima conhecida desde o início.",
+      },
+    ],
+    analogia:
+      "Aposta em campeonato: você pode apostar que 'vai ter gol na partida' (compra movimento) ou que 'a partida termina 0x0' (venda de movimento). São a mesma incerteza — com dinheiro apostado em lados opostos.",
+    naPratica: {
+      titulo: "O algoritmo da escolha consciente",
+      passos: [
+        "Minha hipótese é movimento OU range? (É aqui que tudo se decide.)",
+        "Movimento: straddle (menos exigência) ou strangle (menos custo)?",
+        "Range: o condor cobre o range onde o ativo vive?",
+        "Em ambos: IV está baixa (compra) ou o crédito compensa o risco (venda)?",
+      ],
+    },
+    missao: {
+      titulo: "O gráfico de lado",
+      situacao:
+        "PETR4 está presa entre R$37 e R$39 há um mês. A IV está baixa. Você quer expressar essa lateralização — e seu capital é limitado.",
+      pergunta: "Qual estrutura expressa a hipótese e respeita o capital?",
+      opcoes: [
+        {
+          texto: "Iron condor (vender o range com proteção)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Hipótese de range + IV baixa não favorece compra de movimento — e o condor recebe crédito por uma tese que você acredita.",
+        },
+        {
+          texto: "Straddle, pois 'o mercado sempre anda'",
+          tom: "errada",
+          feedback:
+            "Você está comprando movimento contra a própria hipótese de lateralização — e com IV baixa e range firme, é a estrutura que mais perde.",
+        },
+        {
+          texto: "Strangle, pois é mais barato que o straddle",
+          tom: "quase",
+          feedback:
+            "Quase: o strangle também compra movimento — a hipótese é o oposto. Barato contra a própria tese continua sendo contra.",
+        },
+        {
+          texto: "Não operar, pois 'lateralização não paga'",
+          tom: "quase",
+          feedback:
+            "Quase: não operar é legítimo. Mas o range firme é exatamente a hipótese do condor — a estrutura existe para ela.",
+        },
+      ],
+      termosExplicacao: ["condor", "range", "crédito", "movimento", "iv", "lateral"],
+      aindaPratique:
+        "classificar uma hipótese como compra ou venda de movimento antes de escolher a estrutura",
+      transferencia: {
+        titulo: "O range que se apertou",
+        situacao:
+          "Você montou um iron condor. Duas semanas depois, um evento marca a agenda e a IV dispara — a calmaria que você esperava virou movimento.",
+        pergunta: "O que a sua hipótese original manda fazer?",
+        opcoes: [
+          {
+            texto:
+              "Reavaliar a hipótese: se virou movimento, o condor é a estrutura errada — encerrar com a perda controlada",
+            tom: "correta",
+            feedback:
+              "Boa gestão. A hipótese morreu: encerrar o condor (perda limitada conhecida) é honestidade com o processo — não é 'perder', é corrigir a tese.",
+          },
+          {
+            texto: "Manter e torcer para o evento não andar",
+            tom: "quase",
+            feedback:
+              "Quase: manter sem hipótese é esperança. Se o evento tem cara de movimento, a exposição correta é comprar movimento — não segurar a venda.",
+          },
+          {
+            texto: "Rolar o condor para strikes mais longe",
+            tom: "quase",
+            feedback:
+              "Quase: rolar é gestão se a tese de range seguir viva. Mas o evento mudou a IV: o crédito novo compensa o risco novo?",
+          },
+          {
+            texto: "Comprar straddle por cima para 'proteger' o condor",
+            tom: "errada",
+            feedback:
+              "Sobrepor compra e venda de movimento é pagar dois prêmios para ficar neutro — custo puro, sem tese.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "Qual pergunta separa straddle/strangle do iron condor?",
+        alternativas: [
+          "A direção que eu espero",
+          "Eu espero movimento grande ou calmaria (range)?",
+          "O preço do ativo",
+          "O vencimento que escolho",
+        ],
+        correta: 1,
+        explicacao:
+          "Compra de movimento (straddle/strangle) vs venda de movimento (condor): a magnitude esperada define a família.",
+      },
+      {
+        pergunta: "Hipótese de range com IV baixa. Qual estrutura é a mais alinhada?",
+        alternativas: ["Straddle", "Strangle", "Iron condor", "CALL comprada"],
+        correta: 2,
+        explicacao:
+          "Range + IV baixa = vender o range: o condor recebe crédito por uma calmaria que você acredita.",
+      },
+      {
+        pergunta: "O que o straddle e o strangle têm em comum?",
+        alternativas: [
+          "Os dois vendem movimento",
+          "Os dois compram movimento com perda limitada ao prêmio",
+          "Os dois têm lucro máximo limitado",
+          "Os dois exigem ter ações",
+        ],
+        correta: 1,
+        explicacao:
+          "Ambos compram movimento (lucro ilimitado, perda = prêmio); diferem no custo e no movimento exigido.",
+      },
+    ],
+  },
+  {
+    slug: "gestao-da-decisao",
+    ordem: 21,
     nivel: 5,
-    titulo: "Lição 14 — Tributação de opções (básico)",
+    titulo: "Lição 21 — Gestão da decisão: o ciclo completo",
+    resumo:
+      "Hipótese → estratégias possíveis → comparação → risco → regras → simulação → tese → registro → revisão. O Academy é a primeira etapa do ciclo decisório.",
+    problema: {
+      titulo: "Saber as estruturas não é saber decidir",
+      texto:
+        "Você conhece call, put, travas, condor. Ainda assim, decide por impulso: entra sem hipótese, escolhe a estrutura 'da moda', não registra o porquê — e na revisão não sabe o que aconteceu. Conhecer as ferramentas não é o fim: é o vocabulário.",
+      pergunta: "O que transforma conhecimento em decisão consciente?",
+    },
+    conceitos: [
+      {
+        titulo: "O ciclo da decisão",
+        corpo: `
+Estratégia é conhecimento; **decisão é aplicação desse conhecimento**. A sequência não é negociável:
+
+**Hipótese → Estratégias possíveis → Comparação → Risco/retorno → Regras pessoais → Simulação → Decisão → Registro → Revisão**
+
+| Etapa | Onde acontece | O que sai dela |
+|---|---|---|
+| Hipótese | Sua cabeça / o copilot | "Alta moderada, 3 semanas, R$300" |
+| Estratégias possíveis | O laboratório de estratégias | CALL, trava, coberta |
+| Comparação | As tabelas comparativas | Distribuições de risco/retorno |
+| Risco | A regra do 1% | Tamanho da posição |
+| Regras | Suas regras pessoais | "Se furar, encerro" |
+| Simulação | O simulador | O payoff acontecendo |
+| Decisão | O diário | A tese escrita |
+| Revisão | A revisão | "A decisão foi boa, não o resultado" |
+        `,
+      },
+      {
+        titulo: "Estrutura é linguagem, não receita",
+        corpo: `
+**Nenhuma estrutura é "para ganhar dinheiro".** Cada estrutura expressa uma hipótese com uma distribuição própria de risco e retorno.
+
+- Ninguém te diz "use trava porque vai subir" — você diz "minha hipótese de alta moderada, com capital limitado, pede risco travado".
+- A comparação entre estruturas é sobre **distribuições**, nunca sobre "qual ganha mais".
+- Se uma estrutura "não combina com a sua hipótese", o problema é o encaixe — não a estrutura.
+
+Essa é a fronteira entre educação financeira e recomendação. O Zero ao Trade fica do lado da educação.
+        `,
+      },
+    ],
+    analogia:
+      "Idioma: gramática (as estruturas) não é o mesmo que saber conversar (decidir). Você pode dominar tempos verbais e ainda assim não saber o que dizer na hora certa — o que transforma vocabulário em conversa é o processo de escolher a frase.",
+    naPratica: {
+      titulo: "O ritual de toda decisão",
+      passos: [
+        "Escreva a hipótese: direção, força, prazo, capital. Sem isso, não há estrutura.",
+        "Liste as estruturas que expressam a hipótese e compare as distribuições.",
+        "Aplique a regra de risco (1%) e as suas regras pessoais.",
+        "Simule antes: veja o payoff, o theta e a perda máxima acontecendo.",
+        "Registre a tese no diário: por que essa estrutura, e não as outras.",
+        "Revise depois: a DECISÃO foi boa (processo) ou o resultado é que foi?",
+      ],
+    },
+    missao: {
+      titulo: "Ordenando o processo",
+      situacao:
+        "Você quer operar a alta da PETR4. Misturou as etapas do ciclo: já escolheu a trava de alta ANTES de escrever a hipótese, e pensa em pular a simulação 'porque é rápido'.",
+      pergunta: "Qual é a ordem correta do processo?",
+      opcoes: [
+        {
+          texto:
+            "Hipótese → estruturas possíveis → comparação → risco → regras → simulação → decisão",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Hipótese primeiro; a estrutura aparece como resposta à comparação — nunca como ponto de partida.",
+        },
+        {
+          texto: "Estrutura → hipótese → simulação → comparação",
+          tom: "errada",
+          feedback:
+            "Começar pela estrutura é decidir pelo instrumento, não pela hipótese — o caminho inverso do processo. É como escolher a chave antes de saber a porta.",
+        },
+        {
+          texto: "Hipótese → estrutura → decisão, sem simulação",
+          tom: "quase",
+          feedback:
+            "Quase: a sequência começa certa, mas pular a simulação é abrir mão de ver o risco acontecendo antes do dinheiro.",
+        },
+        {
+          texto: "Decisão → hipótese (escrever depois 'para confirmar')",
+          tom: "errada",
+          feedback:
+            "Escrever a hipótese depois da decisão é racionalização: o processo existe para decidir antes de agir, não para justificar depois.",
+        },
+      ],
+      termosExplicacao: ["hipótese", "comparação", "simulação", "regras", "processo", "ciclo"],
+      aindaPratique: "rodar o ciclo completo para uma operação hipotética no simulador + diário",
+      transferencia: {
+        titulo: "O convite para pular etapas",
+        situacao:
+          "Um amigo mostra uma operação que 'deu muito certo' com iron condor e te convida a copiar a estrutura na próxima semana.",
+        pergunta: "O que o processo manda fazer?",
+        opcoes: [
+          {
+            texto:
+              "Começar pela sua hipótese: o que EU espero do mercado? Só então comparar estruturas",
+            tom: "correta",
+            feedback:
+              "Boa decisão. A estrutura do amigo nasceu da hipótese DELE. A sua só existe se a sua hipótese pedir.",
+          },
+          {
+            texto: "Copiar a estrutura, já que funcionou",
+            tom: "errada",
+            feedback:
+              "Copiar resultado sem hipótese é o padrão clássico de quem perde: o resultado do outro não diz nada sobre a sua distribuição de risco.",
+          },
+          {
+            texto: "Copiar, mas com menos capital",
+            tom: "quase",
+            feedback:
+              "Quase: reduzir tamanho não corrige a ausência de hipótese — é o mesmo erro com menos volume.",
+          },
+          {
+            texto: "Pedir ao copilot 'essa estrutura é boa?'",
+            tom: "quase",
+            feedback:
+              "Quase: o copilot pode explicar a estrutura — mas 'é boa' não é a pergunta. A pergunta é: a sua hipótese pede essa estrutura?",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "Qual a primeira etapa do ciclo de decisão?",
+        alternativas: [
+          "Escolher a estrutura",
+          "Escrever a hipótese",
+          "Abrir o simulador",
+          "Registrar a tese",
+        ],
+        correta: 1,
+        explicacao:
+          "Hipótese primeiro: direção, força, prazo e capital. A estrutura vem como resposta.",
+      },
+      {
+        pergunta: "Estratégia, no Zero ao Trade, é:",
+        alternativas: [
+          "Uma receita para lucrar",
+          "Uma linguagem para expressar uma hipótese, com distribuição própria de risco e retorno",
+          "Uma recomendação do sistema",
+          "Um atalho para não pensar",
+        ],
+        correta: 1,
+        explicacao:
+          "Estruturas expressam hipóteses. O sistema nunca transforma estratégia em recomendação pessoal.",
+      },
+      {
+        pergunta: "O que a revisão avalia, na visão do Zero ao Trade?",
+        alternativas: [
+          "Se a operação deu lucro",
+          "Se a decisão seguiu o processo — independente do resultado",
+          "Se a estrutura era 'da moda'",
+          "Se o mercado previu certo",
+        ],
+        correta: 1,
+        explicacao: "Resultado é sorte com processo; processo é o que você controla e revisa.",
+      },
+    ],
+  },
+  {
+    slug: "tributacao-basica",
+    ordem: 22,
+    nivel: "pratica",
+    titulo: "Lição 22 — Tributação de opções (básico)",
     resumo:
       "15% sobre lucro líquido mensal (swing) e 20% em day trade. Opções não têm isenção dos R$20 mil.",
     problema: {
@@ -2286,9 +3894,9 @@ Prejuízo de um mês **abate lucro futuro** — sem prazo de validade. Registre 
   },
   {
     slug: "darf-e-compensacao",
-    ordem: 15,
-    nivel: 5,
-    titulo: "Lição 15 — DARF, compensação de prejuízo e controle mensal",
+    ordem: 23,
+    nivel: "pratica",
+    titulo: "Lição 23 — DARF, compensação de prejuízo e controle mensal",
     resumo:
       "Como apurar, gerar DARF código 6015, e usar prejuízo pra abater lucro futuro sem prazo.",
     problema: {
@@ -2467,10 +4075,24 @@ export function getLesson(slug: string) {
   return LESSONS.find((l) => l.slug === slug);
 }
 
-export const NIVEIS = {
-  1: "Fundamentos",
-  2: "Preço & Tempo",
-  3: "Estratégias básicas",
-  4: "Rolagem & Travas",
-  5: "Tributação",
+export const NIVEIS: Record<LessonNivel, string> = {
+  1: "Entender",
+  2: "Pensar",
+  3: "Construir",
+  4: "Comparar",
+  5: "Decidir",
+  pratica: "Prática",
 };
+
+export const NIVEIS_DESC: Record<LessonNivel, string> = {
+  1: "O que são opções, prêmio, strike, vencimento, comprador e vendedor.",
+  2: "Alta, baixa, lateralização, tempo, volatilidade e risco.",
+  3: "As estruturas que expressam cada hipótese — risco e retorno sempre conhecidos antes.",
+  4: "Tenho uma hipótese: qual estrutura a expressa melhor?",
+  5: "Regras → simulação → risco → tese → registro → revisão.",
+  pratica: "Tributação é uma trilha transversal à decisão — não um estágio dela.",
+};
+
+export function nivelLabel(nivel: LessonNivel): string {
+  return nivel === "pratica" ? "Prática" : `Nível ${nivel}`;
+}

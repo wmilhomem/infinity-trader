@@ -1,7 +1,8 @@
 import { Clock } from "lucide-react";
+import { nivelLabel, type LessonNivel } from "@/lib/lessons";
 
 type Props = {
-  nivel: number;
+  nivel: LessonNivel;
   nivelNome: string;
   ordem: number;
   total: number;
@@ -31,7 +32,7 @@ export function LessonProgress({
       <div className="mb-2 flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
           <span className="shrink-0 text-[11px] font-semibold uppercase tracking-widest text-primary">
-            Nível {nivel} · {nivelNome}
+            {nivelLabel(nivel)} · {nivelNome}
           </span>
           <span className="hidden gap-[3px] sm:flex" aria-hidden>
             {Array.from({ length: boxes }).map((_, i) => (

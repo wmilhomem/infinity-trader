@@ -1,5 +1,5 @@
 import { ArrowRight, Check, Clock, Target } from "lucide-react";
-import type { Lesson } from "@/lib/lessons";
+import { nivelLabel, type Lesson } from "@/lib/lessons";
 import type { LessonMeta } from "@/lib/lesson-meta";
 import { LessonTimeline, type LessonTimelineStep } from "@/components/lessons/LessonTimeline";
 
@@ -23,7 +23,7 @@ export function LessonHero({ lesson, meta, total, tema, timeline, onJump, onCome
         <span
           className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-widest ${tema.border} ${tema.accent}`}
         >
-          Nível {lesson.nivel} · {tema.nome}
+          {nivelLabel(lesson.nivel)} · {tema.nome}
         </span>
         <span className="rounded-full border border-border px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
           Lição {lesson.ordem} de {total}
