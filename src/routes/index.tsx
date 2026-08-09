@@ -346,11 +346,14 @@ function Landing() {
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {PERGUNTAS.map((q, i) => (
             <Reveal key={q} delay={i * 70}>
-              <div className="h-full glass-panel rounded-2xl p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40">
-                <MessageCircleQuestion size={18} className="text-primary" />
-                <p className="mt-4 text-lg leading-snug">{q}</p>
-              </div>
+              <Tilt3D>
+                <div className="h-full overflow-hidden glass-panel rounded-2xl p-6 transition-colors hover:border-primary/40">
+                  <MessageCircleQuestion size={18} className="text-primary" />
+                  <p className="mt-4 text-lg leading-snug">{q}</p>
+                </div>
+              </Tilt3D>
             </Reveal>
+
           ))}
         </div>
 
