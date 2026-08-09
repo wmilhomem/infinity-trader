@@ -24,6 +24,8 @@ import {
   X,
 } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
+import { Tilt3D } from "@/components/landing/Tilt3D";
+import { HeroScene } from "@/components/landing/HeroScene";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -136,35 +138,48 @@ function Eyebrow({ n, children }: { n: string; children: React.ReactNode }) {
 
 function Landing() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
+    <div className="grain relative min-h-screen overflow-hidden bg-background text-foreground">
+      {/* fundo: malha técnica + auroras */}
+      <div className="pointer-events-none absolute inset-0 grid-mesh opacity-[0.5] [mask-image:radial-gradient(90%_60%_at_50%_0%,#000,transparent)]" />
       <div
-        className="pointer-events-none absolute -top-56 left-1/2 h-[560px] w-[900px] -translate-x-1/2 rounded-full opacity-[0.13] blur-3xl"
+        className="zat-aurora pointer-events-none absolute -top-64 left-1/2 h-[620px] w-[1000px] -translate-x-1/2 rounded-full opacity-[0.18] blur-[110px]"
         style={{ background: "radial-gradient(closest-side, oklch(0.78 0.17 65), transparent)" }}
       />
+      <div
+        className="zat-aurora pointer-events-none absolute top-[70vh] -left-40 h-[520px] w-[720px] rounded-full opacity-[0.10] blur-[120px]"
+        style={{ background: "radial-gradient(closest-side, oklch(0.72 0.18 155), transparent)" }}
+      />
 
-      <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="grid size-9 place-items-center rounded-md bg-primary font-mono font-bold text-primary-foreground">
-            0→
-          </div>
-          <div className="font-semibold">Zero ao Trade</div>
-        </Link>
-        <Link
-          to="/auth"
-          search={{ mode: "login" }}
-          className="rounded-md border border-border px-4 py-2 text-sm transition-colors hover:bg-accent"
-        >
-          Entrar
-        </Link>
+
+      <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <Link to="/" className="group flex items-center gap-2.5">
+            <div className="grid size-9 place-items-center rounded-xl bg-primary font-mono font-bold text-primary-foreground shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--primary)_80%,transparent)] transition-transform group-hover:-translate-y-0.5">
+              0→
+            </div>
+            <div className="font-semibold tracking-tight">Zero ao Trade</div>
+          </Link>
+          <Link
+            to="/auth"
+            search={{ mode: "login" }}
+            className="rounded-xl border border-white/10 bg-card/50 px-4 py-2 text-sm backdrop-blur transition-colors hover:bg-accent"
+          >
+            Entrar
+          </Link>
+        </div>
       </header>
 
       {/* HERO */}
-      <section className="relative z-10 mx-auto max-w-4xl px-6 pb-6 pt-16 text-center md:pt-24">
+      <section className="relative z-10 mx-auto max-w-4xl px-6 pb-6 pt-16 text-center md:pt-20">
         <Reveal>
+          <div className="mx-auto mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-card/50 px-4 py-1.5 font-mono text-[11px] tracking-[0.16em] text-muted-foreground backdrop-blur">
+            <span className="size-1.5 animate-pulse rounded-full bg-primary" />
+            DECISION OPERATING SYSTEM
+          </div>
           <h1 className="mx-auto max-w-3xl text-4xl font-bold leading-[1.06] tracking-tight md:text-6xl">
             Pare de operar por impulso.
             <br />
-            <span className="text-primary">Comece a construir um processo.</span>
+            <span className="text-sheen">Comece a construir um processo.</span>
           </h1>
         </Reveal>
 
@@ -174,17 +189,13 @@ function Landing() {
             <br />
             Ele ajuda você a desenvolver uma forma melhor de decidir.
           </p>
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-foreground">
-            Transforme cada operação em aprendizado através de um ciclo contínuo de reflexão,
-            disciplina e evolução.
-          </p>
         </Reveal>
 
         <Reveal delay={180}>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-mono text-xs tracking-wide text-muted-foreground">
             {CICLO_HERO.map((etapa, i) => (
               <span key={etapa} className="flex items-center gap-3">
-                <span className="rounded-full border border-border bg-card/60 px-3 py-1.5 text-foreground">
+                <span className="glass-panel rounded-full px-3 py-1.5 text-foreground">
                   {etapa}
                 </span>
                 {i < CICLO_HERO.length - 1 ? (
@@ -200,22 +211,33 @@ function Landing() {
             <Link
               to="/auth"
               search={{ mode: "signup" }}
-              className="group inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
+              className="group inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground shadow-[0_20px_50px_-20px_color-mix(in_oklab,var(--primary)_90%,transparent)] transition-all hover:-translate-y-0.5 hover:bg-primary/90"
             >
               Começar gratuitamente
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
             </Link>
             <a
               href="#como-funciona"
-              className="rounded-xl border border-border bg-card/60 px-8 py-4 text-sm font-semibold transition-colors hover:bg-accent"
+              className="glass-panel rounded-xl px-8 py-4 text-sm font-semibold transition-colors hover:bg-accent"
             >
               Ver como funciona
             </a>
           </div>
         </Reveal>
+      </section>
 
-        <Reveal delay={340}>
-          <div className="mx-auto mt-16 max-w-xl border-t border-border pt-8 text-sm leading-relaxed text-muted-foreground">
+      {/* CENA 3D */}
+      <section className="relative z-10 -mt-10 px-6">
+        <HeroScene />
+      </section>
+
+      <section className="relative z-10 mx-auto max-w-4xl px-6 text-center">
+        <Reveal delay={120}>
+          <p className="mx-auto max-w-2xl text-lg leading-relaxed text-foreground">
+            Transforme cada operação em aprendizado através de um ciclo contínuo de reflexão,
+            disciplina e evolução.
+          </p>
+          <div className="mx-auto mt-12 max-w-xl border-t border-white/10 pt-8 text-sm leading-relaxed text-muted-foreground">
             Mais de 90% das pessoas físicas registram perdas ao operar de forma recorrente no
             mercado.
             <br />
@@ -225,6 +247,7 @@ function Landing() {
           </div>
         </Reveal>
       </section>
+
 
       {/* 02 — MÉTODO x INFORMAÇÃO */}
       <section className="relative z-10 mx-auto max-w-5xl px-6 py-28">
@@ -239,7 +262,7 @@ function Landing() {
 
         <div className="mt-12 grid gap-4 md:grid-cols-2">
           <Reveal>
-            <div className="h-full rounded-2xl border border-border bg-card p-7">
+            <div className="h-full glass-panel rounded-2xl p-7">
               <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Hoje
               </div>
@@ -295,7 +318,7 @@ function Landing() {
                     <etapa.icon size={20} />
                   </div>
                 </div>
-                <div className="flex-1 rounded-2xl border border-border bg-card px-6 py-4">
+                <div className="flex-1 glass-panel rounded-2xl px-6 py-4">
                   <div className="font-semibold">{etapa.titulo}</div>
                   <p className="text-sm text-muted-foreground">{etapa.desc}</p>
                 </div>
@@ -323,11 +346,14 @@ function Landing() {
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {PERGUNTAS.map((q, i) => (
             <Reveal key={q} delay={i * 70}>
-              <div className="h-full rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40">
-                <MessageCircleQuestion size={18} className="text-primary" />
-                <p className="mt-4 text-lg leading-snug">{q}</p>
-              </div>
+              <Tilt3D>
+                <div className="h-full overflow-hidden glass-panel rounded-2xl p-6 transition-colors hover:border-primary/40">
+                  <MessageCircleQuestion size={18} className="text-primary" />
+                  <p className="mt-4 text-lg leading-snug">{q}</p>
+                </div>
+              </Tilt3D>
             </Reveal>
+
           ))}
         </div>
 
@@ -352,7 +378,7 @@ function Landing() {
             {DIA.map((m, i) => (
               <Reveal key={m.titulo} delay={i * 60}>
                 <div className="flex items-stretch gap-3">
-                  <div className="flex w-56 flex-col rounded-2xl border border-border bg-card p-5">
+                  <div className="flex w-56 flex-col glass-panel rounded-2xl p-5">
                     <div className="text-2xl">{m.emoji}</div>
                     <div className="mt-3 font-semibold leading-snug">{m.titulo}</div>
                     <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{m.desc}</p>
@@ -381,12 +407,15 @@ function Landing() {
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {MODULOS.map((m, i) => (
             <Reveal key={m.verbo} delay={i * 60}>
-              <div className="h-full rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40">
-                <m.icon size={20} className="text-primary" />
-                <div className="mt-4 text-2xl font-bold tracking-tight">{m.verbo}</div>
-                <p className="mt-1 text-[15px] text-muted-foreground">{m.desc}</p>
-              </div>
+              <Tilt3D>
+                <div className="h-full overflow-hidden glass-panel rounded-2xl p-6 transition-colors hover:border-primary/40">
+                  <m.icon size={20} className="text-primary" />
+                  <div className="mt-4 text-2xl font-bold tracking-tight">{m.verbo}</div>
+                  <p className="mt-1 text-[15px] text-muted-foreground">{m.desc}</p>
+                </div>
+              </Tilt3D>
             </Reveal>
+
           ))}
         </div>
       </section>
@@ -403,12 +432,15 @@ function Landing() {
         <div className="mt-12 grid gap-4 md:grid-cols-2">
           {PILARES.map((p, i) => (
             <Reveal key={p.titulo} delay={i * 70}>
-              <div className="h-full rounded-2xl border border-border bg-card p-7">
-                <div className="font-mono text-xs text-primary">0{i + 1}</div>
-                <div className="mt-3 text-xl font-semibold tracking-tight">{p.titulo}</div>
-                <p className="mt-2 leading-relaxed text-muted-foreground">{p.desc}</p>
-              </div>
+              <Tilt3D max={5}>
+                <div className="h-full overflow-hidden glass-panel rounded-2xl p-7">
+                  <div className="font-mono text-xs text-primary">0{i + 1}</div>
+                  <div className="mt-3 text-xl font-semibold tracking-tight">{p.titulo}</div>
+                  <p className="mt-2 leading-relaxed text-muted-foreground">{p.desc}</p>
+                </div>
+              </Tilt3D>
             </Reveal>
+
           ))}
         </div>
       </section>
@@ -439,7 +471,7 @@ function Landing() {
         <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {ENCONTRA.map((item, i) => (
             <Reveal key={item} delay={i * 45}>
-              <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-5 py-4 text-[15px]">
+              <div className="flex items-center gap-3 glass-panel rounded-xl px-5 py-4 text-[15px]">
                 <Check size={16} className="shrink-0 text-success" />
                 {item}
               </div>
@@ -455,7 +487,7 @@ function Landing() {
         </Reveal>
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           <Reveal>
-            <div className="h-full rounded-2xl border border-border bg-card p-8">
+            <div className="h-full glass-panel rounded-2xl p-8">
               <Sprout size={20} className="text-primary" />
               <div className="mt-4 text-2xl font-bold tracking-tight">Nunca operou</div>
               <p className="mt-3 leading-relaxed text-muted-foreground">
@@ -468,7 +500,7 @@ function Landing() {
             </div>
           </Reveal>
           <Reveal delay={100}>
-            <div className="h-full rounded-2xl border border-border bg-card p-8">
+            <div className="h-full glass-panel rounded-2xl p-8">
               <TrendingUp size={20} className="text-primary" />
               <div className="mt-4 text-2xl font-bold tracking-tight">Já opera</div>
               <p className="mt-3 leading-relaxed text-muted-foreground">
