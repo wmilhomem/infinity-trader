@@ -151,29 +151,35 @@ function Landing() {
       />
 
 
-      <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="grid size-9 place-items-center rounded-md bg-primary font-mono font-bold text-primary-foreground">
-            0→
-          </div>
-          <div className="font-semibold">Zero ao Trade</div>
-        </Link>
-        <Link
-          to="/auth"
-          search={{ mode: "login" }}
-          className="rounded-md border border-border px-4 py-2 text-sm transition-colors hover:bg-accent"
-        >
-          Entrar
-        </Link>
+      <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <Link to="/" className="group flex items-center gap-2.5">
+            <div className="grid size-9 place-items-center rounded-xl bg-primary font-mono font-bold text-primary-foreground shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--primary)_80%,transparent)] transition-transform group-hover:-translate-y-0.5">
+              0→
+            </div>
+            <div className="font-semibold tracking-tight">Zero ao Trade</div>
+          </Link>
+          <Link
+            to="/auth"
+            search={{ mode: "login" }}
+            className="rounded-xl border border-white/10 bg-card/50 px-4 py-2 text-sm backdrop-blur transition-colors hover:bg-accent"
+          >
+            Entrar
+          </Link>
+        </div>
       </header>
 
       {/* HERO */}
-      <section className="relative z-10 mx-auto max-w-4xl px-6 pb-6 pt-16 text-center md:pt-24">
+      <section className="relative z-10 mx-auto max-w-4xl px-6 pb-6 pt-16 text-center md:pt-20">
         <Reveal>
+          <div className="mx-auto mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-card/50 px-4 py-1.5 font-mono text-[11px] tracking-[0.16em] text-muted-foreground backdrop-blur">
+            <span className="size-1.5 animate-pulse rounded-full bg-primary" />
+            DECISION OPERATING SYSTEM
+          </div>
           <h1 className="mx-auto max-w-3xl text-4xl font-bold leading-[1.06] tracking-tight md:text-6xl">
             Pare de operar por impulso.
             <br />
-            <span className="text-primary">Comece a construir um processo.</span>
+            <span className="text-sheen">Comece a construir um processo.</span>
           </h1>
         </Reveal>
 
@@ -183,17 +189,13 @@ function Landing() {
             <br />
             Ele ajuda você a desenvolver uma forma melhor de decidir.
           </p>
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-foreground">
-            Transforme cada operação em aprendizado através de um ciclo contínuo de reflexão,
-            disciplina e evolução.
-          </p>
         </Reveal>
 
         <Reveal delay={180}>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-mono text-xs tracking-wide text-muted-foreground">
             {CICLO_HERO.map((etapa, i) => (
               <span key={etapa} className="flex items-center gap-3">
-                <span className="rounded-full border border-border bg-card/60 px-3 py-1.5 text-foreground">
+                <span className="glass-panel rounded-full px-3 py-1.5 text-foreground">
                   {etapa}
                 </span>
                 {i < CICLO_HERO.length - 1 ? (
@@ -209,22 +211,33 @@ function Landing() {
             <Link
               to="/auth"
               search={{ mode: "signup" }}
-              className="group inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
+              className="group inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground shadow-[0_20px_50px_-20px_color-mix(in_oklab,var(--primary)_90%,transparent)] transition-all hover:-translate-y-0.5 hover:bg-primary/90"
             >
               Começar gratuitamente
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
             </Link>
             <a
               href="#como-funciona"
-              className="rounded-xl border border-border bg-card/60 px-8 py-4 text-sm font-semibold transition-colors hover:bg-accent"
+              className="glass-panel rounded-xl px-8 py-4 text-sm font-semibold transition-colors hover:bg-accent"
             >
               Ver como funciona
             </a>
           </div>
         </Reveal>
+      </section>
 
-        <Reveal delay={340}>
-          <div className="mx-auto mt-16 max-w-xl border-t border-border pt-8 text-sm leading-relaxed text-muted-foreground">
+      {/* CENA 3D */}
+      <section className="relative z-10 -mt-4 px-6">
+        <HeroScene />
+      </section>
+
+      <section className="relative z-10 mx-auto max-w-4xl px-6 text-center">
+        <Reveal delay={120}>
+          <p className="mx-auto max-w-2xl text-lg leading-relaxed text-foreground">
+            Transforme cada operação em aprendizado através de um ciclo contínuo de reflexão,
+            disciplina e evolução.
+          </p>
+          <div className="mx-auto mt-12 max-w-xl border-t border-white/10 pt-8 text-sm leading-relaxed text-muted-foreground">
             Mais de 90% das pessoas físicas registram perdas ao operar de forma recorrente no
             mercado.
             <br />
@@ -234,6 +247,7 @@ function Landing() {
           </div>
         </Reveal>
       </section>
+
 
       {/* 02 — MÉTODO x INFORMAÇÃO */}
       <section className="relative z-10 mx-auto max-w-5xl px-6 py-28">
