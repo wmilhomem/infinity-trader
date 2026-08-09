@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { formatarGuiaParaPrompt } from "@/lib/plataforma-guia";
 import {
   formatOmniscientContextForPrompt,
   type OmniscientContext,
@@ -95,9 +96,14 @@ export const Route = createFileRoute("/api/chat")({
         const omniscient = formatOmniscientContextForPrompt(
           threadRes.data.contexto as unknown as OmniscientContext | null,
         );
+        const guiaPlataforma =
+          threadRes.data.context_type && threadRes.data.context_type !== "geral"
+            ? `\n\nGUIA DA PLATAFORMA ZERO AO TRADE\nResponda dúvidas sobre o funcionamento do app com base nestes fatos (não invente funcionalidades que não estão aqui):\n${formatarGuiaParaPrompt()}\n`
+            : "";
         const contextualSystem =
           SYSTEM_PROMPT +
           contextBlock +
+          guiaPlataforma +
           (omniscient
             ? `\n\nQUANDO O USUÁRIO PERGUNTAR SOBRE ESTA SIMULAÇÃO:\n- Use os valores do CONTEXTO abaixo (breakevens, lucro máximo, perda máxima, gregas, PoP) para explicar a mecânica — eles são hipótese didática, não dado real de mercado.\n- Explique POR QUE cada número tem aquele valor usando as analogias do guia (vale-ingresso, seguro de carro, iogurte, plano de celular, carro de corrida).\n- Se a estrutura violar uma regra pessoal do usuário ou gerar alerta, aponte de forma direta e educativa.\n\n${omniscient}\n`
             : "");

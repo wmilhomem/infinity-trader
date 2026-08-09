@@ -1,5 +1,6 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { CopilotBubble } from "@/components/copilot/CopilotBubble";
 import type { ReactNode } from "react";
 import {
   BookOpen,
@@ -79,6 +80,7 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
           ))}
         </nav>
       </main>
+      <CopilotBubble />
     </div>
   );
 }
