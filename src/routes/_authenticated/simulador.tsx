@@ -43,6 +43,8 @@ import type { Json } from "@/integrations/supabase/types";
 import { FLOW_OPERAR_KEY, type FluxoRetomada } from "@/components/FluxoOperarModal";
 import type { Perna } from "@/lib/payoff";
 import { payoffCurve, summary } from "@/lib/payoff";
+import { PRESETS_ESTRATEGIA } from "@/lib/presets-estrategias";
+import { FLOW_LAB_KEY } from "@/lib/fichas-estrategias";
 import { interpretar } from "@/engines/simulation-interpreter";
 import { explicarRiscos } from "@/engines/risk-explainer";
 import { validarRegras, regrasQuePedemConfirmacao, type Regra } from "@/engines/rule-engine";
@@ -91,52 +93,11 @@ export const Route = createFileRoute("/_authenticated/simulador")({
   component: Simulador,
 });
 
-const PRESETS: Record<string, { ativo: string; centro: number; pernas: Perna[] }> = {
-  "trava-alta": {
-    ativo: "PETR4",
-    centro: 38,
-    pernas: [
-      { tipo: "call", acao: "compra", strike: 38, premio: 1.5, quantidade: 100 },
-      { tipo: "call", acao: "venda", strike: 40, premio: 0.6, quantidade: 100 },
-    ],
-  },
-  "call-sozinha": {
-    ativo: "PETR4",
-    centro: 38,
-    pernas: [{ tipo: "call", acao: "compra", strike: 38, premio: 1.5, quantidade: 100 }],
-  },
-  "trava-baixa": {
-    ativo: "PETR4",
-    centro: 38,
-    pernas: [
-      { tipo: "put", acao: "compra", strike: 38, premio: 1.3, quantidade: 100 },
-      { tipo: "put", acao: "venda", strike: 36, premio: 0.5, quantidade: 100 },
-    ],
-  },
-  "put-sozinha": {
-    ativo: "PETR4",
-    centro: 38,
-    pernas: [{ tipo: "put", acao: "compra", strike: 38, premio: 1.3, quantidade: 100 }],
-  },
-  "iron-condor": {
-    ativo: "PETR4",
-    centro: 38,
-    pernas: [
-      { tipo: "put", acao: "compra", strike: 34, premio: 0.2, quantidade: 100 },
-      { tipo: "put", acao: "venda", strike: 36, premio: 0.5, quantidade: 100 },
-      { tipo: "call", acao: "venda", strike: 40, premio: 0.6, quantidade: 100 },
-      { tipo: "call", acao: "compra", strike: 42, premio: 0.2, quantidade: 100 },
-    ],
-  },
-};
+const PRESETS = PRESETS_ESTRATEGIA;
 
-const PRESET_LABEL: Record<string, string> = {
-  "trava-alta": "Trava de alta",
-  "call-sozinha": "Compra de call",
-  "trava-baixa": "Trava de baixa",
-  "put-sozinha": "Compra de put",
-  "iron-condor": "Iron condor",
-};
+const PRESET_LABEL: Record<string, string> = Object.fromEntries(
+  Object.entries(PRESETS_ESTRATEGIA).map(([k, v]) => [k, v.label]),
+);
 
 type Crenca = "subir" | "cair" | "lateral" | "aprender";
 type Forca = "pouco" | "medio" | "muito";
@@ -324,6 +285,30 @@ function Simulador() {
       setTesePartes((t) => ({ ...t, motivo: fluxo.tese }));
     }
   }, [fluxo, tesePartes.motivo]);
+
+  // Ponte do Laboratório de Estratégias: uma ficha pré-carrega a estrutura escolhida.
+  const labBridge = useMemo(() => {
+    try {
+      const raw = sessionStorage.getItem(FLOW_LAB_KEY);
+      if (!raw) return null;
+      const p = JSON.parse(raw) as { preset?: string; tese?: string };
+      return p && p.preset && PRESETS[p.preset] ? p : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!labBridge) return;
+    sessionStorage.removeItem(FLOW_LAB_KEY);
+    loadPreset(labBridge.preset!);
+    setEtapa("decisao");
+    const motivoLab = labBridge.tese?.trim();
+    if (motivoLab) {
+      setTesePartes((t) => ({ ...t, motivo: motivoLab }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [labBridge]);
 
   const etapaIdx = ETAPAS.findIndex((e) => e.k === etapa);
   const aprendizado = crenca === "aprender";

@@ -17,7 +17,7 @@ export const GUIA_PLATAFORMA: VerbetesGuia = [
     topico: "Trilha",
     pergunta: "Como funciona a trilha de lições?",
     resposta:
-      "São 15 lições organizadas em 5 níveis, do básico ao avançado (opções, prêmio, vencimento, estratégias, rolagem, gestão de risco e tributação). Cada nível desbloqueia o próximo; a trilha mostra onde você parou.",
+      "São 23 lições em 5 níveis conceituais (Entender, Pensar, Construir, Comparar, Decidir) mais a seção transversal de Prática (tributação). Cada nível desbloqueia o próximo; a trilha mostra onde você parou.",
   },
   {
     topico: "Lição",
@@ -36,6 +36,18 @@ export const GUIA_PLATAFORMA: VerbetesGuia = [
     pergunta: "O que é a missão da lição e a pergunta de transferência?",
     resposta:
       "A missão apresenta uma situação real e pergunta qual decisão você tomaria (A, B, C, D), com explicação opcional. Depois do feedback, a pergunta de transferência muda o cenário para verificar se você aplica o conceito em outra situação. O resumo mostra o domínio: reconheceu, aplicou e explicou — sem nota.",
+  },
+  {
+    topico: "Laboratório de Estratégias",
+    pergunta: "Como funciona o Laboratório de Estratégias?",
+    resposta:
+      "Você escolhe a hipótese de mercado (alta, baixa, lateral, movimento ou gestão) e o laboratório mostra as fichas de estruturas que expressam essa hipótese, com perda máxima, lucro máximo, breakevens, gregas dominantes, o que vigiar e cenários. Nenhuma ficha é recomendação: estruturas expressam hipóteses, e a decisão é sempre sua. Cada ficha leva à lição correspondente e ao simulador com a estrutura pré-carregada.",
+  },
+  {
+    topico: "Laboratório · Regra",
+    pergunta: "O laboratório me recomenda uma estratégia?",
+    resposta:
+      "Não. O mapa organiza as estruturas por hipótese, mas quem decide qual hipótese é verdadeira (ou se você tem hipótese alguma) é você. O laboratório entrega risco, retorno e breakevens na mesa — a escolha e as regras continuam suas.",
   },
   {
     topico: "Simulador",

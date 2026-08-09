@@ -16,6 +16,7 @@ import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedEspelhoRouteImport } from './routes/_authenticated/espelho'
 import { Route as AuthenticatedHistoriaRouteImport } from './routes/_authenticated/historia'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedLaboratorioRouteImport } from './routes/_authenticated/laboratorio'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedRegrasRouteImport } from './routes/_authenticated/regras'
 import { Route as AuthenticatedRevisaoRouteImport } from './routes/_authenticated/revisao'
@@ -64,6 +65,12 @@ const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLaboratorioRoute =
+  AuthenticatedLaboratorioRouteImport.update({
+    id: '/laboratorio',
+    path: '/laboratorio',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -140,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/espelho': typeof AuthenticatedEspelhoRoute
   '/historia': typeof AuthenticatedHistoriaRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/regras': typeof AuthenticatedRegrasRoute
   '/revisao': typeof AuthenticatedRevisaoRoute
@@ -161,6 +169,7 @@ export interface FileRoutesByTo {
   '/espelho': typeof AuthenticatedEspelhoRoute
   '/historia': typeof AuthenticatedHistoriaRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/regras': typeof AuthenticatedRegrasRoute
   '/revisao': typeof AuthenticatedRevisaoRoute
@@ -184,6 +193,7 @@ export interface FileRoutesById {
   '/_authenticated/espelho': typeof AuthenticatedEspelhoRoute
   '/_authenticated/historia': typeof AuthenticatedHistoriaRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/regras': typeof AuthenticatedRegrasRoute
   '/_authenticated/revisao': typeof AuthenticatedRevisaoRoute
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/espelho'
     | '/historia'
     | '/home'
+    | '/laboratorio'
     | '/onboarding'
     | '/regras'
     | '/revisao'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/espelho'
     | '/historia'
     | '/home'
+    | '/laboratorio'
     | '/onboarding'
     | '/regras'
     | '/revisao'
@@ -250,6 +262,7 @@ export interface FileRouteTypes {
     | '/_authenticated/espelho'
     | '/_authenticated/historia'
     | '/_authenticated/home'
+    | '/_authenticated/laboratorio'
     | '/_authenticated/onboarding'
     | '/_authenticated/regras'
     | '/_authenticated/revisao'
@@ -322,6 +335,13 @@ declare module '@tanstack/react-router' {
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/laboratorio': {
+      id: '/_authenticated/laboratorio'
+      path: '/laboratorio'
+      fullPath: '/laboratorio'
+      preLoaderRoute: typeof AuthenticatedLaboratorioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/onboarding': {
@@ -423,6 +443,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEspelhoRoute: typeof AuthenticatedEspelhoRoute
   AuthenticatedHistoriaRoute: typeof AuthenticatedHistoriaRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedLaboratorioRoute: typeof AuthenticatedLaboratorioRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedRegrasRoute: typeof AuthenticatedRegrasRoute
   AuthenticatedRevisaoRoute: typeof AuthenticatedRevisaoRoute
@@ -440,6 +461,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEspelhoRoute: AuthenticatedEspelhoRoute,
   AuthenticatedHistoriaRoute: AuthenticatedHistoriaRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedLaboratorioRoute: AuthenticatedLaboratorioRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedRegrasRoute: AuthenticatedRegrasRoute,
   AuthenticatedRevisaoRoute: AuthenticatedRevisaoRoute,

@@ -38,6 +38,17 @@ export const MODULOS_COPILOT: ModuloCopilot[] = [
     ],
   },
   {
+    id: "laboratorio",
+    rotulo: "Laboratório de Estratégias",
+    padrao: /^\/laboratorio/,
+    sugestoes: [
+      "Como o laboratório transforma minha hipótese em estruturas?",
+      "Por que nenhuma ficha do laboratório é recomendação?",
+      "Qual a diferença entre uma trava e uma estrutura sozinha?",
+      "Como levo uma ficha do laboratório para o simulador?",
+    ],
+  },
+  {
     id: "simulador",
     rotulo: "Simulador",
     padrao: /^\/simulador/,

@@ -6,6 +6,7 @@ import {
   BookOpen,
   Calculator,
   ClipboardList,
+  FlaskConical,
   Home,
   LineChart,
   LogOut,
@@ -16,6 +17,7 @@ import {
 const NAV = [
   { to: "/home", label: "Início", icon: Home },
   { to: "/trilha", label: "Trilha", icon: BookOpen },
+  { to: "/laboratorio", label: "Laboratório", icon: FlaskConical },
   { to: "/simulador", label: "Simulador", icon: Calculator },
   { to: "/regras", label: "Regras", icon: ScrollText },
   { to: "/diario", label: "Diário", icon: ClipboardList },
