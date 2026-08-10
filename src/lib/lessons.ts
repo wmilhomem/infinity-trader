@@ -72,6 +72,8 @@ export type Lesson = {
   ordem: number;
   nivel: LessonNivel;
   dominio?: "futuros";
+  /** Contrato específico da lição (só para futuros): win (mini índice) ou wdo (mini dólar). */
+  instrumento?: "win" | "wdo";
   titulo: string;
   resumo: string;
   problema: LessonProblema;
@@ -6303,6 +6305,361 @@ Não é burocracia: é a continuação da sua gestão — o dinheiro do imposto 
       },
     ],
   },
+  {
+    slug: "aprofundamento-win",
+    ordem: 38,
+    nivel: 4,
+    dominio: "futuros",
+    instrumento: "win",
+    titulo: "Lição 15 — Mini Índice em profundidade",
+    resumo:
+      "O contrato que segue o Ibovespa: pontos, vencimento, liquidação financeira e o que move o índice.",
+    problema: {
+      titulo: "O índice que não é um ativo",
+      texto:
+        "Thiago operava o WIN 'achando que comprava o mercado inteiro'. Na verdade, ele comprava um contrato padronizado sobre o Ibovespa — um índice que reúne as ações mais negociadas da B3, e que não existe fora da tela. Quando o contrato venceu, ele esperava 'receber ações' e recebeu apenas o ajuste em reais. Entender o que está do outro lado do contrato é o que separa operar de apostar.",
+      pergunta: "O que exatamente o WIN representa — e como ele termina?",
+    },
+    conceitos: [
+      {
+        titulo: "O ativo de referência",
+        corpo: `
+O **WIN** é um futuro padronizado do **Ibovespa**: o índice de ações mais negociadas da B3, ponderado pelo valor de mercado. O contrato segue os **pontos** do índice, não uma carteira real.
+
+- **Preço**: cotado em pontos (ex.: 130.000). Cada ponto vale **R$ 0,20**; o tick mínimo é 5 pontos (R$ 1,00).
+- **Exposição**: 1 contrato a 130.000 expõe R$ 26.000.
+- **Referência**: o índice à vista durante o pregão; o ajuste diário usa o preço de ajuste da B3.
+        `,
+      },
+      {
+        titulo: "Vencimento e liquidação",
+        corpo: `
+- **Meses de vencimento**: pares (fev, abr, jun, ago, out, dez) — o contrato mais negociado é o do mês mais próximo.
+- **Data de vencimento**: quarta-feira mais próxima do dia 15 do mês.
+- **Liquidação 100% financeira**: no vencimento, a posição é liquidada em reais pelo índice de liquidação — não existe entrega de ações.
+- **Rolagem**: quem quer manter exposição após o vencimento troca de série antes — pagando/levando o prêmio da diferença de pontos entre os vencimentos.
+
+O "prêmio" entre vencimentos reflete a expectativa de juros e dividendos embutida no futuro — é por isso que o futuro raramente negocia exatamente no valor do índice à vista.
+        `,
+      },
+      {
+        titulo: "O que move o índice",
+        corpo: `
+- **Macro**: juros (Copom), inflação (IPCA), câmbio, cenário externo (Fed, Treasuries).
+- **Fluxo**: entrada/saída de estrangeiro, eventos de book building, rebalanceamentos.
+- **Calendário**: divulgações de resultados, dividendos, vencimento de opções e futuros (o dia do vencimento costuma ter volume e volatilidade maiores).
+
+O WIN amplifica o índice: cada ponto de variação do Ibovespa vale R$ 0,20 por contrato — e a alavancagem decide quem aguenta a rota.
+        `,
+      },
+    ],
+    analogia:
+      "O WIN é o velocímetro do mercado brasileiro: ele marca a velocidade (pontos do Ibovespa), não o carro. Quem segura o velocímetro até o fim do trajeto não recebe o carro — recebe o saldo da corrida em dinheiro.",
+    naPratica: {
+      titulo: "Antes de operar o WIN",
+      passos: [
+        "Qual é o vencimento do contrato que estou olhando? (série em vigor)",
+        "Quantos pontos separam o futuro do índice à vista? (base)",
+        "O ajuste diário do dia vai usar qual referência? (preço de ajuste da B3)",
+        "Se o vencimento chegar com a posição aberta, eu sei que a liquidação é em reais?",
+      ],
+    },
+    missao: {
+      titulo: "O contrato que vence",
+      situacao:
+        "Faltam 2 dias para o vencimento do WIN e você ainda tem 2 contratos comprados a 130.000. O índice está em 129.800 e você não quer mais a exposição.",
+      pergunta: "O que acontece se você não fizer nada?",
+      opcoes: [
+        {
+          texto: "A posição é liquidada financeiramente no vencimento — sem entrega de ações",
+          tom: "correta",
+          feedback:
+            "Boa decisão. O WIN liquida em reais pelo índice de liquidação: a exposição acaba sozinha no vencimento, mas o resultado final é o acumulado dos ajustes diários.",
+        },
+        {
+          texto: "Você recebe ações equivalentes ao índice",
+          tom: "errada",
+          feedback: "Não existe entrega de ações no futuro de índice — a liquidação é financeira.",
+        },
+        {
+          texto: "O contrato renova sozinho para o vencimento seguinte",
+          tom: "errada",
+          feedback: "Não há renovação automática: se não rolar, a posição liquida no vencimento.",
+        },
+        {
+          texto: "A corretora mantém a posição aberta indefinidamente",
+          tom: "errada",
+          feedback:
+            "O contrato tem data certa de vencimento — e a posição é zerada no último ajuste.",
+        },
+      ],
+      termosExplicacao: ["liquidação", "financeira", "vencimento", "reais", "ajuste"],
+      aindaPratique: "anotar a data do próximo vencimento do WIN e a série em vigor",
+      transferencia: {
+        titulo: "O futuro frente ao à vista",
+        situacao:
+          "O Ibovespa à vista está em 130.000 e o futuro com vencimento em dezembro negocia a 131.200.",
+        pergunta: "O que explica a diferença de 1.200 pontos?",
+        opcoes: [
+          {
+            texto: "Juros e dividendos esperados até o vencimento embutidos no futuro",
+            tom: "correta",
+            feedback:
+              "Boa decisão. A base entre futuro e à vista reflete o custo de carrego (juros) e os dividendos esperados — não é 'adiantamento do gráfico'.",
+          },
+          {
+            texto: "O mercado está prevendo alta de 1.200 pontos",
+            tom: "errada",
+            feedback:
+              "A base é carrego, não previsão: por isso o futuro converge para o à vista conforme o vencimento se aproxima.",
+          },
+          {
+            texto: "É o spread da corretora",
+            tom: "errada",
+            feedback: "Spread é custo de execução; a base é uma característica do contrato.",
+          },
+          {
+            texto: "Erro de cotação da B3",
+            tom: "errada",
+            feedback: "A base é normal e converge ao longo do tempo — não é erro.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O WIN é um contrato sobre:",
+        alternativas: [
+          "Os pontos do Ibovespa",
+          "Uma carteira real de ações",
+          "O câmbio americano",
+          "O CDI",
+        ],
+        correta: 0,
+        explicacao: "O WIN segue os pontos do Ibovespa — o índice, não uma carteira física.",
+      },
+      {
+        pergunta: "O vencimento do WIN ocorre:",
+        alternativas: [
+          "Nos meses pares, na quarta-feira mais próxima do dia 15",
+          "No último dia útil de todo mês",
+          "Na terceira sexta-feira do mês",
+          "No dia 15 de todos os meses",
+        ],
+        correta: 0,
+        explicacao: "Meses pares (G, J, M, Q, V, Z), quarta-feira mais próxima do dia 15.",
+      },
+      {
+        pergunta: "No vencimento, a posição em WIN é:",
+        alternativas: [
+          "Liquidada financeiramente em reais",
+          "Convertida em ações",
+          "Renovada automaticamente",
+          "Transformada em opção",
+        ],
+        correta: 0,
+        explicacao: "Liquidação 100% financeira pelo índice de liquidação — sem entrega.",
+      },
+      {
+        pergunta: "A diferença entre o futuro e o índice à vista reflete:",
+        alternativas: [
+          "Juros e dividendos esperados (carrego)",
+          "A previsão do mercado",
+          "O humor dos operadores",
+          "A taxa da corretora",
+        ],
+        correta: 0,
+        explicacao: "A base é o custo de carrego — e converge conforme o vencimento se aproxima.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "A série e a base",
+        enunciado:
+          "Hoje é 5 de agosto. O WIN vigente vence em agosto (meses pares). O índice está em 129.500 e o futuro em 130.100. (a) Qual a base? (b) Se você tem 3 contratos, qual a exposição total?",
+        gabarito:
+          "(a) Base = 600 pontos (130.100 − 129.500). (b) 130.100 × R$ 0,20 × 3 = R$ 78.060 de exposição.",
+      },
+    ],
+  },
+  {
+    slug: "aprofundamento-wdo",
+    ordem: 39,
+    nivel: 4,
+    dominio: "futuros",
+    instrumento: "wdo",
+    titulo: "Lição 16 — Mini Dólar em profundidade",
+    resumo:
+      "O contrato que segue o câmbio: dólar referência, vencimento, liquidação e o que move a taxa.",
+    problema: {
+      titulo: "O dólar que ninguém vê",
+      texto:
+        "Camila operava o WDO 'de olho no dólar do Google'. Mas o contrato segue o dólar comercial de referência do mercado brasileiro — e o número da internet nem sempre é o mesmo preço que o book negocia. Sem entender a referência, o vencimento e quem mexe no câmbio (o Banco Central), ela tomava decisões de um mercado e media o resultado em outro.",
+      pergunta: "O que o WDO segue de verdade — e o que o move?",
+    },
+    conceitos: [
+      {
+        titulo: "O ativo de referência",
+        corpo: `
+O **WDO** é um futuro padronizado do **dólar americano** negociado em reais (USDBRL). Ele acompanha o câmbio comercial de referência — a taxa PTAX divulgada pelo Banco Central, apurada a partir do mercado interbancário.
+
+- **Preço**: cotado em pontos (ex.: 5,4000 — com vírgula/4 casas). Cada ponto vale **R$ 10**; o tick é 0,5 ponto (R$ 5,00).
+- **Exposição**: 1 contrato a 5,4000 expõe US$ 10.000 (R$ 54.000).
+- **Referência**: dólar à vista durante o dia; o ajuste final usa a taxa de câmbio de referência da B3.
+        `,
+      },
+      {
+        titulo: "Vencimento e liquidação",
+        corpo: `
+- **Meses de vencimento**: todos os meses (código com letra do mês: F, G, H...).
+- **Data de vencimento**: último dia útil do mês de vencimento.
+- **Liquidação financeira**: a posição é liquidada em reais — ninguém entrega dólar físico.
+- **Horário**: o WDO negocia de ~9h às 18h; o pregão dele acompanha a liquidez do câmbio brasileiro.
+
+No vencimento, o ajuste final usa a taxa PTAX/ref do dia — o ponto de convergência entre futuro e à vista.
+        `,
+      },
+      {
+        titulo: "O que move o dólar",
+        corpo: `
+- **Juros**: o diferencial entre a taxa brasileira (Selic) e a americana (Fed) — o "carry" atrai ou afasta capital.
+- **Banco Central**: atuação no câmbio via **swap cambial** e **leilões** de dólar à vista — o WDO reage aos anúncios.
+- **Externos**: Fed, Treasuries, risco-país, commodities (o Brasil exporta muito), eleições e cenário fiscal.
+- **Saúde**: feriados americanos mudam o fluxo; notícias de madrugada abrem gaps no pregão seguinte.
+
+O dólar não tem "cota certa": tem fluxo — e o contrato mede o fluxo em pontos.
+        `,
+      },
+    ],
+    analogia:
+      "O WDO é o termômetro do fluxo de dólares: quando dinheiro entra no país, o câmbio esfria (cai); quando sai, esquenta (sobe). O termômetro só mede — quem mexe no clima é o juro, o risco e o Banco Central com seus leilões.",
+    naPratica: {
+      titulo: "Antes de operar o WDO",
+      passos: [
+        "Qual a taxa de referência (PTAX) de hoje, e como o book está em relação a ela?",
+        "Há evento de juros (Copom/Fed) ou leilão do BCB no radar?",
+        "O contrato vigente vence quando? (último dia útil do mês)",
+        "O spread de R$ 5 por volta está dentro do meu plano?",
+      ],
+    },
+    missao: {
+      titulo: "O contrato que converge",
+      situacao:
+        "Faltam 3 dias para o vencimento do WDO. O dólar comercial está em 5,3980 e o contrato em 5,4000 — você tem 1 contrato comprado a 5,3950.",
+      pergunta: "O que tende a acontecer conforme o vencimento se aproxima?",
+      opcoes: [
+        {
+          texto: "O futuro converge para a referência — e seu resultado já está no ajuste",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Próximo do vencimento, o futuro converge para a taxa de referência: a diferença de 20 pontos tende a se fechar no ajuste final.",
+        },
+        {
+          texto: "O contrato renova sozinho para o mês seguinte",
+          tom: "errada",
+          feedback:
+            "Sem rolagem, a posição liquida no vencimento — não existe renovação automática.",
+        },
+        {
+          texto: "Você recebe US$ 10.000 na conta",
+          tom: "errada",
+          feedback: "A liquidação é financeira em reais — não há entrega de dólar físico.",
+        },
+        {
+          texto: "O spread desaparece no vencimento",
+          tom: "errada",
+          feedback: "O spread segue existindo; o que converge é a base entre futuro e referência.",
+        },
+      ],
+      termosExplicacao: ["convergência", "referência", "ajuste final", "5,3980", "liquidação"],
+      aindaPratique: "comparar a PTAX do dia com o contrato vigente ao fechar o pregão",
+      transferencia: {
+        titulo: "O anúncio que move",
+        situacao:
+          "O Copom surpreende e corta a Selic mais do que o esperado. O diferencial de juros Brasil × EUA diminui.",
+        pergunta: "Qual é o efeito típico sobre o câmbio?",
+        opcoes: [
+          {
+            texto: "O real tende a se desvalorizar: menos carry atrai menos capital estrangeiro",
+            tom: "correta",
+            feedback:
+              "Boa decisão. Juro menor encolhe o prêmio do carry: o fluxo de entrada enfraquece e o dólar tende a subir — sem garantia, claro.",
+          },
+          {
+            texto: "O real tende a se valorizar automaticamente",
+            tom: "errada",
+            feedback: "Carry menor desestimula a entrada de capital — o efeito típico é o oposto.",
+          },
+          {
+            texto: "O câmbio não reage a juros",
+            tom: "errada",
+            feedback: "O diferencial de juros é um dos motores centrais do câmbio.",
+          },
+          {
+            texto: "A PTAX congela até o próximo vencimento",
+            tom: "errada",
+            feedback: "A PTAX é apurada todo dia útil — não congela.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O WDO é um contrato sobre:",
+        alternativas: [
+          "O dólar americano em reais (USDBRL)",
+          "O Ibovespa em pontos",
+          "O euro",
+          "O ouro",
+        ],
+        correta: 0,
+        explicacao: "O WDO segue o câmbio dólar/real — a taxa de referência do mercado brasileiro.",
+      },
+      {
+        pergunta: "O vencimento do WDO ocorre:",
+        alternativas: [
+          "No último dia útil do mês de vencimento",
+          "Na quarta-feira mais próxima do dia 15",
+          "Nos meses pares apenas",
+          "No primeiro dia útil de cada semana",
+        ],
+        correta: 0,
+        explicacao: "O dólar futuro vence no último dia útil do mês — todo mês.",
+      },
+      {
+        pergunta: "No vencimento, o WDO é liquidado:",
+        alternativas: [
+          "Financeiramente, em reais",
+          "Com entrega de dólar físico",
+          "Com conversão em ações",
+          "Com renovação automática",
+        ],
+        correta: 0,
+        explicacao: "Liquidação financeira pela taxa de referência — sem entrega de moeda.",
+      },
+      {
+        pergunta: "Uma atuação do Banco Central com swap cambial:",
+        alternativas: [
+          "Muda a oferta de proteção e influencia o preço do dólar futuro",
+          "Garante lucro ao operador",
+          "Congela a PTAX",
+          "Só afeta o mercado de ações",
+        ],
+        correta: 0,
+        explicacao:
+          "Swaps e leilões do BCB alteram o fluxo e o prêmio — o WDO reage a esses anúncios.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "A exposição do WDO",
+        enunciado:
+          "WDO a 5,4000, com 2 contratos. (a) Qual a exposição em reais? (b) Se o dólar sobe 30 pontos, qual o resultado por contrato? (c) E com os 2 contratos?",
+        gabarito:
+          "(a) 5.400 × R$ 10 × 2 = R$ 108.000. (b) 30 × R$ 10 = R$ 300. (c) 30 × R$ 10 × 2 = R$ 600.",
+      },
+    ],
+  },
 ];
 
 export function getLesson(slug: string) {
@@ -6316,6 +6673,16 @@ export function liçõesDe(caminho: CaminhoTrilha): Lesson[] {
   if (caminho === "futuros") return LESSONS.filter((l) => l.dominio === "futuros");
   if (caminho === "opcoes") return LESSONS.filter((l) => l.dominio !== "futuros");
   return LESSONS;
+}
+
+/**
+ * Lições do caminho com foco em um contrato de futuros (WIN ou WDO).
+ * Lições sem instrumento são comuns aos dois; as específicas do outro contrato ficam de fora.
+ */
+export function liçõesDeFoco(caminho: CaminhoTrilha, foco: "win" | "wdo" | undefined): Lesson[] {
+  const base = liçõesDe(caminho);
+  if (caminho !== "futuros" || !foco) return base;
+  return base.filter((l) => !l.instrumento || l.instrumento === foco);
 }
 
 export const NIVEIS: Record<LessonNivel, string> = {

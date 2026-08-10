@@ -3,11 +3,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { liçõesDe } from "@/lib/lessons";
+import { liçõesDeFoco } from "@/lib/lessons";
 import { cn } from "@/lib/utils";
 import { preverTamanhoPosicao } from "@/engines/behavior-forecast";
 import { montarPainelDeVoo, type CheckCognitivo } from "@/engines/readiness";
 import { useCaminho } from "@/lib/use-caminho";
+import { useFoco } from "@/lib/use-foco";
 import type { DiaryEntry } from "@/engines/types";
 import { CheckCognitivoModal } from "@/components/CheckCognitivoModal";
 import {
@@ -57,6 +58,7 @@ export const Route = createFileRoute("/_authenticated/home")({
 function Home() {
   const navigate = useNavigate();
   const { caminho } = useCaminho();
+  const { foco } = useFoco();
   const [expandido, setExpandido] = useState(false);
   const [checkAberto, setCheckAberto] = useState(false);
   const [ritualAberto, setRitualAberto] = useState(false);
@@ -182,7 +184,7 @@ function Home() {
   const sims = simsQ.data ?? [];
 
   const doneSlugs = new Set(progress.filter((p) => p.completed_at).map((p) => p.lesson_slug));
-  const trilha = liçõesDe(caminho);
+  const trilha = liçõesDeFoco(caminho, caminho === "futuros" ? foco : undefined);
   const proximaLicao = trilha.find((l) => !doneSlugs.has(l.slug)) ?? trilha[trilha.length - 1];
   const primeiroNome = (profileQ.data?.nome ?? "").trim().split(" ")[0];
 

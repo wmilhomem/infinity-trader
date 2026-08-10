@@ -521,6 +521,7 @@ export type Database = {
           caminho: string;
           created_at: string;
           email: string | null;
+          foco_futuros: string;
           id: string;
           ja_operou: boolean;
           nivel_atual: number;
@@ -536,6 +537,7 @@ export type Database = {
           caminho?: string;
           created_at?: string;
           email?: string | null;
+          foco_futuros?: string;
           id: string;
           ja_operou?: boolean;
           nivel_atual?: number;
@@ -551,6 +553,7 @@ export type Database = {
           caminho?: string;
           created_at?: string;
           email?: string | null;
+          foco_futuros?: string;
           id?: string;
           ja_operou?: boolean;
           nivel_atual?: number;

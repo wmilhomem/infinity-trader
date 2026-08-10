@@ -2,9 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { liçõesDe, NIVEIS, NIVEIS_DESC, nivelLabel, type LessonNivel } from "@/lib/lessons";
+import { liçõesDeFoco, NIVEIS, NIVEIS_DESC, nivelLabel, type LessonNivel } from "@/lib/lessons";
 import { getLessonMeta } from "@/lib/lesson-meta";
 import { useCaminho } from "@/lib/use-caminho";
+import { useFoco, useAtualizarFoco } from "@/lib/use-foco";
+import { FOCOS_FUTUROS, FOCO_INFO } from "@/lib/foco";
 import { ArrowRight, Check, Clock, Lock, Play } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/trilha")({
@@ -45,6 +47,8 @@ function NivelBoxes({
 
 function Trilha() {
   const { caminho } = useCaminho();
+  const { foco } = useFoco();
+  const atualizarFoco = useAtualizarFoco();
   const q = useQuery({
     queryKey: ["progress"],
     queryFn: async () => {
@@ -54,7 +58,7 @@ function Trilha() {
   });
 
   const done = new Set((q.data ?? []).filter((p) => p.completed_at).map((p) => p.lesson_slug));
-  const trilha = liçõesDe(caminho);
+  const trilha = liçõesDeFoco(caminho, caminho === "futuros" ? foco : undefined);
   const byNivel = trilha.reduce<Record<LessonNivel, typeof trilha>>(
     (acc, l) => {
       (acc[l.nivel] ??= []).push(l);
@@ -111,6 +115,46 @@ function Trilha() {
           {trilha.length} lições. Estruturas expressam hipóteses — nunca recomendações. 80% no quiz
           destrava a próxima etapa do ciclo de decisão.
         </p>
+      )}
+
+      {futuros && (
+        <div className="mb-8">
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Qual contrato você quer aprofundar?
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {FOCOS_FUTUROS.map((f) => {
+              const ativo = foco === f;
+              return (
+                <button
+                  key={f}
+                  onClick={() => atualizarFoco(f)}
+                  className={`flex items-center justify-between rounded-xl border p-4 text-left transition-colors ${
+                    ativo
+                      ? "border-primary bg-primary/10"
+                      : "border-border bg-card hover:border-primary/50"
+                  }`}
+                >
+                  <div>
+                    <div className="font-semibold">{FOCO_INFO[f].label}</div>
+                    <div className="text-xs text-muted-foreground">{FOCO_INFO[f].desc}</div>
+                  </div>
+                  <div
+                    className={`grid size-6 shrink-0 place-items-center rounded-full border ${
+                      ativo ? "border-primary bg-primary text-primary-foreground" : "border-border"
+                    }`}
+                  >
+                    {ativo && <Check size={13} />}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            As lições de mecânica valem para os dois contratos; a lição de aprofundamento é
+            específica do escolhido. Você pode trocar quando quiser.
+          </p>
+        </div>
       )}
 
       <div className="mb-8 rounded-2xl border border-border bg-card p-6">
@@ -194,6 +238,17 @@ function Trilha() {
                       <div className="truncate font-medium">{l.titulo}</div>
                       <div className="truncate text-xs text-muted-foreground">{l.resumo}</div>
                     </div>
+                    {l.instrumento && (
+                      <span
+                        className={`hidden shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold sm:inline ${
+                          l.instrumento === foco
+                            ? "border-primary/60 bg-primary/10 text-primary"
+                            : "border-border bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {FOCO_INFO[l.instrumento].curto}
+                      </span>
+                    )}
                     <div className="hidden shrink-0 items-center gap-1 text-xs text-muted-foreground sm:flex">
                       <Clock size={12} /> {meta.tempoMin} min
                     </div>

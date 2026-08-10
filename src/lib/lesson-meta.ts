@@ -495,6 +495,30 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
     },
     resumoPontos: ["Código 6015", "Banco Central", "Último dia útil do mês seguinte"],
   },
+  "aprofundamento-win": {
+    objetivo: "Saber o que o WIN representa, como vence e o que move o Ibovespa.",
+    tempoMin: 8,
+    erroComum: {
+      titulo: "Tratar o WIN como se entregasse ações",
+      texto:
+        "O futuro de índice liquida 100% em reais — e a base entre futuro e à vista é carrego, não previsão.",
+    },
+    resumoPontos: [
+      "Ibovespa em pontos",
+      "Meses pares, quarta-feira próxima do dia 15",
+      "Liquidação financeira",
+    ],
+  },
+  "aprofundamento-wdo": {
+    objetivo: "Saber o que o WDO segue (câmbio de referência), como vence e o que move o dólar.",
+    tempoMin: 8,
+    erroComum: {
+      titulo: "Medir a operação pelo 'dólar da internet'",
+      texto:
+        "O contrato segue a referência do mercado (PTAX) — e o câmbio reage a juros, risco e atuação do BCB.",
+    },
+    resumoPontos: ["USDBRL em pontos", "Vence no último dia útil do mês", "Liquidação financeira"],
+  },
 };
 
 export function getLessonMeta(slug: string): LessonMeta {
