@@ -6706,3 +6706,116 @@ export const NIVEIS_DESC: Record<LessonNivel, string> = {
 export function nivelLabel(nivel: LessonNivel): string {
   return nivel === "pratica" ? "Prática" : `Nível ${nivel}`;
 }
+
+/** Temas da Trilha: agrupam as lições do caminho em seções expansíveis (blocos contíguos de ordem). */
+export type Tema = string;
+
+export const TEMAS: Record<Tema, { nome: string; desc: string }> = {
+  fundamentos: {
+    nome: "Fundamentos",
+    desc: "O que é uma opção, prêmio, strike, vencimento, o efeito do tempo e da volatilidade.",
+  },
+  estrategias: {
+    nome: "Estratégias e estruturas",
+    desc: "Comprar, vender, proteger, rolar e estruturas de movimento ou lateralização.",
+  },
+  decisao: {
+    nome: "Comparação e decisão",
+    desc: "Escolher entre estruturas e fechar o ciclo de decisão.",
+  },
+  fiscal: {
+    nome: "Tributação",
+    desc: "Imposto sobre o resultado e o DARF mensal.",
+  },
+  mecanica: {
+    nome: "Mecânica do contrato",
+    desc: "O contrato futuro, valor do ponto, margem e alavancagem.",
+  },
+  pregao: {
+    nome: "Pregão e dimensionamento",
+    desc: "A sessão de negociação, o stop com dimensionamento e day trade vs swing.",
+  },
+  risco: {
+    nome: "Execução e risco",
+    desc: "Slippage, ajuste diário e a armadilha da alavancagem.",
+  },
+  comparacao: {
+    nome: "Comparação",
+    desc: "WIN vs WDO e futuro vs opção.",
+  },
+  gestao: {
+    nome: "Decisão e fiscal",
+    desc: "A decisão no day trade, a tributação (6015) e o DARF na prática.",
+  },
+  aprofundamento: {
+    nome: "Aprofundamento",
+    desc: "O contrato que você escolheu estudar em profundidade.",
+  },
+  outros: {
+    nome: "Geral",
+    desc: "Lições sem tema específico.",
+  },
+};
+
+export const TEMA_LICOES: Record<string, Tema> = {
+  "o-que-e-opcao": "fundamentos",
+  "call-vs-put": "fundamentos",
+  "vencimento-e-exercicio": "fundamentos",
+  "premio-e-strike": "fundamentos",
+  moneyness: "fundamentos",
+  "theta-e-tempo": "fundamentos",
+  "volatilidade-e-vega": "fundamentos",
+  "compra-a-seco": "estrategias",
+  "venda-coberta": "estrategias",
+  "protective-put": "estrategias",
+  "trava-de-alta": "estrategias",
+  "trava-de-baixa": "estrategias",
+  rolagem: "estrategias",
+  "rolagem-defensiva": "estrategias",
+  "gestao-de-risco-travas": "estrategias",
+  straddle: "estrategias",
+  strangle: "estrategias",
+  "iron-condor": "estrategias",
+  "comparar-estruturas-de-alta": "decisao",
+  "comparar-estruturas-neutras": "decisao",
+  "gestao-da-decisao": "decisao",
+  "tributacao-basica": "fiscal",
+  "darf-e-compensacao": "fiscal",
+  "o-que-e-um-futuro": "mecanica",
+  "valor-do-ponto-e-tick": "mecanica",
+  "margem-e-alavancagem": "mecanica",
+  "pregao-e-sessao": "pregao",
+  "stop-e-dimensionamento": "pregao",
+  "day-trade-vs-swing": "pregao",
+  "slippage-e-execucao": "risco",
+  "ajuste-diario": "risco",
+  "armadilha-da-alavancagem": "risco",
+  "win-vs-wdo": "comparacao",
+  "futuro-vs-opcao": "comparacao",
+  "decisao-no-day-trade": "gestao",
+  "tributacao-day-trade": "gestao",
+  "darf-day-trade": "gestao",
+  "aprofundamento-win": "aprofundamento",
+  "aprofundamento-wdo": "aprofundamento",
+};
+
+export function temaDeLição(slug: string): Tema {
+  return TEMA_LICOES[slug] ?? "outros";
+}
+
+/** Agrupa as lições por tema (temas na ordem do início da jornada; lições por ordem). */
+export function liçõesPorTema(trilha: Lesson[]): { tema: Tema; lições: Lesson[] }[] {
+  const grupos = new Map<Tema, Lesson[]>();
+  for (const l of trilha) {
+    const tema = temaDeLição(l.slug);
+    const lista = grupos.get(tema);
+    if (lista) lista.push(l);
+    else grupos.set(tema, [l]);
+  }
+  return [...grupos.entries()]
+    .map(([tema, lições]) => ({
+      tema,
+      lições: [...lições].sort((a, b) => a.ordem - b.ordem),
+    }))
+    .sort((a, b) => a.lições[0].ordem - b.lições[0].ordem);
+}

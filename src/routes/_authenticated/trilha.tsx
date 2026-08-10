@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { liçõesDeFoco, NIVEIS, NIVEIS_DESC, nivelLabel, type LessonNivel } from "@/lib/lessons";
+import { TemaAccordion } from "@/components/lessons/TemaAccordion";
+import { liçõesDeFoco, liçõesPorTema, TEMAS, temaDeLição } from "@/lib/lessons";
 import { getLessonMeta } from "@/lib/lesson-meta";
 import { useCaminho } from "@/lib/use-caminho";
 import { useFoco, useAtualizarFoco } from "@/lib/use-foco";
@@ -13,37 +14,6 @@ export const Route = createFileRoute("/_authenticated/trilha")({
   head: () => ({ meta: [{ title: "Trilha · Zero ao Trade" }] }),
   component: Trilha,
 });
-
-function NivelBoxes({
-  nivel,
-  doneInNivel,
-  totalInNivel,
-}: {
-  nivel: LessonNivel;
-  doneInNivel: number;
-  totalInNivel: number;
-}) {
-  const boxes = 10;
-  const filled = totalInNivel === 0 ? 0 : Math.round((doneInNivel / totalInNivel) * boxes);
-  return (
-    <div className="flex items-center gap-2">
-      <span className="text-[11px] font-semibold uppercase tracking-widest text-primary">
-        {nivelLabel(nivel)}
-      </span>
-      <span className="flex gap-[3px]" aria-hidden>
-        {Array.from({ length: boxes }).map((_, i) => (
-          <span
-            key={i}
-            className={`h-2.5 w-1.5 rounded-[2px] ${i < filled ? "bg-primary" : "bg-muted"}`}
-          />
-        ))}
-      </span>
-      <span className="text-xs text-muted-foreground">
-        {doneInNivel}/{totalInNivel}
-      </span>
-    </div>
-  );
-}
 
 function Trilha() {
   const { caminho } = useCaminho();
@@ -59,15 +29,10 @@ function Trilha() {
 
   const done = new Set((q.data ?? []).filter((p) => p.completed_at).map((p) => p.lesson_slug));
   const trilha = liçõesDeFoco(caminho, caminho === "futuros" ? foco : undefined);
-  const byNivel = trilha.reduce<Record<LessonNivel, typeof trilha>>(
-    (acc, l) => {
-      (acc[l.nivel] ??= []).push(l);
-      return acc;
-    },
-    { 1: [], 2: [], 3: [], 4: [], 5: [], pratica: [] },
-  );
+  const temas = liçõesPorTema(trilha);
   const proxima = trilha.find((l) => !done.has(l.slug));
   const proximaMeta = proxima ? getLessonMeta(proxima.slug) : null;
+  const temaDaProxima = proxima ? temaDeLição(proxima.slug) : undefined;
 
   const futuros = caminho === "futuros";
 
@@ -200,63 +165,19 @@ function Trilha() {
         </Link>
       )}
 
-      {Object.entries(byNivel).map(([nivel, lessons]) => {
-        const n = nivel as LessonNivel;
-        const doneInNivel = lessons.filter((l) => done.has(l.slug)).length;
-        const ehPratica = n === "pratica";
+      {temas.map(({ tema, lições }, i) => {
+        const info = TEMAS[tema] ?? TEMAS.outros;
         return (
-          <section key={n} className="mb-8">
-            <div className="mb-3 flex flex-wrap items-center gap-2">
-              <div className="grid size-7 place-items-center rounded-md bg-primary/20 font-mono text-sm font-bold text-primary">
-                {ehPratica ? "P" : n}
-              </div>
-              <div>
-                <h2 className="font-semibold">{NIVEIS[n]}</h2>
-                <p className="text-xs text-muted-foreground">{NIVEIS_DESC[n]}</p>
-              </div>
-              <div className="ml-auto">
-                <NivelBoxes nivel={n} doneInNivel={doneInNivel} totalInNivel={lessons.length} />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              {lessons.map((l) => {
-                const isDone = done.has(l.slug);
-                const meta = getLessonMeta(l.slug);
-                return (
-                  <Link
-                    key={l.slug}
-                    to="/licao/$slug"
-                    params={{ slug: l.slug }}
-                    className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/60"
-                  >
-                    <div
-                      className={`grid size-8 shrink-0 place-items-center rounded-full ${isDone ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"}`}
-                    >
-                      {isDone ? <Check size={16} /> : <span className="text-sm">{l.ordem}</span>}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate font-medium">{l.titulo}</div>
-                      <div className="truncate text-xs text-muted-foreground">{l.resumo}</div>
-                    </div>
-                    {l.instrumento && (
-                      <span
-                        className={`hidden shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold sm:inline ${
-                          l.instrumento === foco
-                            ? "border-primary/60 bg-primary/10 text-primary"
-                            : "border-border bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {FOCO_INFO[l.instrumento].curto}
-                      </span>
-                    )}
-                    <div className="hidden shrink-0 items-center gap-1 text-xs text-muted-foreground sm:flex">
-                      <Clock size={12} /> {meta.tempoMin} min
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
+          <TemaAccordion
+            key={tema}
+            indice={i + 1}
+            nome={info.nome}
+            desc={info.desc}
+            lições={lições}
+            done={done}
+            foco={caminho === "futuros" ? foco : undefined}
+            abertoInicial={tema === temaDaProxima}
+          />
         );
       })}
       <div className="rounded-md border border-dashed border-border p-4 text-xs text-muted-foreground">
