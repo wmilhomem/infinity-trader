@@ -336,6 +336,165 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
       "Prejuízo compensa lucro futuro",
     ],
   },
+  "o-que-e-um-futuro": {
+    objetivo: "Saber o que é comprado e vendido antes de abrir a primeira posição.",
+    tempoMin: 6,
+    erroComum: {
+      titulo: "Tratar futuro como se fosse ação",
+      texto:
+        "O futuro não é um ativo que você compra e guarda: é um contrato com vencimento, margem e ajuste diário.",
+    },
+    resumoPontos: ["Contrato, não ativo", "Margem não é custo", "Ajuste diário"],
+  },
+  "valor-do-ponto-e-tick": {
+    objetivo: "Ler o contrato em reais: ponto, tick e multiplicador de cada contrato.",
+    tempoMin: 6,
+    erroComum: {
+      titulo: "Confundir ponto com tick",
+      texto:
+        "Ponto e tick são unidades diferentes — e o tamanho da posição inteira depende de saber as duas em reais.",
+    },
+    resumoPontos: ["WIN: R$ 0,20/ponto", "WDO: R$ 10/ponto", "Dimensionar = multiplicar certo"],
+  },
+  "margem-e-alavancagem": {
+    objetivo: "Distinguir margem (garantia) de exposição e custo — e calcular a alavancagem real.",
+    tempoMin: 7,
+    erroComum: {
+      titulo: "Achar que a margem é o seu risco",
+      texto:
+        "A margem é a garantia; o risco é a exposição vezes o quanto o mercado pode andar contra você.",
+    },
+    resumoPontos: [
+      "Margem = garantia",
+      "Exposição = o que você controla",
+      "1 contrato WIN ≈ R$ 26.000",
+    ],
+  },
+  "pregao-e-sessao": {
+    objetivo: "Operar sabendo quando o mercado existe — e o que acontece fora do pregão.",
+    tempoMin: 6,
+    erroComum: {
+      titulo: "Planejar operações para horários que não existem",
+      texto: "O ajuste diário usa o preço do fechamento — e o pregão tem hora para abrir e fechar.",
+    },
+    resumoPontos: ["Pregão 9h–18h", "Ajuste consolida ao fechar", "Liquidez varia na sessão"],
+  },
+  "stop-e-dimensionamento": {
+    objetivo: "Calcular contratos = risco ÷ (stop × valor do ponto) e honrar o stop.",
+    tempoMin: 7,
+    erroComum: {
+      titulo: "Dimensionar pelo lucro em vez do risco",
+      texto: "O tamanho da posição nasce do stop e do risco em reais — nunca do alvo.",
+    },
+    resumoPontos: [
+      "Contratos = risco ÷ (stop × ponto)",
+      "1% da conta",
+      "Stop é limite, não previsão",
+    ],
+  },
+  "day-trade-vs-swing": {
+    objetivo: "Saber que day trade e swing são regimes diferentes — no risco e no imposto.",
+    tempoMin: 7,
+    erroComum: {
+      titulo: "Tratar as duas modalidades como a mesma coisa",
+      texto: "20% vs 15%, compensação estanque e isenção que só existe no swing.",
+    },
+    resumoPontos: [
+      "Day trade: 20%",
+      "Swing: 15% com isenção de R$ 20 mil",
+      "Modalidade decide antes de entrar",
+    ],
+  },
+  "slippage-e-execucao": {
+    objetivo: "Contabilizar o custo invisível das duas pontas: spread e slippage.",
+    tempoMin: 7,
+    erroComum: {
+      titulo: "Comparar o resultado real com o preço teórico",
+      texto:
+        "Cada volta paga o spread duas vezes — a simulação que ignora isso mente sobre o edge.",
+    },
+    resumoPontos: ["2 ticks por volta", "Stop também paga", "Simular com custos"],
+  },
+  "ajuste-diario": {
+    objetivo: "Saber que o resultado do futuro é liquidado todo fim de pregão.",
+    tempoMin: 7,
+    erroComum: {
+      titulo: "Achar que o resultado só existe no vencimento",
+      texto: "O ajuste diário credita ou debita todos os dias — e a soma deles é o seu resultado.",
+    },
+    resumoPontos: [
+      "Marcação a mercado diária",
+      "Sem saldo, a posição pode ser liquidada",
+      "Total = soma dos ajustes",
+    ],
+  },
+  "armadilha-da-alavancagem": {
+    objetivo: "Calcular a exposição real de cada posição antes de entrar.",
+    tempoMin: 8,
+    erroComum: {
+      titulo: "Usar a margem mínima como régua de tamanho",
+      texto:
+        "1 contrato de WIN expõe R$ 26.000: a alavancagem é o que multiplica a rota até o limite diário.",
+    },
+    resumoPontos: ["Exposição ≠ margem", "Regra do 1%", "Limite diário é o teto da sessão"],
+  },
+  "win-vs-wdo": {
+    objetivo: "Saber que WIN e WDO são contratos diferentes — ponto, tick e comportamento.",
+    tempoMin: 8,
+    erroComum: {
+      titulo: "Copiar o setup de um contrato para o outro",
+      texto:
+        "1 ponto de WDO vale R$ 10; 1 ponto de WIN, R$ 0,20. Setup se recalcula, não se copia.",
+    },
+    resumoPontos: ["WDO: R$ 10/ponto", "WIN: R$ 0,20/ponto", "50 pts de WIN = 1 pt de WDO"],
+  },
+  "futuro-vs-opcao": {
+    objetivo: "Escolher entre futuro e opção pelo risco, margem e perfil da tese.",
+    tempoMin: 8,
+    erroComum: {
+      titulo: "Tratar futuro e opção como a mesma mesa",
+      texto:
+        "Futuro exige ajuste e margem; opção comprada limita a perda ao prêmio — com theta corroendo.",
+    },
+    resumoPontos: [
+      "Futuro = compromisso contínuo",
+      "Opção comprada = bilhete limitado",
+      "Escolha pela tese",
+    ],
+  },
+  "decisao-no-day-trade": {
+    objetivo: "Ter o ciclo completo escrito antes de o gatilho disparar.",
+    tempoMin: 9,
+    erroComum: {
+      titulo: "Avaliar a decisão pelo resultado",
+      texto: "Lucro com processo ruim é sorte; perda dentro do plano pode ser ótima decisão.",
+    },
+    resumoPontos: [
+      "Check → hipótese → stop → tamanho",
+      "Decisão antes do gatilho",
+      "Processo, não resultado",
+    ],
+  },
+  "tributacao-day-trade": {
+    objetivo: "Saber que day trade paga 20% no mês, com IRRF de 1% abatido — sem isenção.",
+    tempoMin: 7,
+    erroComum: {
+      titulo: "Aplicar a isenção de R$ 20 mil ao day trade",
+      texto:
+        "A isenção não existe para day trade: 20% mês a mês, DARF 6015 até o fim do mês seguinte.",
+    },
+    resumoPontos: ["20% sobre o lucro do mês", "IRRF 1% abate", "Sem isenção no day trade"],
+  },
+  "darf-day-trade": {
+    objetivo: "Emitir e pagar o DARF de day trade no prazo, sem susto.",
+    tempoMin: 7,
+    erroComum: {
+      titulo: "Esperar a declaração anual para pagar",
+      texto:
+        "O DARF é mensal: atraso gera multa e juros, e a corretora já informou o IRRF à Receita.",
+    },
+    resumoPontos: ["Código 6015", "Banco Central", "Último dia útil do mês seguinte"],
+  },
 };
 
 export function getLessonMeta(slug: string): LessonMeta {

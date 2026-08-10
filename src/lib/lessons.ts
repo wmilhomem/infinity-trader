@@ -71,6 +71,7 @@ export type Lesson = {
   slug: string;
   ordem: number;
   nivel: LessonNivel;
+  dominio?: "futuros";
   titulo: string;
   resumo: string;
   problema: LessonProblema;
@@ -4069,10 +4070,2252 @@ Planilha própria ou o **diário do Zero ao Trade** — os campos de resultado a
       },
     ],
   },
+  {
+    slug: "o-que-e-um-futuro",
+    ordem: 24,
+    nivel: 1,
+    dominio: "futuros",
+    titulo: "Lição 1 — O que é um contrato futuro",
+    resumo:
+      "Um compromisso padronizado de comprar ou vender a um preço combinado, com ajuste todo dia.",
+    problema: {
+      titulo: "O cafezal e o preço de amanhã",
+      texto:
+        "Dona Rosa vende café e teme que o preço caia antes da colheita. O comprador teme que suba. Os dois querem travar o preço hoje — mas nenhum quer carregar a incerteza do outro. No mercado de futuros, os dois assinam um contrato padronizado: preço combinado hoje, liquidação no futuro.",
+      pergunta: "O que exatamente você está assumindo quando compra um futuro?",
+    },
+    conceitos: [
+      {
+        titulo: "O conceito",
+        corpo: `
+Um **contrato futuro** é um compromisso padronizado de comprar (ou vender) um ativo por um preço combinado, com liquidação em uma data futura.
+
+- **Compromisso, não direito**: ao contrário da opção, você tem a obrigação de cumprir o contrato.
+- **Padronizado**: tamanho, vencimento e valor são fixos — no mini índice e no mini dólar, um contrato sempre vale a mesma coisa.
+- **Ajuste diário**: a diferença do dia é liquidada no fim do pregão, como se o contrato fosse renegociado todo dia.
+        `,
+      },
+      {
+        titulo: "MINI índice e MINI dólar",
+        corpo: `
+Na B3, os contratos mais negociados são o **WIN** (mini índice) e o **WDO** (mini dólar). "Mini" significa tamanho pequeno: o contrato cheio vale 5x mais.
+
+- **WIN** = contrato futuro sobre o índice Bovespa, valor de **R$ 0,20 por ponto**.
+- **WDO** = contrato futuro sobre a taxa de câmbio dólar/real, valor de **R$ 10 por ponto**.
+        `,
+      },
+    ],
+    analogia:
+      "Pense num contrato de futuro como um combinado com o hortifruti: você acerta hoje o preço da caixa de maçãs para receber daqui a um mês. A diferença dos futuros é que, todo fim de dia, o mercado olha o combinado e liquida a diferença — como se renegociasse tudo diariamente.",
+    naPratica: {
+      titulo: "Antes de operar qualquer contrato futuro",
+      passos: [
+        "Qual é o tamanho do contrato (quantos pontos x valor do ponto)?",
+        "Qual é o vencimento do contrato que você está olhando?",
+        "Quanto custa a margem para segurá-lo?",
+        "Quanto você perde se o mercado andar 100 pontos contra você?",
+      ],
+    },
+    missao: {
+      titulo: "O compromisso que você assumiu",
+      situacao:
+        "Você comprou 1 contrato WIN (R$ 0,20 por ponto) porque acredita que o índice vai subir. O pregão fecha com o índice 100 pontos abaixo da sua entrada.",
+      pergunta: "O que aconteceu de verdade com você ao final do dia?",
+      opcoes: [
+        {
+          texto: "Nada — só no vencimento se sabe o resultado",
+          tom: "errada",
+          feedback:
+            "No futuro, o resultado é liquidado todo dia no ajuste diário. Você já perdeu 100 x R$ 0,20 = R$ 20 na conta, no fim do pregão.",
+        },
+        {
+          texto: "O ajuste diário debita R$ 20 — e isso pode acontecer todos os dias",
+          tom: "correta",
+          feedback:
+            "Boa decisão. O ajuste diário marca a posição a mercado todo fim de pregão: 100 pontos x R$ 0,20 = R$ 20 de débito. O resultado acumula dia a dia, não só no vencimento.",
+        },
+        {
+          texto: "Você tem o direito de desistir pagando uma multa",
+          tom: "errada",
+          feedback:
+            "Futuro é compromisso, não direito. Sair da posição significa fechar o contrato (vender o que comprou), realizando o resultado do momento.",
+        },
+        {
+          texto: "R$ 20 de lucro, porque o preço estava abaixo",
+          tom: "errada",
+          feedback:
+            "Você comprou esperando alta; o índice caiu 100 pontos. O ajuste debita R$ 20, não credita.",
+        },
+      ],
+      termosExplicacao: ["ajuste", "0,20", "20", "R$ 20", "pontos"],
+      aindaPratique: "somar ajustes de vários dias até o fechamento da posição",
+      transferencia: {
+        titulo: "O mesmo dia, no WDO",
+        situacao: "Você comprou 1 contrato WDO (R$ 10 por ponto) e o dólar subiu 30 pontos no dia.",
+        pergunta: "Qual é o resultado do ajuste diário?",
+        opcoes: [
+          {
+            texto: "R$ 300 de crédito (30 pontos x R$ 10)",
+            tom: "correta",
+            feedback:
+              "Boa decisão. O WDO vale R$ 10 por ponto: 30 pontos x R$ 10 = R$ 300 creditados no ajuste. A cada ponto do dólar, R$ 10.",
+          },
+          {
+            texto: "R$ 6 (30 x R$ 0,20)",
+            tom: "errada",
+            feedback:
+              "R$ 0,20 é o valor do ponto do WIN (índice). No WDO (dólar), cada ponto vale R$ 10.",
+          },
+          {
+            texto: "Nada até o vencimento",
+            tom: "errada",
+            feedback:
+              "No futuro, o resultado é liquidado diariamente no ajuste, não apenas no vencimento.",
+          },
+          {
+            texto: "R$ 300 de débito, porque subiu contra você",
+            tom: "errada",
+            feedback:
+              "Você comprou esperando alta e o dólar subiu: o movimento foi a seu favor — crédito, não débito.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "A diferença central entre uma opção e um futuro é:",
+        alternativas: [
+          "Futuro é compromisso; opção é direito",
+          "Opção é mais arriscada que futuro",
+          "Futuro só existe na B3",
+          "Não há diferença",
+        ],
+        correta: 0,
+        explicacao:
+          "No futuro você tem a obrigação de cumprir o contrato. Na opção, você compra um direito e pode simplesmente não exercer.",
+      },
+      {
+        pergunta: "O ajuste diário faz com que:",
+        alternativas: [
+          "O resultado do dia seja liquidado no fim do pregão",
+          "O contrato seja cancelado todo dia",
+          "Só o vencimento importe",
+          "A margem seja devolvida todo dia",
+        ],
+        correta: 0,
+        explicacao:
+          "A posição é marcada a mercado no fim de cada sessão e a diferença é creditada ou debitada da conta.",
+      },
+      {
+        pergunta: "Quantos reais valem 100 pontos de WIN?",
+        alternativas: ["R$ 20", "R$ 1.000", "R$ 0,20", "R$ 100"],
+        correta: 0,
+        explicacao: "WIN vale R$ 0,20 por ponto: 100 x R$ 0,20 = R$ 20.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Traduza o contrato",
+        enunciado:
+          "Um contrato WIN vale R$ 0,20 por ponto. Quantos reais você ganha ou perde se o índice andar 50 pontos? E 1.000 pontos?",
+        gabarito: "50 x 0,20 = R$ 10. 1.000 x 0,20 = R$ 200 por contrato.",
+      },
+      {
+        titulo: "Repita no WDO",
+        enunciado:
+          "Um contrato WDO vale R$ 10 por ponto. Quantos reais você perde se o dólar andar 25 pontos contra você?",
+        gabarito: "25 x 10 = R$ 250 por contrato.",
+      },
+    ],
+  },
+  {
+    slug: "valor-do-ponto-e-tick",
+    ordem: 25,
+    nivel: 1,
+    dominio: "futuros",
+    titulo: "Lição 2 — Valor do ponto e tick",
+    resumo: "Cada ponto do índice e do dólar tem um preço em reais — e o mercado anda em ticks.",
+    problema: {
+      titulo: "O preço do milímetro",
+      texto:
+        "Bruno olha a tela do WIN e vê o número 130.000. Em 5 minutos, virou 130.005. Ele sabe que 'subiu', mas não sabe: quanto isso valeu em reais? Cada movimento mínimo tem um tamanho — e um preço. Sem traduzir pontos em reais, o trader não sabe nem o tamanho da própria posição.",
+      pergunta: "Quanto vale o menor movimento do contrato que você opera?",
+    },
+    conceitos: [
+      {
+        titulo: "Ponto e tick",
+        corpo: `
+**Ponto** é a unidade do preço do ativo (o índice em pontos, o dólar em centavos). **Tick** é o menor movimento que o mercado pode andar.
+
+- **WIN**: ponto vale **R$ 0,20**. O mercado anda em ticks de **5 pontos** = **R$ 1,00**.
+- **WDO**: ponto vale **R$ 10**. O mercado anda em ticks de **0,5 ponto** = **R$ 5,00**.
+
+Um tick é a menor "moeda" do seu contrato: todo preço de entrada e de stop é múltiplo de tick.
+        `,
+      },
+      {
+        titulo: "Tradução rápida",
+        corpo: `
+| Contrato | 1 ponto | 1 tick | 10 pontos | 100 pontos |
+|---|---|---|---|---|
+| WIN | R$ 0,20 | R$ 1,00 | R$ 2,00 | R$ 20,00 |
+| WDO | R$ 10 | R$ 5,00 | R$ 100 | R$ 1.000 |
+
+O hábito do dia: sempre transformar pontos em reais antes de decidir. "O índice caiu 300 pontos" só ganha significado quando você vira "R$ 60 por contrato".
+        `,
+      },
+    ],
+    analogia:
+      "Ponto e tick são como o pedágio de uma estrada: cada quilômetro (ponto) tem um valor por contrato. O tick é o troco: no WIN, o pedágio mínimo cobrado é de R$ 1,00 (5 pontos x R$ 0,20); no WDO, R$ 5,00 (0,5 ponto x R$ 10).",
+    naPratica: {
+      titulo: "Antes de operar qualquer contrato",
+      passos: [
+        "Quanto vale 1 ponto do meu contrato? E 1 tick?",
+        "Quantos reais andam 10 pontos? E 100 pontos?",
+        "Meu stop em pontos vira quantos reais por contrato?",
+        "O preço que quero entrar é um múltiplo de tick válido?",
+      ],
+    },
+    missao: {
+      titulo: "O índice andou — e agora?",
+      situacao:
+        "O WIN estava em 130.000 e fechou o dia em 129.800. Você está comprado em 1 contrato desde a abertura.",
+      pergunta: "Qual foi o impacto na sua conta?",
+      opcoes: [
+        {
+          texto: "-R$ 40 (200 pontos x R$ 0,20)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. 200 pontos x R$ 0,20 = R$ 40 de prejuízo no ajuste diário. Pontos traduzidos em reais antes de qualquer outra conversa.",
+        },
+        {
+          texto: "-R$ 40.000, porque o índice é 130.000",
+          tom: "errada",
+          feedback:
+            "O índice em si não é o seu contrato: o WIN vale R$ 0,20 por ponto, não R$ 1 por ponto.",
+        },
+        {
+          texto: "-R$ 200 (200 pontos x R$ 1,00)",
+          tom: "errada",
+          feedback: "R$ 1,00 é o valor de um tick (5 pontos) do WIN, não de um ponto.",
+        },
+        {
+          texto: "-R$ 2.000 (200 pontos x R$ 10)",
+          tom: "errada",
+          feedback: "R$ 10 por ponto é o valor do WDO (dólar), não do WIN (índice).",
+        },
+      ],
+      termosExplicacao: ["0,20", "40", "200 pontos", "R$ 0,20"],
+      aindaPratique: "traduzir pontos de WDO e de WIN até virar automático",
+      transferencia: {
+        titulo: "O mesmo raciocínio no WDO",
+        situacao: "O dólar andou 80 pontos contra você no dia. Você está comprado em 1 WDO.",
+        pergunta: "Quanto isso custou no ajuste diário?",
+        opcoes: [
+          {
+            texto: "-R$ 800 (80 pontos x R$ 10)",
+            tom: "correta",
+            feedback: "Boa decisão. WDO: R$ 10 por ponto -> 80 x R$ 10 = R$ 800 de débito.",
+          },
+          {
+            texto: "-R$ 16 (80 x R$ 0,20)",
+            tom: "errada",
+            feedback: "R$ 0,20 é do WIN. No WDO, cada ponto vale R$ 10.",
+          },
+          {
+            texto: "-R$ 400 (80 x R$ 5,00)",
+            tom: "errada",
+            feedback: "R$ 5,00 é o valor do tick do WDO (0,5 ponto), não do ponto inteiro.",
+          },
+          {
+            texto: "-R$ 80, um real por ponto",
+            tom: "errada",
+            feedback: "Nenhum contrato mini vale R$ 1 por ponto: WIN R$ 0,20, WDO R$ 10.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "Quantos reais vale um tick de WIN?",
+        alternativas: ["R$ 1,00", "R$ 0,20", "R$ 5,00", "R$ 0,50"],
+        correta: 0,
+        explicacao: "Tick de WIN = 5 pontos x R$ 0,20 = R$ 1,00.",
+      },
+      {
+        pergunta: "Quantos reais vale um tick de WDO?",
+        alternativas: ["R$ 5,00", "R$ 10,00", "R$ 0,50", "R$ 1,00"],
+        correta: 0,
+        explicacao: "Tick de WDO = 0,5 ponto x R$ 10 = R$ 5,00.",
+      },
+      {
+        pergunta: "O WIN andou 60 pontos. Em 2 contratos, isso vale:",
+        alternativas: ["R$ 24 (60 x 0,20 x 2)", "R$ 12 (60 x 0,20)", "R$ 120 (60 x 2)", "R$ 60"],
+        correta: 0,
+        explicacao: "60 pontos x R$ 0,20 = R$ 12 por contrato; em 2 contratos, R$ 24.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Tabela de tradução",
+        enunciado:
+          "Complete: (a) 250 pontos de WIN = R$ __; (b) 75 pontos de WDO = R$ __; (c) 40 ticks de WIN = R$ __; (d) 30 ticks de WDO = R$ __.",
+        gabarito:
+          "(a) 250 x 0,20 = R$ 50. (b) 75 x 10 = R$ 750. (c) 40 x 1,00 = R$ 40. (d) 30 x 5,00 = R$ 150.",
+      },
+    ],
+  },
+  {
+    slug: "margem-e-alavancagem",
+    ordem: 26,
+    nivel: 1,
+    dominio: "futuros",
+    titulo: "Lição 3 — Margem e alavancagem",
+    resumo:
+      "Uma garantia pequena controla um contrato grande — a alavancagem amplia ganhos e perdas.",
+    problema: {
+      titulo: "O depósito do apartamento",
+      texto:
+        "O corretor cobra uma garantia de ~R$ 100 para você segurar um contrato WIN que vale ~R$ 26.000 de exposição. Parece ótimo: R$ 100 para controlar R$ 26 mil. Mas a pergunta que ninguém faz no primeiro dia: se o índice andar 1% contra você, quanto sai da sua conta?",
+      pergunta: "O que a margem cobre — e o que ela NÃO cobre?",
+    },
+    conceitos: [
+      {
+        titulo: "Margem: a garantia, não o preço",
+        corpo: `
+**Margem mínima** é a garantia exigida para abrir a posição — não é o custo do contrato e não é o seu risco máximo.
+
+- **WIN**: margem em torno de **R$ 100** por contrato.
+- **WDO**: margem em torno de **R$ 150** por contrato.
+- A margem cobre o **ajuste diário**: se você não tem saldo para o débito do dia, a posição pode ser liquidada.
+
+O risco do dia não é a margem: é **quantos pontos o mercado pode andar contra você**.
+        `,
+      },
+      {
+        titulo: "Alavancagem real",
+        corpo: `
+A exposição de um contrato WIN é o valor do índice x R$ 0,20: com o índice em ~130.000 pontos, cerca de **R$ 26.000** por contrato. Com ~R$ 100 de margem, a alavancagem é de **~260 vezes**.
+
+Traduzindo: **1% de movimento do índice** (~1.300 pontos) vale **R$ 260** na sua conta — mais que o dobro da margem. A alavancagem não faz o mercado andar menos; faz cada ponto valer mais na sua conta.
+        `,
+      },
+    ],
+    analogia:
+      "Margem é como o depósito de segurança de um aluguel: você entrega um valor pequeno, mas responde pelo imóvel inteiro. Se o muro cair, o conserto sai do seu bolso, não do depósito.",
+    naPratica: {
+      titulo: "Antes de abrir posição",
+      passos: [
+        "Qual é a margem do contrato que vou operar?",
+        "Qual é a exposição total (pontos x valor do ponto)?",
+        "Se o mercado andar 1% contra, quanto isso custa?",
+        "Meu capital aguenta o ajuste diário de vários dias seguidos contra?",
+      ],
+    },
+    missao: {
+      titulo: "O 1% que ninguém vê",
+      situacao:
+        "O índice está em 130.000. Você abre 2 contratos WIN com ~R$ 200 de margem total (R$ 100 cada). O mercado cai 1% no dia e o ajuste é debitado.",
+      pergunta: "Quanto você perdeu nesse movimento?",
+      opcoes: [
+        {
+          texto: "R$ 520 (1.300 pontos x R$ 0,20 x 2 contratos)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. 1% de 130.000 = 1.300 pontos x R$ 0,20 = R$ 260 por contrato; em 2 contratos, R$ 520. O ajuste diário cobra isso — e a margem de R$ 200 não cobre nem metade.",
+        },
+        {
+          texto: "R$ 200, no máximo — a margem protege",
+          tom: "errada",
+          feedback:
+            "A margem não é um limite de perda: é uma garantia. A perda é o movimento x valor do ponto x contratos.",
+        },
+        {
+          texto: "R$ 2.600 (1% de R$ 260.000)",
+          tom: "errada",
+          feedback:
+            "A exposição é 1.300 pontos x R$ 0,20 = R$ 260 por contrato, não R$ 1 por ponto.",
+        },
+        {
+          texto: "Nada — a margem é recomposta no dia seguinte",
+          tom: "errada",
+          feedback:
+            "O ajuste é liquidado no fim do pregão: o débito sai da conta. Sem saldo, a corretora encerra a posição.",
+        },
+      ],
+      termosExplicacao: ["520", "1.300", "ajuste", "0,20"],
+      aindaPratique: "calcular a perda de 1% nos dois contratos, com o índice em outros níveis",
+      transferencia: {
+        titulo: "O mesmo movimento, no WDO",
+        situacao:
+          "O dólar está em 5,4000. Você abre 1 WDO com ~R$ 150 de margem. O dólar sobe 1% (~54 pontos) contra você.",
+        pergunta: "Quanto o ajuste debita?",
+        opcoes: [
+          {
+            texto: "R$ 540 (54 pontos x R$ 10)",
+            tom: "correta",
+            feedback:
+              "Boa decisão. 1% de 5,4000 = 54 pontos x R$ 10 = R$ 540 de débito — mais de três vezes a margem de R$ 150.",
+          },
+          {
+            texto: "R$ 54 (54 x R$ 1)",
+            tom: "errada",
+            feedback: "O WDO vale R$ 10 por ponto, não R$ 1.",
+          },
+          {
+            texto: "R$ 150 — limitado pela margem",
+            tom: "errada",
+            feedback:
+              "A margem não limita a perda; o stop limita. Sem stop, o ajuste segue debitando.",
+          },
+          {
+            texto: "R$ 10,80 (54 x R$ 0,20)",
+            tom: "errada",
+            feedback: "R$ 0,20 por ponto é o WIN; o WDO vale R$ 10 por ponto.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "A margem mínima de um contrato futuro é:",
+        alternativas: [
+          "Uma garantia para o ajuste diário, não um limite de perda",
+          "O preço do contrato",
+          "O valor máximo que você pode perder",
+          "Uma taxa paga ao governo",
+        ],
+        correta: 0,
+        explicacao:
+          "A margem cobre os ajustes diários. Quem limita sua perda é o stop, definido por você.",
+      },
+      {
+        pergunta: "Com o índice em 130.000, 1 contrato WIN expõe você a:",
+        alternativas: ["~R$ 26.000 (130.000 x R$ 0,20)", "~R$ 130.000", "~R$ 100", "~R$ 260"],
+        correta: 0,
+        explicacao: "Exposição = valor do índice x valor do ponto = 130.000 x R$ 0,20 = R$ 26.000.",
+      },
+      {
+        pergunta: "Se você não tem saldo para pagar o ajuste diário:",
+        alternativas: [
+          "A corretora pode liquidar sua posição",
+          "O prejuízo fica para o vencimento",
+          "A margem absorve tudo",
+          "O contrato é cancelado sem custo",
+        ],
+        correta: 0,
+        explicacao:
+          "O ajuste é devido no fim do dia. Sem saldo, a posição é encerrada — geralmente no pior momento.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "O custo de 1%",
+        enunciado:
+          "Índice em 130.000, WIN (R$ 0,20/pt). Quanto custa uma queda de 1% em 1 contrato? E em 5? Se a sua regra é perder no máximo R$ 200 por dia, quantos contratos cabem nessa queda de 1%?",
+        gabarito:
+          "1% = 1.300 pts -> R$ 260/contrato; 5 contratos = R$ 1.300. Com limite de R$ 200, nem 1 contrato cabe nesse cenário: o stop precisa vir antes do 1%.",
+      },
+    ],
+  },
+  {
+    slug: "pregao-e-sessao",
+    ordem: 27,
+    nivel: 2,
+    dominio: "futuros",
+    titulo: "Lição 4 — Pregão e sessão",
+    resumo: "WIN e WDO vivem entre 9h e 18h — e a sessão muda de personalidade ao longo do dia.",
+    problema: {
+      titulo: "O cinema que abre às 9h e fecha às 18h",
+      texto:
+        "Camila entrou no WIN às 22h porque o mercado americano caía. Não havia tela — nem book, nem preço. Day trade de WIN/WDO só existe dentro do pregão. E dentro do pregão, os momentos não são iguais: a abertura tem volume, o meio do dia dorme e o fechamento decide.",
+      pergunta: "O que muda dentro do horário de negociação — e fora dele?",
+    },
+    conceitos: [
+      {
+        titulo: "O horário é o palco",
+        corpo: `
+O pregão de **WIN e WDO vai das 9h às 18h** (horário de Brasília), em dias úteis.
+
+- Fora desse intervalo **não há preço de referência** para day trade: o contrato que "pariu" depois das 18h é o vencimento do dia seguinte — outro instrumento.
+- **9h–10h30**: abertura. Maior volume e maior volatilidade. É onde os movimentos grandes nascem.
+- **11h–15h**: meio do dia. Menor liquidez, spreads abertos, falsos rompimentos.
+- **15h–18h**: fechamento. Reação às notícias americanas e ajuste final.
+
+Day trade é um esporte com horário marcado: a posição precisa ser encerrada dentro da sessão.
+        `,
+      },
+      {
+        titulo: "Sessão e vencimento",
+        corpo: `
+**Sessão** é o dia de negociação (9h–18h). **Vencimento** é o contrato que vence em determinada data (WIN com vencimento em cada mês, WDO idem).
+
+- No **vencimento**, o contrato é liquidado e o próximo mês vira o principal.
+- Operar na semana do vencimento muda o comportamento do contrato (convergência, liquidez migrando).
+
+Sempre confira **qual vencimento** você está olhando antes de entrar.
+        `,
+      },
+    ],
+    analogia:
+      "O pregão é como um cinema com sessão única: o WIN abre às 9h, fecha às 18h e não tem matinê. Quem perde o horário não assiste ao filme — e quem assiste precisa sair antes do fim da sessão (zerar a posição).",
+    naPratica: {
+      titulo: "Antes de operar qualquer dia",
+      passos: [
+        "Estou dentro do pregão (9h–18h)?",
+        "Qual vencimento está no meu preço?",
+        "Estou na abertura, no meio do dia ou no fechamento?",
+        "Quanto tempo de sessão ainda resta para a minha tese acontecer?",
+      ],
+    },
+    missao: {
+      titulo: "O horário que decide",
+      situacao:
+        "São 14h30, o índice está lateral. Você vê um rompimento pequeno e entra comprado em WIN. Às 17h50, o rompimento não se confirmou e você está −R$ 30 no dia.",
+      pergunta: "O que é coerente fazer às 17h50?",
+      opcoes: [
+        {
+          texto: "Encerrar a posição — day trade zera antes das 18h",
+          tom: "correta",
+          feedback:
+            "Boa decisão. A tese não se confirmou e a sessão está acabando: segurar até depois das 18h vira outra operação (overnight), sem a sua permissão.",
+        },
+        {
+          texto: "Segurar até o vencimento do contrato",
+          tom: "errada",
+          feedback:
+            "Segurar para o outro dia transforma o day trade em swing sem aviso — e sem o seu plano.",
+        },
+        {
+          texto: "Dobrar a posição para recuperar antes das 18h",
+          tom: "errada",
+          feedback:
+            "Recuperar prejuízo aumentando tamanho na última meia hora é a receita do estouro de conta.",
+        },
+        {
+          texto: "Deixar a posição aberta, o ajuste cuida",
+          tom: "errada",
+          feedback:
+            "O ajuste não decide por você: a posição continua com risco durante a noite e no dia seguinte.",
+        },
+      ],
+      termosExplicacao: ["18h", "zerar", "encerrar", "sessão", "fechar"],
+      aindaPratique: "respeitar o horário de fechamento mesmo com prejuízo pequeno",
+      transferencia: {
+        titulo: "A abertura como palco",
+        situacao:
+          "São 9h20 e o WIN abre com um gap de alta de 200 pontos, mas o volume parece baixo na primeira meia hora.",
+        pergunta: "O que essa leitura sugere?",
+        opcoes: [
+          {
+            texto: "Desconfiar: abertura com volume baixo costuma reverter",
+            tom: "correta",
+            feedback:
+              "Boa decisão. Abertura sem volume sustenta pouco: movimentos de abertura precisam de liquidez para não serem varridos.",
+          },
+          {
+            texto: "Entrar na direção do gap imediatamente",
+            tom: "errada",
+            feedback:
+              "Gap não é ordem de compra: sem volume, o preço costuma retornar ao fechamento anterior.",
+          },
+          {
+            texto: "Ignorar o volume — preço é preço",
+            tom: "errada",
+            feedback:
+              "Volume é o que sustenta o preço. Movimento sem volume é rumor, não tendência.",
+          },
+          {
+            texto: "Comprar 10 contratos porque o dia abre com notícia",
+            tom: "errada",
+            feedback:
+              "Notícia abre a tela, não autoriza tamanho: o dimensionamento continua mandando.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O pregão de WIN e WDO acontece:",
+        alternativas: [
+          "Das 9h às 18h, em dias úteis",
+          "24 horas por dia",
+          "Só no vencimento",
+          "Das 10h às 16h",
+        ],
+        correta: 0,
+        explicacao: "WIN e WDO negociam das 9h às 18h (horário de Brasília), em dias úteis.",
+      },
+      {
+        pergunta: "Uma posição de day trade aberta às 17h45 precisa ser:",
+        alternativas: [
+          "Encerrada até as 18h",
+          "Rolada para o próximo vencimento",
+          "Garantida com margem dobrada",
+          "Mantida até virar lucro",
+        ],
+        correta: 0,
+        explicacao:
+          "Day trade é intra-sessão: a posição zera dentro do horário. Manter aberta vira outra operação.",
+      },
+      {
+        pergunta: "O momento com maior volume e volatilidade costuma ser:",
+        alternativas: [
+          "A abertura (9h–10h30)",
+          "O meio do dia (12h)",
+          "O intervalo do almoço",
+          "As 18h em ponto",
+        ],
+        correta: 0,
+        explicacao: "A abertura concentra volume e define o tom do dia.",
+      },
+      {
+        pergunta: "Qual vencimento você deve conferir antes de operar?",
+        alternativas: [
+          "O do contrato que está na tela",
+          "O do mês seguinte, sempre",
+          "O do ano",
+          "Nenhum — vencimento não importa",
+        ],
+        correta: 0,
+        explicacao:
+          "Perto do vencimento, o contrato converge e a liquidez migra — o contrato da tela pode não ser o que você pensa.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Mapa da sessão",
+        enunciado:
+          "Descreva em uma frase o que você espera de (a) 9h–10h30, (b) 11h–15h e (c) 15h–18h no WIN. Depois marque em qual janela a sua estratégia de day trade tem melhor liquidez.",
+        gabarito:
+          "Exemplo: (a) volume alto, movimentos definindo o dia; (b) liquidez baixa, falsos rompimentos; (c) reação às notícias dos EUA. A janela escolhida deve ser a de maior liquidez para o seu setup.",
+      },
+    ],
+  },
+  {
+    slug: "stop-e-dimensionamento",
+    ordem: 28,
+    nivel: 2,
+    dominio: "futuros",
+    titulo: "Lição 5 — Stop e dimensionamento",
+    resumo:
+      "Contratos = risco ÷ (stop × valor do ponto): o tamanho da posição nasce do prejuízo que você aceita.",
+    problema: {
+      titulo: "O desfibrilador desligado",
+      texto:
+        "Diego entrou comprado em WIN com 5 contratos porque 'o lucro seria bom'. O mercado andou 300 pontos contra. 5 × 300 × R$ 0,20 = R$ 300 de prejuízo — o dobro do que ele aceitava perder. O stop existia na tela, mas estava a 600 pontos, para 'não ser pego'. O desfibrilador estava desligado.",
+      pergunta: "Como definir stop e quantidade ANTES de entrar?",
+    },
+    conceitos: [
+      {
+        titulo: "A fórmula mecânica",
+        corpo: `
+O dimensionamento de futuros é uma equação, não um palpite:
+
+**contratos = risco em R$ ÷ (stop em pontos × valor do ponto)**
+
+Com R$ 200 de risco, stop de 200 pontos em WIN (R$ 0,20/pt):
+- Contratos = 200 ÷ (200 × 0,20) = 200 ÷ 40 = **5 contratos**.
+
+Se o stop precisa ser maior (400 pts), o número de contratos cai: 200 ÷ 80 = 2,5 → **2 contratos** (piso de 1).
+        `,
+      },
+      {
+        titulo: "O stop é decisão, não acidente",
+        corpo: `
+O stop é o ponto onde **a sua hipótese estaria errada** — não um número confortável.
+
+- Stop curto demais: morre no ruído.
+- Stop longo demais: a conta paga.
+- **Mover o stop para longe depois da entrada** não é gestão: é eliminar a decisão. Se o stop está onde você não aceita perder, o tamanho é que muda — não o stop.
+
+No simulador de futuros, contratos = risco ÷ (stop × valor do ponto), e o risco real é sempre conferido antes de salvar.
+        `,
+      },
+    ],
+    analogia:
+      "O stop é o desfibrilador: a gente liga antes da emergência, não durante. No futuro, sem stop você não tem perda máxima — você tem uma margem que pode ser consumida e uma posição que a corretora pode liquidar no pior momento.",
+    naPratica: {
+      titulo: "Antes de entrar",
+      passos: [
+        "Quanto em R$ posso perder nesta operação (regra do 1%)?",
+        "Onde o mercado provaria que estou errado (stop em pontos)?",
+        "Contratos = risco ÷ (stop × valor do ponto)",
+        "O risco real confere com o risco que aceitei?",
+      ],
+    },
+    missao: {
+      titulo: "O tamanho que nasce do risco",
+      situacao:
+        "Seu patrimônio é R$ 20.000 e sua regra é arriscar no máximo 1% por operação (R$ 200). Você quer operar WDO (R$ 10/pt) com stop de 50 pontos.",
+      pergunta: "Quantos contratos cabem?",
+      opcoes: [
+        {
+          texto: "0,4 → 0 contratos: o piso de 1 contrato já estoura o risco",
+          tom: "errada",
+          feedback:
+            "Quase! 200 ÷ (50 × 10) = 0,4. Como o piso é 1 contrato, o mínimo (1 × 50 × 10 = R$ 500) excede o risco aceito: a conclusão coerente é não operar ou diminuir o stop.",
+        },
+        {
+          texto: "1 contrato, pois é o mínimo possível — ciente de que estoura a regra",
+          tom: "correta",
+          feedback:
+            "Boa decisão — com o aviso de que 1 contrato (R$ 500 de risco) estoura a regra dos R$ 200: ou o stop encolhe, ou a operação não existe. Dimensionar é também saber dizer não.",
+        },
+        {
+          texto: "2 contratos, para compensar o risco",
+          tom: "errada",
+          feedback: "2 contratos = R$ 1.000 de risco com stop de 50 pts: cinco vezes o seu limite.",
+        },
+        {
+          texto: "5 contratos — o lucro seria melhor",
+          tom: "errada",
+          feedback: "Tamanho nunca nasce do lucro possível. Nasce do prejuízo que você aceita.",
+        },
+      ],
+      termosExplicacao: ["1", "piso", "50", "500", "R$ 200", "risco"],
+      aindaPratique: "calcular contratos para os quatro stops dos presets do simulador",
+      transferencia: {
+        titulo: "Diminuindo o stop",
+        situacao:
+          "Mesmo capital (R$ 200 de risco máximo). Você reduz o stop do WDO para 20 pontos.",
+        pergunta: "Quantos contratos agora?",
+        opcoes: [
+          {
+            texto: "1 contrato: 200 ÷ (20 × 10) = 1 → risco real R$ 200",
+            tom: "correta",
+            feedback:
+              "Boa decisão. 20 × 10 = R$ 200 por contrato = exatamente o limite. Piso respeitado e risco real conferido.",
+          },
+          {
+            texto: "10 contratos: 200 ÷ 20 = 10",
+            tom: "errada",
+            feedback:
+              "Faltou multiplicar o stop pelo valor do ponto (R$ 10): 20 pontos × R$ 10 = R$ 200 por contrato.",
+          },
+          {
+            texto: "1 contrato, mas com stop de 50 movido depois",
+            tom: "errada",
+            feedback:
+              "Mover o stop para longe depois de entrar elimina a decisão e o dimensionamento.",
+          },
+          {
+            texto: "2 contratos, porque o stop é menor",
+            tom: "errada",
+            feedback: "2 × 20 × 10 = R$ 400 de risco: o dobro do limite.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "A fórmula de dimensionamento de futuros é:",
+        alternativas: [
+          "contratos = risco ÷ (stop × valor do ponto)",
+          "contratos = stop ÷ risco",
+          "contratos = valor do ponto ÷ stop",
+          "contratos = risco × stop",
+        ],
+        correta: 0,
+        explicacao: "O tamanho nasce do prejuízo aceito dividido pelo custo do stop por contrato.",
+      },
+      {
+        pergunta: "Risco de R$ 300, stop de 300 pontos em WIN (R$ 0,20/pt):",
+        alternativas: ["5 contratos", "1 contrato", "15 contratos", "3 contratos"],
+        correta: 0,
+        explicacao: "300 ÷ (300 × 0,20) = 300 ÷ 60 = 5 contratos.",
+      },
+      {
+        pergunta: "O stop deve ficar onde:",
+        alternativas: [
+          "A sua hipótese estaria errada",
+          "Você aguenta ver o prejuízo",
+          "O gráfico parece bonito",
+          "O lucro seria dobrado",
+        ],
+        correta: 0,
+        explicacao:
+          "O stop marca a invalidação da tese. O tamanho se ajusta ao stop, nunca o contrário.",
+      },
+      {
+        pergunta: "A fórmula retorna 0,4 contrato. A decisão coerente é:",
+        alternativas: [
+          "Não operar, ou encolher o stop até caber",
+          "Arredondar para 1 contrato sempre",
+          "Arredondar para cima e ajustar depois",
+          "Aumentar o risco para caber",
+        ],
+        correta: 0,
+        explicacao:
+          "O piso é 1 contrato: se o mínimo estoura o risco aceito, a operação não existe.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Quatro cenários",
+        enunciado:
+          "Calcule os contratos: (a) R$ 150, stop 100 pts, WIN; (b) R$ 400, stop 80 pts, WDO; (c) R$ 90, stop 300 pts, WIN; (d) R$ 1.000, stop 25 pts, WDO. Indique quando o resultado pede 'não operar'.",
+        gabarito:
+          "(a) 150÷20 = 7. (b) 400÷800 = 0,5 → não opera. (c) 90÷60 = 1 (piso). (d) 1.000÷250 = 4.",
+      },
+      {
+        titulo: "No simulador",
+        enunciado:
+          "Monte no simulador de futuros: risco R$ 200, stop 300 pts, WIN. Confira os contratos e o risco real. Depois dobre o stop e veja os contratos caírem.",
+        gabarito:
+          "300 pts × 0,20 = 60 → 200÷60 = 3 contratos; risco real R$ 180. Com stop 600: 1 contrato, R$ 120.",
+      },
+    ],
+  },
+  {
+    slug: "day-trade-vs-swing",
+    ordem: 29,
+    nivel: 2,
+    dominio: "futuros",
+    titulo: "Lição 6 — Day trade vs swing",
+    resumo:
+      "Abrir e fechar na mesma sessão ou dormir com a posição: regras, riscos e impostos diferentes.",
+    problema: {
+      titulo: "O mesmo contrato, dois regimes",
+      texto:
+        "Eduardo operou o mesmo WIN de duas formas no mês: algumas operações zeradas no mesmo dia, outras mantidas de um dia para o outro. Na hora do imposto, ele descobriu que as duas modalidades não se misturam: uma paga 20%, a outra 15%, e o prejuízo de uma não compensa o lucro da outra.",
+      pergunta: "Qual a diferença real entre day trade e swing no futuro?",
+    },
+    conceitos: [
+      {
+        titulo: "A definição que muda tudo",
+        corpo: `
+**Day trade** = abrir e encerrar a posição **no mesmo dia**, com o mesmo contrato (mesmo vencimento), na mesma instituição.
+
+**Swing** = manter a posição aberta de um dia para o outro (ou mais).
+
+No futuro, o swing convive com o **ajuste diário**: mesmo dormindo com a posição, seu resultado vai sendo liquidado todo fim de pregão.
+        `,
+      },
+      {
+        titulo: "Consequências práticas",
+        corpo: `
+| | Day trade | Swing |
+|---|---|---|
+| Alíquota | **20%** | **15%** |
+| Compensação | day trade com day trade | swing com swing |
+| Isenção de R$ 20 mil/mês | **não existe** | vigora |
+| Ajuste diário | consolida o resultado do dia | também consolida, diariamente |
+
+A modalidade é uma **decisão antes de entrar** — não uma descoberta depois de sair.
+        `,
+      },
+    ],
+    analogia:
+      "Day trade é filme de cinema com sessão única: você entra, assiste e sai na mesma sessão. Swing é maratona de série: a história continua amanhã — e, nos futuros, a 'assinatura' (ajuste diário) é cobrada todos os dias, mesmo nos episódios que você não assistiu.",
+    naPratica: {
+      titulo: "Antes de entrar",
+      passos: [
+        "Esta operação é day trade ou swing?",
+        "Eu consigo zerar antes das 18h se a tese falhar?",
+        "A alíquota de 20% (day) ou 15% (swing) está no meu plano?",
+        "Meu prejuízo de day trade vai compensar apenas lucro de day trade?",
+      ],
+    },
+    missao: {
+      titulo: "A modalidade que você escolhe",
+      situacao:
+        "Você comprou 2 WIN às 10h com intenção de day trade. São 17h50 e a tese não aconteceu: a posição está −R$ 80. Você resolve 'segurar para amanhã' para ver se recupera.",
+      pergunta: "O que mudou ao segurar a posição?",
+      opcoes: [
+        {
+          texto: "A operação virou swing: outra alíquota, outra compensação, outro risco",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Manter aberta após as 18h reclassifica a operação: swing (15%), ajuste diário continuando e a perda potencial deixando de ser limitada pelo dia.",
+        },
+        {
+          texto: "Nada mudou — continua sendo a mesma operação",
+          tom: "errada",
+          feedback:
+            "Mudou tudo: modalidade, alíquota, compensação e o risco de abrir o dia seguinte já devendo.",
+        },
+        {
+          texto: "Vira day trade com ajuste dobrado",
+          tom: "errada",
+          feedback: "Ajuste não dobra; a modalidade é que muda de day trade para swing.",
+        },
+        {
+          texto: "A corretora encerra automaticamente às 18h",
+          tom: "errada",
+          feedback:
+            "O mercado fecha, mas sua posição segue aberta para o dia seguinte (a menos que sua corretora tenha regra própria de encerramento).",
+        },
+      ],
+      termosExplicacao: ["swing", "modalidade", "20%", "15%", "ajuste"],
+      aindaPratique: "definir a modalidade no diário antes de registrar a operação",
+      transferencia: {
+        titulo: "A compensação estanque",
+        situacao:
+          "No mês, você teve −R$ 300 em operações de day trade e +R$ 500 em operações de swing.",
+        pergunta: "O que a Receita permite?",
+        opcoes: [
+          {
+            texto: "Apurar separadamente: day trade compensa só day trade, swing só swing",
+            tom: "correta",
+            feedback:
+              "Boa decisão. As modalidades são estanques: o prejuízo de day trade não abate o lucro de swing nem o contrário.",
+          },
+          {
+            texto: "Compensar tudo junto: −300 + 500 = +200",
+            tom: "errada",
+            feedback: "A compensação cruzada entre modalidades não existe.",
+          },
+          {
+            texto: "O prejuízo de day trade pode abater o lucro de swing",
+            tom: "errada",
+            feedback: "Só day trade compensa day trade; só swing compensa swing.",
+          },
+          {
+            texto: "Nenhum prejuízo pode ser compensado",
+            tom: "errada",
+            feedback: "Prejuízos compensam lucros da MESMA modalidade.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "Uma operação é day trade quando:",
+        alternativas: [
+          "É aberta e encerrada no mesmo dia",
+          "Dura menos de uma hora",
+          "É feita antes das 10h",
+          "Termina no vencimento",
+        ],
+        correta: 0,
+        explicacao: "Mesma sessão, mesma instituição: abriu e fechou no mesmo dia.",
+      },
+      {
+        pergunta: "A alíquota do lucro de day trade em futuros é:",
+        alternativas: ["20%", "15%", "27,5%", "Isenta até R$ 20 mil"],
+        correta: 0,
+        explicacao: "Day trade paga 20%; a isenção de R$ 20 mil não existe nessa modalidade.",
+      },
+      {
+        pergunta: "Prejuízo de swing compensa lucro de day trade?",
+        alternativas: [
+          "Não — modalidades separadas",
+          "Sim, sempre",
+          "Só no mesmo mês",
+          "Só com autorização",
+        ],
+        correta: 0,
+        explicacao: "A compensação é estanque: swing com swing, day trade com day trade.",
+      },
+      {
+        pergunta: "No swing de futuros, o ajuste diário:",
+        alternativas: [
+          "Segue liquidando o resultado todo fim de pregão",
+          "Só ocorre no vencimento",
+          "É opcional",
+          "Vira isenção fiscal",
+        ],
+        correta: 0,
+        explicacao:
+          "O ajuste diário consolida o resultado todos os dias, mesmo com a posição aberta.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Classifique",
+        enunciado:
+          "Classifique como day trade ou swing: (a) comprou 3 WDO às 9h30, vendeu às 10h15; (b) comprou 1 WIN às 16h, vendeu no dia seguinte às 11h; (c) comprou 2 WIN às 11h, zerou às 17h50.",
+        gabarito:
+          "(a) day trade. (b) swing (virou). (c) day trade — desde que tenha zerado de fato no mesmo dia.",
+      },
+    ],
+  },
+  {
+    slug: "slippage-e-execucao",
+    ordem: 30,
+    nivel: 3,
+    dominio: "futuros",
+    titulo: "Lição 7 — Slippage e execução",
+    resumo: "Entre o preço que você vê e o preço que executa existe o spread — e ele custa.",
+    problema: {
+      titulo: "O preço que nunca existiu",
+      texto:
+        "Flávia viu o WIN a 130.000 e mandou uma ordem a mercado. Executou a 130.005. 'Perdi 1 tick', ela pensou. O que ela ainda não sabe: na saída, o stop também vai executar 1 tick pior. O custo invisível das duas pontas é o spread — e o prejuízo teórico da simulação nunca bate com o real enquanto ele não estiver no plano.",
+      pergunta: "Quanto o spread e o slippage custam em cada operação?",
+    },
+    conceitos: [
+      {
+        titulo: "Spread: o preço do outro lado",
+        corpo: `
+**Spread** é a distância entre a melhor oferta de compra e de venda. No WIN, costuma ser 1 tick (5 pontos = R$ 1,00); no WDO, 1 tick (0,5 ponto = R$ 5,00).
+
+- Ordem **a mercado**: executa no melhor preço disponível — você paga o spread (compra no ask, vende no bid).
+- Ordem **limitada**: executa no preço que você quer — ou não executa.
+
+**Slippage** é a diferença entre o preço desejado e o executado: no stop, o mercado pode estar 'furado' e você sai pior que o limite.
+        `,
+      },
+      {
+        titulo: "O stop também paga",
+        corpo: `
+Um stop de venda executado a mercado paga o spread de saída — e, em movimento rápido, slippage extra.
+
+Operação de WIN com spread de 1 tick: **custo de 2 ticks por volta** (1 na entrada, 1 na saída). Em reais, 2 × R$ 1,00 × contratos.
+
+Um 'lucro teórico' de 5 ticks vira 3 ticks reais. A simulação sem custos mente sobre o seu edge.
+        `,
+      },
+    ],
+    analogia:
+      "O spread é a comissão invisível do pedágio: você paga para entrar na estrada e paga para sair. Mesmo quando o mercado não se moveu, a volta completa já custou os dois pedágios.",
+    naPratica: {
+      titulo: "Antes de enviar a ordem",
+      passos: [
+        "Qual é o spread atual do contrato?",
+        "Vou entrar a mercado (pago spread) ou com limite?",
+        "Meu stop tolera o slippage da saída?",
+        "O resultado esperado cobre os 2 ticks de custo por volta?",
+      ],
+    },
+    missao: {
+      titulo: "A volta que já custa",
+      situacao:
+        "O spread do WIN está em 1 tick (R$ 1,00). Você decide entrar e sair pelo stop no mesmo dia, sempre a mercado, com 3 contratos.",
+      pergunta: "Quanto custam só as duas passagens pelo spread?",
+      opcoes: [
+        {
+          texto: "R$ 6 (2 ticks × R$ 1,00 × 3 contratos)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Entrada + saída = 2 ticks por contrato × R$ 1,00 × 3 = R$ 6 que a sua estratégia precisa superar antes de lucrar.",
+        },
+        {
+          texto: "R$ 3 (1 tick × 3 contratos)",
+          tom: "errada",
+          feedback: "Uma volta completa paga o spread duas vezes: na entrada e na saída.",
+        },
+        {
+          texto: "R$ 6 × 5 (cada tick vale 5 pontos)",
+          tom: "errada",
+          feedback: "No WIN, o tick vale R$ 1,00 — não R$ 5,00. R$ 5 é o tick do WDO.",
+        },
+        {
+          texto: "Nada — o spread é do vendedor",
+          tom: "errada",
+          feedback:
+            "Quem compra paga o ask; quem vende recebe o bid. O spread é custo seu nas duas pontas.",
+        },
+      ],
+      termosExplicacao: ["spread", "2 ticks", "entrada", "saída", "R$ 6"],
+      aindaPratique: "conferir o spread em momentos de baixa liquidez (meio do dia)",
+      transferencia: {
+        titulo: "O stop furado",
+        situacao:
+          "Uma notícia derruba o WIN 100 pontos em segundos. Seu stop de venda a 130.000 executou a 129.990.",
+        pergunta: "O que aconteceu?",
+        opcoes: [
+          {
+            texto: "Slippage: a execução saiu pior que o limite por causa do movimento",
+            tom: "correta",
+            feedback:
+              "Boa decisão. Em movimento rápido, o book 'fura' e o stop executa pior que o preço limite. Isso não é defeito do stop: é a realidade do mercado.",
+          },
+          {
+            texto: "Seu stop foi cancelado pela corretora",
+            tom: "errada",
+            feedback:
+              "O stop executou — só que com slippage. Nenhuma corretora cancela stop por movimento.",
+          },
+          {
+            texto: "O ajuste diário corrigiu o preço de volta",
+            tom: "errada",
+            feedback: "O ajuste não devolve slippage: ele consolida o resultado real da execução.",
+          },
+          {
+            texto: "A ordem era limitada e virou mercado",
+            tom: "errada",
+            feedback:
+              "O cenário descreve um stop comum (mercado): executou pior, sem mudar de tipo.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O spread é:",
+        alternativas: [
+          "A distância entre a melhor oferta de compra e de venda",
+          "A taxa da corretora",
+          "O imposto da operação",
+          "A margem exigida",
+        ],
+        correta: 0,
+        explicacao: "Spread é a distância entre bid e ask — o custo de atravessar o book.",
+      },
+      {
+        pergunta: "Uma ordem a mercado:",
+        alternativas: [
+          "Executa no melhor preço disponível, pagando o spread",
+          "Garante sempre o preço desejado",
+          "Só executa no tick exato",
+          "É mais barata que a limitada",
+        ],
+        correta: 0,
+        explicacao:
+          "A mercado compra no ask e vende no bid: você paga o spread para ter execução imediata.",
+      },
+      {
+        pergunta: "Slippage é:",
+        alternativas: [
+          "A diferença entre o preço desejado e o executado",
+          "Uma garantia da corretora",
+          "O lucro de um tick",
+          "O horário da execução",
+        ],
+        correta: 0,
+        explicacao: "Slippage é o preço que o mercado te dá quando o book está em movimento.",
+      },
+      {
+        pergunta: "Com spread de 1 tick no WIN e 2 contratos, a volta completa custa:",
+        alternativas: ["R$ 4", "R$ 2", "R$ 8", "R$ 1"],
+        correta: 0,
+        explicacao: "2 ticks (entrada + saída) × R$ 1,00 × 2 contratos = R$ 4.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "O custo escondido",
+        enunciado:
+          "Seu setup no WIN lucra 10 ticks em média, mas paga 2 ticks de custo por volta. Qual é o lucro real médio por operação em reais, com 1 contrato? E com 5?",
+        gabarito: "10 − 2 = 8 ticks × R$ 1,00 = R$ 8 por contrato. Com 5: R$ 40.",
+      },
+    ],
+  },
+  {
+    slug: "ajuste-diario",
+    ordem: 31,
+    nivel: 3,
+    dominio: "futuros",
+    titulo: "Lição 8 — Ajuste diário",
+    resumo: "Todo fim de pregão o mercado liquida a diferença — sua posição vale o que o dia fez.",
+    problema: {
+      titulo: "A conta de luz de todo dia",
+      texto:
+        "Gustavo comprou 2 WIN e 'esqueceu' da posição aberta. No dia seguinte, descobriu que o ajuste da noite tinha debitado R$ 160 da conta. Ele achava que o resultado só existiria no vencimento. No futuro, o medidor é lido todos os dias.",
+      pergunta: "Como o ajuste diário consolida o seu resultado?",
+    },
+    conceitos: [
+      {
+        titulo: "Marcação a mercado diária",
+        corpo: `
+O **ajuste diário** é a liquidação financeira da variação do contrato entre um pregão e o seguinte.
+
+- Ao fim de cada sessão, a posição é **marcada a mercado**: o ganho/perda do dia é creditado ou debitado na conta.
+- O resultado total da posição = **soma dos ajustes diários** até o encerramento.
+- A **margem** garante que o débito do dia seja pagável; sem saldo, a posição pode ser liquidada.
+
+No day trade, você 'paga' o ajuste ao encerrar: o resultado do dia já está consolidado.
+        `,
+      },
+      {
+        titulo: "O que isso muda na sua decisão",
+        corpo: `
+- **Sem surpresa no vencimento**: quando o contrato vence, não existe 'resultado acumulado revelado' — ele já foi liquidado dia a dia.
+- **Fluxo de caixa**: operar futuro é conviver com débitos/créditos diários na conta.
+- **Psicologia**: uma posição no futuro 'cobra' todo dia — o que força a revisão diária da tese.
+
+O ajuste não é taxa: é a mecânica de liquidação do contrato.
+        `,
+      },
+    ],
+    analogia:
+      "O ajuste diário é a conta de luz com leitura todo fim do dia: o medidor (o preço do contrato) é lido às 18h e a diferença é cobrada ou devolvida na hora. Não existe 'deixar para pagar no fim do mês'.",
+    naPratica: {
+      titulo: "Com posição aberta (ou pensando em abrir)",
+      passos: [
+        "Se o pregão fechar contra mim hoje, quanto é debitado?",
+        "Tenho saldo para o ajuste de vários dias seguidos contra?",
+        "Minha regra exige zerar antes do fim da sessão?",
+        "O diário registra o resultado consolidado do ajuste?",
+      ],
+    },
+    missao: {
+      titulo: "A noite que cobra",
+      situacao:
+        "Você comprou 3 WDO a 5,4000 e o dia fecha com o dólar a 5,4050. Cada ponto do WDO vale R$ 10.",
+      pergunta: "O que o ajuste diário faz na sua conta?",
+      opcoes: [
+        {
+          texto: "Credita R$ 1.500 (50 pontos × R$ 10 × 3 contratos)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. 50 pontos × R$ 10 = R$ 500 por contrato; × 3 = R$ 1.500 creditados no fechamento.",
+        },
+        {
+          texto: "Credita R$ 150 (50 × R$ 3)",
+          tom: "errada",
+          feedback:
+            "O valor do ponto do WDO é R$ 10 — e o total ainda multiplica pelos 3 contratos.",
+        },
+        {
+          texto: "Nada — o resultado só existe no vencimento",
+          tom: "errada",
+          feedback: "No futuro, o resultado é liquidado todo dia pelo ajuste.",
+        },
+        {
+          texto: "Debita R$ 1.500, porque o dólar subiu",
+          tom: "errada",
+          feedback:
+            "Você comprou esperando alta e o dólar subiu: o movimento é a seu favor — crédito.",
+        },
+      ],
+      termosExplicacao: ["1.500", "crédito", "ajuste", "50 pontos", "R$ 10"],
+      aindaPratique: "acompanhar o saldo após o fechamento de uma posição real",
+      transferencia: {
+        titulo: "Dois dias seguidos",
+        situacao:
+          "1 contrato WIN comprado a 130.000. Dia 1: fecha a 129.900. Dia 2: fecha a 130.100.",
+        pergunta: "Qual é o resultado acumulado dos dois ajustes?",
+        opcoes: [
+          {
+            texto: "+R$ 20 acumulados (soma dos dois ajustes: −20 + 40)",
+            tom: "correta",
+            feedback:
+              "Boa decisão. Dia 1 = −100 pts × 0,20 = −R$ 20; dia 2 = +200 pts × 0,20 = +R$ 40. Acumulado = +R$ 20.",
+          },
+          {
+            texto: "+R$ 40, porque o último dia foi lucro",
+            tom: "errada",
+            feedback:
+              "O dia 1 já foi liquidado (R$ 20 negativos). O total considera os dois ajustes.",
+          },
+          {
+            texto: "−R$ 20, porque o ajuste nunca credita",
+            tom: "errada",
+            feedback: "O ajuste credita quando o movimento é a seu favor.",
+          },
+          {
+            texto: "R$ 0, porque voltou perto da entrada",
+            tom: "errada",
+            feedback: "A posição terminou acima da entrada: acumulado de +R$ 20.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O ajuste diário é:",
+        alternativas: [
+          "A liquidação diária da variação do contrato",
+          "Uma taxa da corretora",
+          "Um imposto retido",
+          "Uma garantia opcional",
+        ],
+        correta: 0,
+        explicacao: "Ao fim do pregão, a diferença do dia é creditada ou debitada.",
+      },
+      {
+        pergunta: "O resultado total de uma posição em futuros é:",
+        alternativas: [
+          "A soma dos ajustes diários",
+          "O valor do vencimento menos a entrada",
+          "O valor da margem",
+          "A diferença entre os spreads",
+        ],
+        correta: 0,
+        explicacao: "Cada dia é liquidado separadamente; o total é o somatório dos ajustes.",
+      },
+      {
+        pergunta: "Se a conta não tem saldo para o ajuste:",
+        alternativas: [
+          "A posição pode ser liquidada",
+          "O débito é adiado",
+          "A margem cobre para sempre",
+          "O contrato é cancelado sem custo",
+        ],
+        correta: 0,
+        explicacao: "O débito é devido no fechamento; sem saldo, a corretora encerra a posição.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Soma de ajustes",
+        enunciado:
+          "2 WIN comprados a 130.000. Fechamentos: 130.100, 129.950, 130.000. Calcule os três ajustes e o total.",
+        gabarito:
+          "D1: +100×0,20×2 = +R$ 40. D2: −150×0,20×2 = −R$ 60. D3: +50×0,20×2 = +R$ 20. Total: R$ 0 (voltou à entrada).",
+      },
+    ],
+  },
+  {
+    slug: "armadilha-da-alavancagem",
+    ordem: 32,
+    nivel: 3,
+    dominio: "futuros",
+    titulo: "Lição 9 — A armadilha da alavancagem",
+    resumo: "A margem mínima parece barata — o risco real da posição é o que ela pode perder.",
+    problema: {
+      titulo: "A margem que esconde a exposição",
+      texto:
+        "Larissa viu que o WIN 'só' exige cerca de R$ 100 de margem por contrato. Comprou 20 contratos com R$ 2.000 na conta — sem perceber que cada WIN a 130.000 expõe R$ 26.000. O mercado andou 100 pontos contra ela e a conta inteira virou pó. A margem não é o seu risco: é só a garantia.",
+      pergunta: "Quanto risco uma posição realmente carrega?",
+    },
+    conceitos: [
+      {
+        titulo: "Exposição, não margem",
+        corpo: `
+Com o WIN a 130.000, cada contrato expõe **R$ 26.000** (130.000 × R$ 0,20) de ativo. Com a margem de R$ 100, a alavancagem real é de ~260x.
+
+- **Margem** = garantia exigida para manter a posição.
+- **Exposição** = valor do que você controla.
+- **Risco** = quanto o ativo pode andar contra você (não é nem margem nem exposição).
+
+Com a **regra do 1%**, o risco é calculado antes: 1% da conta por posição, transformado em pontos e contratos.
+        `,
+      },
+      {
+        titulo: "O limite diário que salva",
+        corpo: `
+O futuro tem um teto de perda por dia: quando o mercado derruba um contrato **acima do limite diário**, o pregão é suspenso.
+
+- No WIN, o **limite diário** (10% do preço) gira em torno de 13.000 pontos: com 1 contrato, são cerca de R$ 2.600 de oscilação máxima por dia.
+- Se 20 contratos dessem 260× de alavancagem, o limite diário sozinho destruiria R$ 52.000 — muito além de qualquer conta.
+
+A alavancagem multiplica os pontos em direção ao limite: o risco real é a rota, não o pedágio.
+        `,
+      },
+    ],
+    analogia:
+      "A margem é o aluguel de um carro de corrida. O valor da fiança (R$ 100) não tem nada a ver com o que acontece se você bater o carro (R$ 26.000 em exposição). Quem aluga 20 carros sem capital para a batida não tem 20 estratégias: tem um acidente.",
+    naPratica: {
+      titulo: "O cálculo antes de entrar",
+      passos: [
+        "Qual é 1% da minha conta? (ex.: conta R$ 10.000 → R$ 100)",
+        "Quantos pontos de stop comportam esse valor? (ex.: R$ 100 ÷ R$ 1,00/pt = 100 pontos de WIN)",
+        "Quantos contratos? (ex.: 2 WIN com stop de 50 pontos)",
+        "A posição inteira cabe no meu limite diário de perda?",
+      ],
+    },
+    missao: {
+      titulo: "Contando exposição",
+      situacao:
+        "WDO a 5,4000 (R$ 10 por ponto). Você quer comprar 5 contratos, achando barato porque a margem total é baixa.",
+      pergunta: "Qual é a exposição total da posição?",
+      opcoes: [
+        {
+          texto: "R$ 270.000 (5.400 pontos × R$ 10 × 5)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Cada WDO a 5,4000 = R$ 54.000; com 5 contratos, R$ 270.000 de exposição — o número que importa para o risco.",
+        },
+        {
+          texto: "A margem somada dos 5 contratos",
+          tom: "errada",
+          feedback: "A margem é só a garantia — o risco vem da exposição.",
+        },
+        {
+          texto: "R$ 54.000 (o valor de 1 contrato)",
+          tom: "errada",
+          feedback: "A conta considerou só um contrato; a posição tem 5.",
+        },
+        {
+          texto: "R$ 50 (5 × R$ 10)",
+          tom: "errada",
+          feedback: "O ponto do WDO vale R$ 10, mas a exposição é pontos × R$ 10 × contratos.",
+        },
+      ],
+      termosExplicacao: ["270.000", "exposição", "5 contratos", "margem"],
+      aindaPratique: "calcular a exposição de toda posição antes de abrir",
+      transferencia: {
+        titulo: "O limite diário como teto",
+        situacao:
+          "O limite diário do WIN está em ~13.000 pontos. Você tem 10 contratos comprados quando o mercado trava na queda.",
+        pergunta: "O que o limite diário significa para você?",
+        opcoes: [
+          {
+            texto: "O pregão para e seu prejuízo é limitado à queda máxima do dia",
+            tom: "correta",
+            feedback:
+              "Boa decisão. Com 10 contratos e ~13.000 pontos de teto, o risco máximo do dia é ~R$ 26.000 — número que precisa caber no seu capital ANTES de entrar.",
+          },
+          {
+            texto: "O limite multiplica seu lucro no dia seguinte",
+            tom: "errada",
+            feedback: "O limite apenas pausa o pregão para evitar movimentos extremos.",
+          },
+          {
+            texto: "O limite cancela seu ajuste diário",
+            tom: "errada",
+            feedback: "O ajuste do dia ainda é liquidado.",
+          },
+          {
+            texto: "O limite só vale para opções",
+            tom: "errada",
+            feedback: "O limite diário vale para os contratos futuros.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "A margem mínima é:",
+        alternativas: [
+          "A garantia exigida para manter a posição",
+          "O seu risco máximo",
+          "O valor do ativo comprado",
+          "O lucro garantido",
+        ],
+        correta: 0,
+        explicacao: "Margem garante a posição; risco é outra história.",
+      },
+      {
+        pergunta: "Com WIN a 130.000, a exposição de 1 contrato é:",
+        alternativas: ["R$ 26.000", "R$ 100", "R$ 1.300", "R$ 13.000"],
+        correta: 0,
+        explicacao: "130.000 pontos × R$ 0,20 = R$ 26.000 por contrato.",
+      },
+      {
+        pergunta: "A regra do 1% calcula o risco:",
+        alternativas: [
+          "Antes de entrar, em reais",
+          "Depois do prejuízo",
+          "Só no vencimento",
+          "Pela margem mínima",
+        ],
+        correta: 0,
+        explicacao: "1% da conta define o valor máximo em risco — e dali os pontos e contratos.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Do risco à posição",
+        enunciado:
+          "Conta de R$ 10.000, stop de 100 pontos no WIN. Calcule: risco máximo (1%), número máximo de contratos e exposição com WIN a 130.000.",
+        gabarito:
+          "1% = R$ 100. Por contrato: 100 pts × R$ 0,20 = R$ 20 de risco → até 5 contratos. Exposição: 5 × R$ 26.000 = R$ 130.000.",
+      },
+    ],
+  },
+  {
+    slug: "win-vs-wdo",
+    ordem: 33,
+    nivel: 4,
+    dominio: "futuros",
+    titulo: "Lição 10 — WIN vs WDO",
+    resumo: "Dois contratos, duas personalidades: o índice e o dólar andam em ritmos diferentes.",
+    problema: {
+      titulo: "O mesmo botão, outra máquina",
+      texto:
+        "Pedro operava o WIN há meses e resolveu 'replicar o setup' no WDO. A estratégia que dava 20 pontos de alvo no índice se desfez no dólar: 20 pontos do WDO são 200% do alvo esperado, o spread custa 5× mais e o horário de maior ruído é outro. Não é o mesmo jogo com outro nome.",
+      pergunta: "Quais as diferenças essenciais entre WIN e WDO?",
+    },
+    conceitos: [
+      {
+        titulo: "A tabela que resolve tudo",
+        corpo: `
+| | WIN (Mini Índice) | WDO (Mini Dólar) |
+|---|---|---|
+| Ativo | Ibovespa (pontos) | Dólar (pontos × R$ 0,10) |
+| Valor do ponto | **R$ 0,20** | **R$ 10,00** |
+| Tick | 5 pts = **R$ 1,00** | 0,5 pt = **R$ 5,00** |
+| Margem mínima | ~R$ 100 | ~R$ 150 |
+| Alvo típico | 50–200 pts | 10–40 pts |
+| Horário de vida | 9h–18h | 9h–18h (com poucos minutos antes) |
+
+O dólar anda em **pontos menores e reais maiores**: 1 ponto do WDO vale R$ 10; 50 pontos do WIN valem R$ 10. Confundir as unidades quebra o dimensionamento.
+        `,
+      },
+      {
+        titulo: "Por que a estratégia não se copia",
+        corpo: `
+- **Volatilidade relativa**: WDO costuma andar mais rápido em % do que o índice — os alvos de pontos são outros.
+- **Abertura**: o WDO abre ~9h00 com alguns minutos de negociação antes do índice; o WIN só vive das 9h às 18h (mais horário de fechamento).
+- **Slippage em reais**: 1 tick de WDO custa R$ 5 contra R$ 1 do WIN — 5× mais caro errar a execução.
+- **Correlação**: em momentos de aversão ao risco, os dois andam juntos; em cenários de juros e fluxo, se descolam.
+
+Setup não se transporta: se recalcula.
+        `,
+      },
+    ],
+    analogia:
+      "WIN e WDO são o mesmo console com jogos diferentes: os botões são iguais (comprar/vender/stop), mas os mapas, as moedas e os chefes mudam. Quem joga com o tutorial do WIN no mundo do WDO leva hit gratuita.",
+    naPratica: {
+      titulo: "Ao mudar de contrato",
+      passos: [
+        "Valor do ponto e do tick do NOVO contrato estão na cabeça?",
+        "Meu alvo em pontos continua fazendo sentido em reais?",
+        "O spread custa quanto por volta, em reais?",
+        "Os horários de entrada ainda batem com a minha rotina?",
+      ],
+    },
+    missao: {
+      titulo: "O setup transportado",
+      situacao:
+        "Seu setup no WIN alvo 50 pontos, stop 25. Você leva o mesmo 'alvo 50, stop 25' para o WDO.",
+      pergunta: "O que acontece em reais?",
+      opcoes: [
+        {
+          texto: "O risco saltou: 25 pts de WDO = R$ 250 vs 25 pts de WIN = R$ 5",
+          tom: "correta",
+          feedback:
+            "Boa decisão. O mesmo número de pontos custa 50× mais reais no WDO. Setup não se copia — recalcula o dimensionamento.",
+        },
+        {
+          texto: "Nada muda: 50 pontos é 50 pontos",
+          tom: "errada",
+          feedback: "Os pontos são unidades de contratos diferentes; o dinheiro em jogo é outro.",
+        },
+        {
+          texto: "O WDO é mais barato porque o contrato é menor",
+          tom: "errada",
+          feedback: "O ponto do WDO (R$ 10) vale 50× o do WIN (R$ 0,20).",
+        },
+        {
+          texto: "O spread compensa o valor do ponto",
+          tom: "errada",
+          feedback: "Pelo contrário: o spread do WDO é R$ 5 por volta contra R$ 1 do WIN.",
+        },
+      ],
+      termosExplicacao: ["WDO", "R$ 250", "50×", "dimensionamento"],
+      aindaPratique: "cotar os dois contratos na mesma hora e comparar o tick em reais",
+      transferencia: {
+        titulo: "A leitura do contrato",
+        situacao:
+          "Você comprou 3 WDO e o dólar subiu 20 pontos. O WIN andou 100 pontos no mesmo período.",
+        pergunta: "Quem te rendeu mais reais, com 3 WDO vs 3 WIN?",
+        opcoes: [
+          {
+            texto: "WDO: 20 × R$ 10 × 3 = R$ 600 vs WIN: 100 × R$ 0,20 × 3 = R$ 60",
+            tom: "correta",
+            feedback:
+              "Boa decisão. Os reais não acompanham os pontos: WDO converteu 20 pontos em R$ 600; WIN, 100 pontos em R$ 60.",
+          },
+          {
+            texto: "WIN: mais pontos é mais dinheiro",
+            tom: "errada",
+            feedback: "Pontos de contratos diferentes não se comparam — só reais.",
+          },
+          {
+            texto: "Iguais, porque os dois são futuros",
+            tom: "errada",
+            feedback: "O valor do ponto difere 50× entre os contratos.",
+          },
+          {
+            texto: "WDO: 20 × R$ 0,20 = R$ 12",
+            tom: "errada",
+            feedback: "O ponto do WDO vale R$ 10 — essa conta é do WIN.",
+          },
+        ],
+      },
+    },
+    cenarios: [
+      {
+        titulo: "Movimento forte no horário de vida",
+        tom: "ganho",
+        descricao:
+          "O WIN anda 300 pontos no início da tarde. Em reais, 300 × R$ 0,20 = R$ 60 por contrato. No mesmo dia, o WDO anda 30 pontos: R$ 300 por contrato. O mesmo 'setup direcional' rende 5× mais reais no dólar — se o dimensionamento acompanhou.",
+      },
+      {
+        titulo: "Market making fino",
+        tom: "neutro",
+        descricao:
+          "Pregão parado, spread de 1 tick nos dois contratos. No WIN, a volta custa R$ 2 por contrato; no WDO, R$ 10. A estratégia que vive de muitos trades pequenos migrou do zero ao negativo sem ninguém perceber.",
+      },
+      {
+        titulo: "Abertura descolada",
+        tom: "perda",
+        descricao:
+          "O dólar abre com gap de 40 pontos e o índice nem acompanha. Quem carregou o setup 'de índice' no WDO pela manhã recebeu o ajuste na contramão: 40 × R$ 10 = R$ 400 por contrato de prejuízo, com a tese do WIN intacta.",
+      },
+    ],
+    comparativo: {
+      titulo: "WIN vs WDO em uma tabela",
+      colunas: ["", "WIN", "WDO"],
+      linhas: [
+        { item: "Valor do ponto", valores: ["R$ 0,20", "R$ 10,00"] },
+        { item: "Tick", valores: ["5 pts = R$ 1,00", "0,5 pt = R$ 5,00"] },
+        { item: "Margem mínima", valores: ["~R$ 100", "~R$ 150"] },
+        { item: "Alvo típico", valores: ["50–200 pts", "10–40 pts"] },
+        { item: "Spread típico", valores: ["1 tick = R$ 1", "1 tick = R$ 5"] },
+        { item: "Horário", valores: ["9h–18h", "9h–18h (abre antes)"] },
+      ],
+    },
+    quiz: [
+      {
+        pergunta: "O valor do ponto do WDO é:",
+        alternativas: ["R$ 10,00", "R$ 0,20", "R$ 5,00", "R$ 1,00"],
+        correta: 0,
+        explicacao: "WDO = R$ 10/ponto; WIN = R$ 0,20/ponto.",
+      },
+      {
+        pergunta: "Um tick do WIN vale:",
+        alternativas: ["R$ 1,00 (5 pontos)", "R$ 5,00", "R$ 0,20", "R$ 10,00"],
+        correta: 0,
+        explicacao: "5 pontos × R$ 0,20 = R$ 1,00 por tick de WIN.",
+      },
+      {
+        pergunta: "50 pontos de WIN equivalem, em reais, a quantos pontos de WDO?",
+        alternativas: ["1 ponto", "5 pontos", "50 pontos", "0,5 ponto"],
+        correta: 0,
+        explicacao: "50 × R$ 0,20 = R$ 10 = 1 ponto de WDO.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Conversão de contratos",
+        enunciado:
+          "Converta para reais: (a) 200 pts de WIN; (b) 15 pts de WDO; (c) 1.300 pts de WIN; (d) 30 pts de WDO com 2 contratos.",
+        gabarito: "(a) R$ 40. (b) R$ 150. (c) R$ 260. (d) 30 × R$ 10 × 2 = R$ 600.",
+      },
+    ],
+  },
+  {
+    slug: "futuro-vs-opcao",
+    ordem: 34,
+    nivel: 4,
+    dominio: "futuros",
+    titulo: "Lição 11 — Futuro vs opção",
+    resumo:
+      "O futuro te obriga a honrar a posição todos os dias; a opção limita sua perda ao prêmio.",
+    problema: {
+      titulo: "A mesa redonda das duas pernas",
+      texto:
+        "Renata comprou uma opção de compra sobre o índice 'para não ter que escolher entre risco e oportunidade'. No dia seguinte, percebeu que não sabia nem em que mesa estava: o futuro cobra ajuste todo dia e exige margem; a opção só cobra o prêmio na compra. Duas ferramentas que parecem fazer a mesma pergunta — 'pra onde vai o mercado?' — com respostas e riscos diferentes.",
+      pergunta: "Em que situações cada um faz sentido?",
+    },
+    conceitos: [
+      {
+        titulo: "A régua do risco",
+        corpo: `
+| | Futuro | Opção comprada |
+|---|---|---|
+| Perda máxima | a posição (pode ser enorme) | o prêmio pago |
+| Margem | exigida todo dia | só na venda |
+| Ajuste diário | sim | não (prêmio a vista) |
+| Exigência de decisão | gestão diária da posição | decide se exerce até o vencimento |
+| Vencimento | pode rolar | pode expirar sem valor |
+
+O futuro é um compromisso contínuo; a opção comprada é um bilhete com custo limitado — e com tempo para dar errado.
+        `,
+      },
+      {
+        titulo: "Quando cada um brilha",
+        corpo: `
+- **Futuro**: direção clara, quer resultado linear com o movimento, aceita o ajuste diário e tem capital para a margem e o risco.
+- **Opção comprada**: quer participar do movimento com **perda limitada**, sem margem, e está disposto a pagar o prêmio — aceitando que o tempo (theta) trabalha contra.
+- **Venda de opção**: coleta prêmio, mas assume margem e risco de direção — o que exige o mesmo cuidado de dimensionamento do futuro.
+
+Ferramentas não têm lado bom: têm **condições de uso**.
+        `,
+      },
+    ],
+    analogia:
+      "O futuro é alugar um imóvel com pagamento todo mês (ajuste diário e margem). A opção comprada é comprar uma entrada de cinema válida por X dias: custa fixo, e se o filme não acontecer, você perde só o ingresso. Nenhum dos dois é melhor — um é compromisso, o outro é bilhete.",
+    naPratica: {
+      titulo: "Escolhendo a mesa",
+      passos: [
+        "Minha tese é de direção com gestão diária? → futuro.",
+        "Quero risco limitado ao prêmio e fôlego para o tempo? → opção comprada.",
+        "Estou pagando prêmio demais pelo movimento esperado? → repensar.",
+        "O ajuste diário cabe no meu fluxo de caixa e na minha rotina?",
+      ],
+    },
+    missao: {
+      titulo: "A mesa certa para a tese",
+      situacao:
+        "Sua tese: o índice vai subir até o fim do mês, mas pode oscilar bastante no caminho. Você tem R$ 600 disponíveis para o risco total da ideia.",
+      pergunta: "Qual instrumento encaixa melhor, se a opção custa R$ 300?",
+      opcoes: [
+        {
+          texto: "Opção comprada: perda máxima R$ 300 e sem margem nem ajuste",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Para uma tese mensal com oscilação no caminho, o bilhete (opção) limita a perda ao prêmio e não exige gestão diária de margem.",
+        },
+        {
+          texto: "Futuro: sem pagar prêmio, fico com tudo do movimento",
+          tom: "errada",
+          feedback:
+            "Futuro não cobra prêmio, mas cobra ajuste diário, margem e risco total da posição — incompatível com 'só tenho R$ 600'.",
+        },
+        {
+          texto: "Os dois: futuro + opção no mesmo lado",
+          tom: "errada",
+          feedback:
+            "Combinar as mesas multiplica exposição e margem — só se a tese exigir, não por padrão.",
+        },
+        {
+          texto: "Vender a opção de compra do mesmo strike",
+          tom: "errada",
+          feedback:
+            "Vender opção inverte o risco: perda ilimitada e margem — o oposto da sua limitação de R$ 600.",
+        },
+      ],
+      termosExplicacao: ["prêmio", "margem", "ajuste diário", "perda máxima"],
+      aindaPratique: "desenhar o gráfico de risco das duas mesas antes de operar",
+      transferencia: {
+        titulo: "O vencimento chegando",
+        situacao:
+          "Faltam 3 dias para o vencimento da opção que você comprou. A tese ainda não aconteceu e a opção caiu 60%.",
+        pergunta: "O que a gestão de decisão (sua) sugere?",
+        opcoes: [
+          {
+            texto: "Revisar a tese: tempo curto + queda de 60% pedem corte, não espera",
+            tom: "correta",
+            feedback:
+              "Boa decisão. A perda máxima é o prêmio, mas 'máxima' não é convite: manter os 40% restantes por teimosia é decisão nova, com outra tese.",
+          },
+          {
+            texto: "Segurar até o vencimento porque a perda já é 'máxima'",
+            tom: "errada",
+            feedback:
+              "A perda máxima é o prêmio total; segurar os 40% restantes é nova decisão, não espera neutra.",
+          },
+          {
+            texto: "Comprar mais para baixar o preço médio",
+            tom: "errada",
+            feedback:
+              "Adicionar com tese vencida é escalada — dobra a aposta sem dobrar a informação.",
+          },
+          {
+            texto: "Rolar para o vencimento seguinte sem revisar a tese",
+            tom: "errada",
+            feedback: "Rolar recompra tempo — só faz sentido com tese ainda válida.",
+          },
+        ],
+      },
+    },
+    cenarios: [
+      {
+        titulo: "O movimento veio",
+        tom: "ganho",
+        descricao:
+          "O índice sobe 2.000 pontos em duas semanas. O futuro entrega os R$ 400 por contrato integralmente; a opção comprada também lucra — menos se o tempo já corroeu o prêmio. As duas mesas ganharam; o futuro ganhou de forma linear.",
+      },
+      {
+        titulo: "O mercado travou",
+        tom: "neutro",
+        descricao:
+          "Duas semanas de lateralização. O futuro devolve oscilações pequenas, dia a dia, com ajuste; a opção comprada sangra o theta todos os dias. A mesma 'não-decisão' custou R$ 0 ao futuro e boa parte do prêmio à opção.",
+      },
+      {
+        titulo: "O movimento foi o contrário",
+        tom: "perda",
+        descricao:
+          "O índice cai 1.500 pontos. O futuro perde R$ 300 por contrato e ainda exige margem para aguentar; a opção comprada perde, no máximo, o prêmio. O risco da posição definiu a diferença — e a margem definiu quem aguentou ficar.",
+      },
+    ],
+    comparativo: {
+      titulo: "Futuro × Opção",
+      colunas: ["", "Futuro", "Opção comprada"],
+      linhas: [
+        { item: "Perda máxima", valores: ["posição inteira", "o prêmio"] },
+        { item: "Margem", valores: ["exigida", "não (na compra)"] },
+        { item: "Ajuste diário", valores: ["sim", "não"] },
+        { item: "Custo do tempo", valores: ["não existe (linear)", "theta corrói"] },
+        { item: "Vencimento", valores: ["rola ou liquida", "expira ou exerce"] },
+      ],
+    },
+    quiz: [
+      {
+        pergunta: "A perda máxima de quem COMPRA uma opção é:",
+        alternativas: ["O prêmio pago", "A posição inteira", "A margem", "Ilimitada"],
+        correta: 0,
+        explicacao: "O comprador perde, no máximo, o prêmio. Risco limitado é a marca da compra.",
+      },
+      {
+        pergunta: "Quem exige ajuste diário?",
+        alternativas: ["O futuro", "A opção comprada", "A opção vendida sem margem", "Nenhum"],
+        correta: 0,
+        explicacao: "O ajuste diário é mecânica do contrato futuro — opções liquidam pelo prêmio.",
+      },
+      {
+        pergunta: "Uma tese de alta mensal com pouca tolerância a oscilação no caminho favorece:",
+        alternativas: ["Opção comprada", "Futuro", "Venda de opção", "Margem máxima"],
+        correta: 0,
+        explicacao: "Bilhete com perda limitada ao prêmio para tese com prazo e oscilação.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "As duas mesas",
+        enunciado:
+          "Desenhe mentalmente: (a) risco máximo de comprar 1 WIN a 130.000 com stop de 500 pts; (b) risco máximo de comprar uma opção por R$ 150; (c) qual dos dois exige margem?",
+        gabarito: "(a) stop honrado = R$ 100 (ou a posição sem stop). (b) R$ 150. (c) o futuro.",
+      },
+    ],
+  },
+  {
+    slug: "decisao-no-day-trade",
+    ordem: 35,
+    nivel: 5,
+    dominio: "futuros",
+    titulo: "Lição 12 — A decisão no day trade",
+    resumo:
+      "O ciclo completo: check, hipótese, stop, dimensionamento e decisão — em menos de um segundo.",
+    problema: {
+      titulo: "O segundo que decide",
+      texto:
+        "Marina perdeu o melhor setup do mês porque 'não conseguiu decidir'. Na verdade, ela não tinha decidido NADA antes: o plano parava na hipótese. Quando o gatilho apareceu, faltava o que fazer, onde era o stop, quanto arriscar. A decisão no day trade não acontece na hora — acontece antes.",
+      pergunta: "O que precisa estar pronto antes de o gatilho disparar?",
+    },
+    conceitos: [
+      {
+        titulo: "O ciclo completo da decisão",
+        corpo: `
+No day trade, cada setup percorre um ciclo antes de existir:
+
+1. **Check do contexto**: tendência, notícias, horário, liquidez.
+2. **Hipótese falsável**: 'se o WIN perder 129.800 com volume, abro venda com alvo 129.600'.
+3. **Stop definido**: em pontos, no mesmo momento da hipótese.
+4. **Dimensionamento**: contratos = risco em reais ÷ (pontos de stop × valor do ponto).
+5. **Decisão pronta**: gatilho acionou? Executa o que foi escrito. Não acionou? Não existe trade.
+
+Uma operação com tese fraca que deu lucro **não** foi uma boa decisão — e uma perda dentro do plano pode ter sido uma ótima.
+        `,
+      },
+      {
+        titulo: "O preço da decisão errada",
+        corpo: `
+- **Reagir a mercado** sem check: pagar o movimento contra você.
+- **Mudar o stop no meio**: transformar plano em torcida.
+- **Aumentar contratos para 'recuperar'**: transformar perda em acidente.
+- **Duvidar do gatilho**: deixar o setup acontecer sem você.
+
+Decisão não é pressentimento: é a execução de um plano que já incluiu o pior caso.
+        `,
+      },
+    ],
+    analogia:
+      "O day trade é um zagueiro em cobrança de pênalti: o vencedor não é o mais rápido — é o que decidiu o canto antes da bola sair. Decidir depois do chute é o erro que custa o jogo.",
+    naPratica: {
+      titulo: "Montando o ciclo antes do pregão",
+      passos: [
+        "Liste os setups que você VAI operar hoje (com gatilho, stop e alvo).",
+        "Defina o risco máximo do dia em reais.",
+        "Calcule os contratos de cada setup.",
+        "Comprometa-se: gatilho fora do plano = não operar.",
+      ],
+    },
+    missao: {
+      titulo: "O gatilho acionado",
+      situacao:
+        "Seu plano: 'WDO perdeu 5,3950 com volume → venda com alvo 5,3930 e stop 5,3965.' O preço perdeu o nível e está voltando — você ainda não entrou porque 'quis confirmar mais um candle'.",
+      pergunta: "Qual a melhor decisão?",
+      opcoes: [
+        {
+          texto: "Executar o plano como escrito — ou aceitar que a entrada passou",
+          tom: "correta",
+          feedback:
+            "Boa decisão. Se o gatilho valeu, executa; se o preço já voltou, o setup passou. Os dois caminhos são plano — 'esperar confirmação extra' é decisão nova não escrita.",
+        },
+        {
+          texto: "Entrar agora mesmo, sem olhar stop nem contratos",
+          tom: "errada",
+          feedback: "Entrar sem o ciclo pronto é reação, não decisão.",
+        },
+        {
+          texto: "Comprar no rebote porque 'o mercado sempre volta'",
+          tom: "errada",
+          feedback: "Essa não é a hipótese que você validou — é outra operação sem check.",
+        },
+        {
+          texto: "Entrar com o dobro de contratos para compensar a demora",
+          tom: "errada",
+          feedback: "Dimensionamento muda só com nova conta de risco, nunca por compensação.",
+        },
+      ],
+      termosExplicacao: ["gatilho", "plano", "5.3930", "1%", "decisão"],
+      aindaPratique: "registrar no diário a diferença entre operar o plano e reagir ao mercado",
+      transferencia: {
+        titulo: "O lucro que não era decisão",
+        situacao:
+          "Você comprou 2 WIN 'na emoção' depois de ver uma vela forte. Deu +R$ 40. Na semana seguinte, repetiu o mesmo gesto e perdeu R$ 120.",
+        pergunta: "Qual o aprendizado correto?",
+        opcoes: [
+          {
+            texto: "As duas foram a mesma decisão errada — o lucro não valida o processo",
+            tom: "correta",
+            feedback:
+              "Boa decisão. Processo ruim com lucro é sorte cobrada depois. A avaliação é da decisão (antes), não do resultado (depois).",
+          },
+          {
+            texto: "A primeira foi certa porque deu lucro",
+            tom: "errada",
+            feedback: "Avaliar pelo resultado ensina a repetir erros que, um dia, dão prejuízo.",
+          },
+          {
+            texto: "O problema é que você aumentou o tamanho da segunda",
+            tom: "errada",
+            feedback: "O problema é o processo: sem plano, qualquer tamanho é acidente.",
+          },
+          {
+            texto: "Você deve operar só vela forte",
+            tom: "errada",
+            feedback: "O setup em si não é o erro — é a falta de check, stop e dimensionamento.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "A ordem correta do ciclo de decisão é:",
+        alternativas: [
+          "Check → hipótese → stop → dimensionamento → decisão",
+          "Decisão → hipótese → check → stop",
+          "Gatilho → contratos → reza",
+          "Stop → hipótese → check → decisão",
+        ],
+        correta: 0,
+        explicacao: "O contexto vem antes da hipótese; stop e tamanho antes de decidir executar.",
+      },
+      {
+        pergunta: "Um trade com tese fraca que deu lucro foi:",
+        alternativas: [
+          "Uma decisão ruim com resultado favorável",
+          "Uma boa decisão validada",
+          "Um erro que se anulou",
+          "Um sinal do mercado",
+        ],
+        correta: 0,
+        explicacao: "Resultado não valida processo: a decisão se julga antes, não depois.",
+      },
+      {
+        pergunta: "O dimensionamento é feito:",
+        alternativas: [
+          "Antes do gatilho, com risco em reais e pontos de stop",
+          "Depois da entrada, se o trade der certo",
+          "Pela margem mínima da corretora",
+          "No momento de recuperar perda",
+        ],
+        correta: 0,
+        explicacao: "Contratos = risco ÷ (stop × valor do ponto), tudo antes do gatilho.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Escreva seu ciclo",
+        enunciado:
+          "Escreva o ciclo completo de um setup que você operaria amanhã no WIN ou WDO: contexto, hipótese falsável com nível, stop em pontos, risco em reais (1% da conta) e número de contratos.",
+        gabarito:
+          "Conferir se todos os 5 passos têm resposta numérica e se contratos = risco ÷ (stop × valor do ponto).",
+      },
+    ],
+  },
+  {
+    slug: "tributacao-day-trade",
+    ordem: 36,
+    nivel: 5,
+    dominio: "futuros",
+    titulo: "Lição 13 — Tributação do day trade",
+    resumo:
+      "Day trade de futuros: 20% sobre o lucro, com IRRF de 1% na fonte e sem isenção de R$ 20 mil.",
+    problema: {
+      titulo: "O mês que cobra 20%",
+      texto:
+        "Otávio teve um mês excepcional: R$ 2.000 de lucro em day trade de WIN. Ouviu falar da 'isenção de R$ 20 mil' e nem guardou o dinheiro do imposto. Na declaração, descobriu que a isenção não existe para day trade — e que o DARF era devido mês a mês, com 20% sobre o lucro.",
+      pergunta: "Quanto o day trade de futuros paga de imposto, e quando?",
+    },
+    conceitos: [
+      {
+        titulo: "A regra do day trade",
+        corpo: `
+- **Alíquota**: 20% sobre o lucro líquido do mês (day trade), apurada mês a mês.
+- **IRRF**: 1% retido na fonte sobre cada operação — valor que **abate** o imposto devido.
+- **Isenção de R$ 20 mil/mês**: **não existe** para day trade (vale para vendas de ações/swing até o limite).
+- **Compensação**: prejuízo de day trade compensa só lucro de day trade — não swing.
+- **Vencimento**: DARF com código 6015 até o último dia útil do mês seguinte.
+
+O swing (15%, com isenção de R$ 20 mil) segue regra separada.
+        `,
+      },
+      {
+        titulo: "A conta na prática",
+        corpo: `
+Lucro do mês em day trade: R$ 1.000.
+
+- IRRF retido no mês (1% das operações): R$ 10.
+- Imposto devido: 20% × R$ 1.000 = R$ 200.
+- **DARF a pagar**: R$ 200 − R$ 10 = **R$ 190**.
+
+Sem IRRF suficiente, paga a diferença; se o IRRF superar o devido (prejuízo), vira compensação/restituição na declaração. O ajuste diário consolida o resultado de cada dia — o que facilita apurar o mês.
+        `,
+      },
+    ],
+    analogia:
+      "O imposto do day trade é a gorjeta de garçom 'na conta': 1% já vem retido em cada operação como entrada da comissão (IRRF), e no fim do mês você acerta o restante dos 20% com o DARF. Esquecer o acerto mensal é jantar caro no ano seguinte.",
+    naPratica: {
+      titulo: "Todo mês, com day trade",
+      passos: [
+        "Somar o lucro líquido de day trade do mês.",
+        "Somar o IRRF retido (1% de cada operação).",
+        "Calcular 20% do lucro e abater o IRRF.",
+        "Emitir o DARF (6015) até o último dia útil do mês seguinte.",
+      ],
+    },
+    missao: {
+      titulo: "A conta do mês",
+      situacao: "Seu mês: +R$ 1.500 em day trade de WIN, com R$ 15 de IRRF retido na fonte.",
+      pergunta: "Quanto você paga de DARF?",
+      opcoes: [
+        {
+          texto: "R$ 285 (20% de 1.500 − 15)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. 20% × R$ 1.500 = R$ 300; menos os R$ 15 de IRRF = R$ 285 de DARF.",
+        },
+        {
+          texto: "R$ 300 (20% de 1.500, sem abater o IRRF)",
+          tom: "errada",
+          feedback: "O IRRF retido abate o imposto devido — senão você pagaria 21% no total.",
+        },
+        {
+          texto: "R$ 15 (o IRRF é o imposto final)",
+          tom: "errada",
+          feedback: "O IRRF é antecipação; os 20% são o imposto final sobre o lucro do mês.",
+        },
+        {
+          texto: "R$ 0 — lucro abaixo de R$ 20 mil é isento",
+          tom: "errada",
+          feedback: "A isenção de R$ 20 mil não existe para day trade.",
+        },
+      ],
+      termosExplicacao: ["DARF", "20%", "IRRF", "6015", "mês seguinte"],
+      aindaPratique: "abrir o extrato de corretagem e conferir o IRRF retido",
+      transferencia: {
+        titulo: "O prejuízo que salva",
+        situacao: "Janeiro: −R$ 400 em day trade. Fevereiro: +R$ 700 em day trade.",
+        pergunta: "O que a compensação permite?",
+        opcoes: [
+          {
+            texto: "Compensar: imposto de 20% sobre R$ 300 no mês do lucro",
+            tom: "correta",
+            feedback:
+              "Boa decisão. O prejuízo de day trade compensa lucro de day trade: fevereiro paga 20% sobre R$ 700 − R$ 400 = R$ 300.",
+          },
+          {
+            texto: "Compensar com lucros de swing do mesmo período",
+            tom: "errada",
+            feedback: "A compensação não cruza modalidades: day trade com day trade apenas.",
+          },
+          {
+            texto: "Não compensar nada, cada mês é independente",
+            tom: "errada",
+            feedback:
+              "Prejuízos de day trade são compensáveis com lucros futuros da mesma modalidade.",
+          },
+          {
+            texto: "Pagar 20% sobre R$ 700 inteiro",
+            tom: "errada",
+            feedback:
+              "O prejuízo anterior reduz a base de cálculo — esse é o objetivo da compensação.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "A alíquota do lucro de day trade em futuros é:",
+        alternativas: ["20%", "15%", "27,5%", "Isenta até R$ 20 mil"],
+        correta: 0,
+        explicacao: "Day trade: 20%; swing: 15% com isenção de R$ 20 mil.",
+      },
+      {
+        pergunta: "O IRRF de 1% retido nas operações:",
+        alternativas: [
+          "Abate o imposto devido no DARF",
+          "É o imposto final",
+          "É devolvido integralmente",
+          "Só vale para swing",
+        ],
+        correta: 0,
+        explicacao: "IRRF é antecipação: entra como crédito no cálculo do DARF.",
+      },
+      {
+        pergunta: "O DARF de day trade (6015) vence:",
+        alternativas: [
+          "Até o último dia útil do mês seguinte",
+          "Só na declaração anual",
+          "No dia do trade",
+          "Nunca, se houver IRRF",
+        ],
+        correta: 0,
+        explicacao: "É mês a mês, até o último dia útil do mês seguinte.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "O DARF da semana",
+        enunciado:
+          "Mês com: day trade +R$ 900 (IRRF R$ 9) e swing +R$ 400 (IRRF R$ 4). Calcule os DARFs separados de cada modalidade.",
+        gabarito:
+          "Day: 20% × 900 − 9 = R$ 171. Swing: 15% × 400 − 4 = R$ 56. Dois DARFs, modalidades separadas.",
+      },
+    ],
+  },
+  {
+    slug: "darf-day-trade",
+    ordem: 37,
+    nivel: "pratica",
+    dominio: "futuros",
+    titulo: "Lição 14 — DARF na prática",
+    resumo: "Emitir, preencher e pagar o DARF de day trade: o passo a passo sem mistério.",
+    problema: {
+      titulo: "O código que ninguém explica",
+      texto:
+        "No fim do mês lucrativo, Caio abriu o site do Banco Central para emitir o DARF e travou: qual código? Day trade de futuros usa o **6015**. Já o swing, o 6015 com alíquota de 15%? Não: swing de futuros também é 6015 — a diferença está na apuração (15% vs 20%). Sem o passo a passo, até o código certo parece errado.",
+      pergunta: "Como emitir e pagar o DARF de day trade corretamente?",
+    },
+    conceitos: [
+      {
+        titulo: "O passo a passo do DARF",
+        corpo: `
+1. Acesse o **Banco Central** → Emissão de DARF (ou o programa da Receita para valores altos).
+2. Preencha: **CPF**, período de apuração (mês) e código **6015**.
+3. Informe o **valor do imposto** (20% do lucro de day trade − IRRF retido).
+4. Gere e pague até o **último dia útil do mês seguinte** (via banco, como qualquer boleto).
+5. Conserve o comprovante junto ao diário: a Receita cruza o IRRF da corretora com o seu DARF.
+
+Valores mensais iguais ou superiores a R$ 10 (no código 6015, o piso é R$ 10) exigem DARF; abaixo, pode levar o saldo para o mês seguinte.
+        `,
+      },
+      {
+        titulo: "O cruzamento que não perdoa",
+        corpo: `
+- A corretora **informa à Receita** o IRRF de 1% de cada operação.
+- O ajuste diário deixa o resultado mensal registrado — e auditável.
+- Se o DARF não bater com o lucro apurado, a diferença vira multa e juros.
+- Manter o **diário de operações** (entrada, saída, pontos, custos) é a sua defesa em qualquer retificação.
+
+Não é burocracia: é a continuação da sua gestão — o dinheiro do imposto é separado do risco.
+        `,
+      },
+    ],
+    analogia:
+      "O DARF é o carnê do armário de verdade: se você paga mês a mês (20% do lucro de day trade), dezembro chega leve. Quem empurra para 'ver no ano que vem' encontra o carnê com juros, multa e a corretora apontando o dedo.",
+    naPratica: {
+      titulo: "Todo mês, dia do DARF",
+      passos: [
+        "Separar, no fechamento do mês, os lucros de day trade e de swing.",
+        "Apurar o imposto de cada modalidade (20% / 15%), abatendo o IRRF.",
+        "Emitir o DARF 6015 no site do Banco Central.",
+        "Pagar até o último dia útil do mês seguinte e arquivar.",
+      ],
+    },
+    missao: {
+      titulo: "O mês que chegou",
+      situacao:
+        "Mês fechado: R$ 800 de lucro em day trade, R$ 8 de IRRF retido. Você decide emitir o DARF hoje.",
+      pergunta: "Qual o caminho correto?",
+      opcoes: [
+        {
+          texto: "Banco Central → código 6015 → R$ 152 (20% × 800 − 8)",
+          tom: "correta",
+          feedback:
+            "Boa decisão. 20% × R$ 800 = R$ 160; menos R$ 8 de IRRF = R$ 152, código 6015, até o fim do mês seguinte.",
+        },
+        {
+          texto: "Banco Central → código 6015 → R$ 160 sem abater o IRRF",
+          tom: "errada",
+          feedback: "O IRRF retido abate o DARF — pagar R$ 160 é pagar 21% do lucro.",
+        },
+        {
+          texto: "Programa da Receita → código 6123 → R$ 152",
+          tom: "errada",
+          feedback: "O código de day trade de futuros é o 6015.",
+        },
+        {
+          texto: "Esperar a declaração anual e pagar tudo junto",
+          tom: "errada",
+          feedback: "O DARF é mensal; o atraso gera multa e juros.",
+        },
+      ],
+      termosExplicacao: ["6015", "Banco Central", "152", "mês seguinte"],
+      aindaPratique: "simular a emissão do DARF sem pagar, só para ver o formulário",
+      transferencia: {
+        titulo: "O DARF do mês do prejuízo",
+        situacao: "Mês com prejuízo de R$ 250 em day trade. Nenhum DARF a pagar.",
+        pergunta: "O que você registra para não perder o direito à compensação?",
+        opcoes: [
+          {
+            texto: "Guardo o prejuízo apurado: ele abate lucros futuros de day trade",
+            tom: "correta",
+            feedback:
+              "Boa decisão. Prejuízo não apurado vira dinheiro esquecido; registrado, compensa lucros de day trade dos meses seguintes.",
+          },
+          {
+            texto: "Emito um DARF de R$ 0 para registrar",
+            tom: "errada",
+            feedback:
+              "Não existe DARF sem imposto devido — o registro do prejuízo é no seu controle.",
+          },
+          {
+            texto: "O prejuízo compensa qualquer lucro, de qualquer modalidade",
+            tom: "errada",
+            feedback: "Só day trade compensa day trade.",
+          },
+          {
+            texto: "O prejuízo pode abater o IRRF de outros meses",
+            tom: "errada",
+            feedback: "A compensação de prejuízo é com lucro da mesma modalidade, não com IRRF.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O código do DARF para day trade de futuros é:",
+        alternativas: ["6015", "6123", "3302", "8015"],
+        correta: 0,
+        explicacao: "Day trade de renda variável (incluindo futuros) usa o código 6015.",
+      },
+      {
+        pergunta: "O DARF de day trade deve ser pago:",
+        alternativas: [
+          "Todo mês, até o último dia útil do mês seguinte",
+          "Uma vez por ano",
+          "A cada operação",
+          "Somente no vencimento do contrato",
+        ],
+        correta: 0,
+        explicacao: "Apuração mensal, vencimento no último dia útil do mês seguinte.",
+      },
+      {
+        pergunta: "O prejuízo de day trade não compensado:",
+        alternativas: [
+          "Abate lucros de day trade de meses seguintes",
+          "Expira no fim do ano",
+          "Vira IRRF",
+          "Só compensa no swing",
+        ],
+        correta: 0,
+        explicacao: "Compensa lucros futuros da MESMA modalidade.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "O fluxo completo",
+        enunciado:
+          "Simule o mês: +R$ 1.200 de day trade (IRRF R$ 12). Preencha: imposto bruto, IRRF a abater, DARF a pagar, código, prazo de vencimento.",
+        gabarito:
+          "20% × 1.200 = R$ 240; − R$ 12 = R$ 228; código 6015; último dia útil do mês seguinte.",
+      },
+    ],
+  },
 ];
 
 export function getLesson(slug: string) {
   return LESSONS.find((l) => l.slug === slug);
+}
+
+export type CaminhoTrilha = "opcoes" | "futuros" | "geral";
+
+/** Lições visíveis para o caminho do usuário (segmentação por mercado). */
+export function liçõesDe(caminho: CaminhoTrilha): Lesson[] {
+  if (caminho === "futuros") return LESSONS.filter((l) => l.dominio === "futuros");
+  if (caminho === "opcoes") return LESSONS.filter((l) => l.dominio !== "futuros");
+  return LESSONS;
 }
 
 export const NIVEIS: Record<LessonNivel, string> = {

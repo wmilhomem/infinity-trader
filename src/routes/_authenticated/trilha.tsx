@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { LESSONS, NIVEIS, NIVEIS_DESC, nivelLabel, type LessonNivel } from "@/lib/lessons";
+import { liçõesDe, NIVEIS, NIVEIS_DESC, nivelLabel, type LessonNivel } from "@/lib/lessons";
 import { getLessonMeta } from "@/lib/lesson-meta";
 import { useCaminho } from "@/lib/use-caminho";
 import { ArrowRight, Check, Clock, Lock, Play } from "lucide-react";
@@ -54,14 +54,15 @@ function Trilha() {
   });
 
   const done = new Set((q.data ?? []).filter((p) => p.completed_at).map((p) => p.lesson_slug));
-  const byNivel = LESSONS.reduce<Record<LessonNivel, typeof LESSONS>>(
+  const trilha = liçõesDe(caminho);
+  const byNivel = trilha.reduce<Record<LessonNivel, typeof trilha>>(
     (acc, l) => {
       (acc[l.nivel] ??= []).push(l);
       return acc;
     },
     { 1: [], 2: [], 3: [], 4: [], 5: [], pratica: [] },
   );
-  const proxima = LESSONS.find((l) => !done.has(l.slug));
+  const proxima = trilha.find((l) => !done.has(l.slug));
   const proximaMeta = proxima ? getLessonMeta(proxima.slug) : null;
 
   const futuros = caminho === "futuros";
@@ -73,11 +74,13 @@ function Trilha() {
           <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-primary">
             <Play size={14} /> Sua trilha · Day trade (WIN/WDO)
           </div>
-          <h2 className="mt-3 text-2xl font-bold tracking-tight">Sua trilha está em construção.</h2>
+          <h2 className="mt-3 text-2xl font-bold tracking-tight">
+            {trilha.length} lições para dominar o mini índice e o mini dólar.
+          </h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            As lições completas de WIN/WDO chegam nas próximas releases. Enquanto isso, o essencial
-            já funciona no simulador de futuros: dimensionamento por stop (contratos = risco ÷ (stop
-            × valor do ponto)), margem, ajuste diário e pregão 9h–18h.
+            Da mecânica do contrato futuro ao DARF de day trade — com quiz, missões e simulador.
+            Estruturas expressam hipóteses — nunca recomendações. 80% no quiz destrava a próxima
+            etapa do ciclo de decisão.
           </p>
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
             {[
@@ -99,37 +102,35 @@ function Trilha() {
             Explorar o simulador de futuros <ArrowRight size={15} />
           </Link>
           <div className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
-            Tributação: day trade em futuros usa o mesmo código da declaração (6015) e a mesma
-            alíquota de 20% sobre o lucro líquido mensal.
+            Tributação: day trade em futuros usa o código 6015 e alíquota de 20% sobre o lucro
+            líquido mensal — sem isenção de R$ 20 mil (lições 13 e 14).
           </div>
         </div>
       ) : (
         <p className="mb-6 text-sm text-muted-foreground">
-          {LESSONS.length} lições. Estruturas expressam hipóteses — nunca recomendações. 80% no quiz
+          {trilha.length} lições. Estruturas expressam hipóteses — nunca recomendações. 80% no quiz
           destrava a próxima etapa do ciclo de decisão.
         </p>
       )}
 
-      {!futuros && (
-        <div className="mb-8 rounded-2xl border border-border bg-card p-6">
-          <div className="flex items-center justify-between text-sm">
-            <span className="font-semibold">
-              {done.size} de {LESSONS.length} lições concluídas
-            </span>
-            <span className="font-mono text-xs text-muted-foreground">
-              {Math.round((done.size / LESSONS.length) * 100)}%
-            </span>
-          </div>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full rounded-full bg-primary transition-all duration-300"
-              style={{ width: `${(done.size / LESSONS.length) * 100}%` }}
-            />
-          </div>
+      <div className="mb-8 rounded-2xl border border-border bg-card p-6">
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-semibold">
+            {done.size} de {trilha.length} lições concluídas
+          </span>
+          <span className="font-mono text-xs text-muted-foreground">
+            {Math.round((done.size / trilha.length) * 100)}%
+          </span>
         </div>
-      )}
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-primary transition-all duration-300"
+            style={{ width: `${(done.size / trilha.length) * 100}%` }}
+          />
+        </div>
+      </div>
 
-      {!futuros && proxima && proximaMeta && (
+      {proxima && proximaMeta && (
         <Link
           to="/licao/$slug"
           params={{ slug: proxima.slug }}
@@ -206,7 +207,7 @@ function Trilha() {
       <div className="rounded-md border border-dashed border-border p-4 text-xs text-muted-foreground">
         <Lock size={12} className="mr-1 inline" />
         {futuros
-          ? "As lições completas de day trade (WIN/WDO) chegam nas próximas releases. O simulador de futuros já cobre dimensionamento, stop, margem e ajuste diário. As estruturas de opções abaixo continuam disponíveis se você quiser explorar o outro mercado."
+          ? "Mais conteúdo de futuros (agro, commodities, contratos cheios) chega nas próximas releases. O simulador de futuros já cobre dimensionamento, stop, margem e ajuste diário."
           : "Mais estruturas (Calendar Spread, venda a descoberto, diagonal) chegam nas próximas releases. O loop de decisão completo já funciona."}
       </div>
     </AppShell>

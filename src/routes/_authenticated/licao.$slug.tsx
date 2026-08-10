@@ -4,8 +4,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { getLesson, LESSONS } from "@/lib/lessons";
+import { getLesson, liçõesDe } from "@/lib/lessons";
 import { getLessonMeta, NIVEL_THEME } from "@/lib/lesson-meta";
+import { useCaminho } from "@/lib/use-caminho";
 import { LessonProgress } from "@/components/lessons/LessonProgress";
 import { LessonHero } from "@/components/lessons/LessonHero";
 import { LessonProblem } from "@/components/lessons/LessonProblem";
@@ -61,6 +62,7 @@ function LicaoPage() {
   const { slug } = Route.useParams();
   const lesson = getLesson(slug);
   const meta = getLessonMeta(slug);
+  const { caminho } = useCaminho();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const topRef = useRef<HTMLDivElement>(null);
@@ -123,8 +125,9 @@ function LicaoPage() {
   const theme = NIVEL_THEME[lesson.nivel] ?? NIVEL_THEME[1];
   const step = steps[idx];
   const progress = Math.round(((idx + 1) / steps.length) * 100);
-  const nextLesson = LESSONS[LESSONS.findIndex((l) => l.slug === slug) + 1];
-  const inNivel = LESSONS.filter((l) => l.nivel === lesson.nivel);
+  const trilha = liçõesDe(caminho);
+  const nextLesson = trilha[trilha.findIndex((l) => l.slug === slug) + 1];
+  const inNivel = trilha.filter((l) => l.nivel === lesson.nivel);
   const posInNivel = inNivel.findIndex((l) => l.slug === slug) + 1;
 
   const correctCount = lesson.quiz.filter((q, i) => answers[i] === q.correta).length;
@@ -307,7 +310,7 @@ function LicaoPage() {
           nivel={lesson.nivel}
           nivelNome={theme.nome}
           ordem={lesson.ordem}
-          total={LESSONS.length}
+          total={trilha.length}
           posInNivel={posInNivel}
           totalInNivel={inNivel.length}
           pct={progress}
@@ -320,7 +323,7 @@ function LicaoPage() {
             <LessonHero
               lesson={lesson}
               meta={meta}
-              total={LESSONS.length}
+              total={trilha.length}
               tema={theme}
               timeline={timeline}
               onJump={(i) => jumpTo(i + 1)}

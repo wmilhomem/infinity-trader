@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
-import { LESSONS } from "@/lib/lessons";
+import { liçõesDe } from "@/lib/lessons";
 import { cn } from "@/lib/utils";
 import { preverTamanhoPosicao } from "@/engines/behavior-forecast";
 import { montarPainelDeVoo, type CheckCognitivo } from "@/engines/readiness";
@@ -182,7 +182,8 @@ function Home() {
   const sims = simsQ.data ?? [];
 
   const doneSlugs = new Set(progress.filter((p) => p.completed_at).map((p) => p.lesson_slug));
-  const proximaLicao = LESSONS.find((l) => !doneSlugs.has(l.slug)) ?? LESSONS[LESSONS.length - 1];
+  const trilha = liçõesDe(caminho);
+  const proximaLicao = trilha.find((l) => !doneSlugs.has(l.slug)) ?? trilha[trilha.length - 1];
   const primeiroNome = (profileQ.data?.nome ?? "").trim().split(" ")[0];
 
   // ---- Painel de voo -----------------------------------------------------
@@ -221,20 +222,13 @@ function Home() {
   const temRegras = rules.length >= 3;
 
   const missao = [
-    caminho === "futuros"
-      ? {
-          done: false,
-          label: "Explorar os conceitos essenciais de futuros",
-          to: "/trilha" as const,
-          min: 8,
-        }
-      : {
-          done: licaoHoje,
-          label: `Entender "${proximaLicao.titulo}"`,
-          to: "/licao/$slug" as const,
-          params: { slug: proximaLicao.slug },
-          min: 8,
-        },
+    {
+      done: licaoHoje,
+      label: `Entender "${proximaLicao.titulo}"`,
+      to: "/licao/$slug" as const,
+      params: { slug: proximaLicao.slug },
+      min: 8,
+    },
     { done: temRegras, label: "Atualizar suas regras", to: "/regras" as const, min: 3 },
     {
       done: simHoje,
@@ -592,7 +586,7 @@ function Home() {
               icon={BookOpen}
               label="Aprender"
               to="/trilha"
-              desc={`${doneSlugs.size}/${LESSONS.length} lições`}
+              desc={`${doneSlugs.size}/${trilha.length} lições`}
             />
             <Step
               n={2}
