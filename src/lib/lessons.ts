@@ -89,8 +89,971 @@ export type Lesson = {
 
 export const LESSONS: Lesson[] = [
   {
-    slug: "o-que-e-opcao",
+    slug: "lendo-um-candle",
     ordem: 1,
+    nivel: 1,
+    titulo: "Lição 1 — Lendo um candle",
+    resumo:
+      "O candle resume um período de negociação: quem dominou, até onde o preço foi e onde fechou.",
+    problema: {
+      titulo: "O retângulo que ninguém explicou",
+      texto:
+        "Carlos abriu o gráfico pela primeira vez e viu uma fileira de retângulos com risquinhos saindo de cada um. A corretora não explica nada; a internet joga 47 siglas em cima dele. Ele sabe que o preço 'andou', mas não consegue dizer nem o que um único retângulo significa.",
+      pergunta: "O que exatamente um candle mostra?",
+    },
+    conceitos: [
+      {
+        titulo: "A anatomia do candle",
+        corpo: `
+Cada candle resume **um período** de negociação (1 minuto, 5 minutos, 1 dia...). Ele guarda quatro preços:
+
+- **Abertura** — o primeiro preço negociado do período.
+- **Fechamento** — o último preço negociado do período.
+- **Máxima** — o preço mais alto que o período alcançou.
+- **Mínima** — o preço mais baixo que o período alcançou.
+
+O **corpo** liga abertura e fechamento. Os **pavios** (ou sombras) ligam o corpo à máxima e à mínima.
+        `,
+      },
+      {
+        titulo: "Alta, baixa e o que fica no meio",
+        corpo: `
+Candle de **alta**: o fechamento ficou acima da abertura. Candle de **baixa**: o fechamento ficou abaixo da abertura. É isso — a cor é consequência dessa comparação.
+
+O que o corpo conta: se abertura e fechamento estão distantes, um lado dominou o período. Se estão colados, o período foi uma disputa.
+
+O que os pavios contam: até onde o preço **chegou** — e que não conseguiu segurar.
+
+Um candle nunca diz o que vem depois. Ele diz **o que aconteceu** no período.
+        `,
+      },
+    ],
+    analogia:
+      "Cada candle é a ata de um round de luta: o corpo mostra quem dominou e por quanto, os pavios mostram as investidas que não seguraram — e a ata nunca diz quem vence o próximo round.",
+    naPratica: {
+      titulo: "Antes de qualquer leitura",
+      passos: [
+        "Identifique a abertura e o fechamento do candle (o corpo).",
+        "Veja até onde os pavios levaram o preço (máxima e mínima).",
+        "Classifique: alta ou baixa? Corpo longo ou disputa?",
+        "Responda em uma frase: o que aconteceu aqui?",
+      ],
+    },
+    missao: {
+      titulo: "Observe o candle",
+      situacao:
+        "Você abre o gráfico de 5 minutos e encontra um candle de alta com corpo longo e um pavio inferior visível: o preço abriu, cedeu um pouco, subiu com força e fechou perto da máxima do período.",
+      pergunta: "O que aconteceu neste período?",
+      opcoes: [
+        {
+          texto:
+            "Abriu, os compradores dominaram o período e o fechamento ficou perto da máxima — houve força compradora no período.",
+          tom: "correta",
+          feedback:
+            "Correto: corpo longo com fechamento perto da máxima é domínio comprador no período. Lembre que isso descreve o passado — decisão exige regra e risco.",
+        },
+        {
+          texto:
+            "Os compradores dominaram o período inteiro sem nenhuma pressão contrária — mas o pavio inferior mostra que o preço visitou níveis mais baixos antes de subir.",
+          tom: "quase",
+          feedback:
+            "Quase: houve domínio comprador, mas o pavio inferior mostra uma visita a níveis baixos — pressão contrária existiu no início do período.",
+        },
+        {
+          texto:
+            "O preço vai subir no próximo período — o candle do período passado não prevê o futuro.",
+          tom: "errada",
+          feedback:
+            "Não: um candle descreve o que aconteceu, nunca o que vai acontecer. Previsão é hipótese — e precisa de regra e risco.",
+        },
+        {
+          texto:
+            "Quem vendeu dominou o período — o fechamento acima da abertura indica o contrário.",
+          tom: "errada",
+          feedback:
+            "Não: fechamento acima da abertura define um candle de alta — domínio comprador no período.",
+        },
+      ],
+      termosExplicacao: ["abertura", "fechamento", "pavio", "corpo"],
+      aindaPratique:
+        "Abrir o gráfico de qualquer ativo e descrever o último candle em uma frase, sem olhar o que veio antes.",
+      transferencia: {
+        titulo: "O candle de baixa do fim do dia",
+        situacao:
+          "No fim do pregão, o último candle é de baixa, com corpo curto e um pavio superior visível: o preço tentou subir, voltou e fechou ligeiramente abaixo da abertura.",
+        pergunta: "O que esse candle conta sobre o período?",
+        opcoes: [
+          {
+            texto:
+              "Quem vendeu ficou com a palavra final no período, mas a disputa foi acirrada — corpo curto é disputa, não domínio.",
+            tom: "correta",
+            feedback:
+              "Correto: corpo curto significa abertura e fechamento colados — disputa. O vendedor só venceu por pouco, dentro do período.",
+          },
+          {
+            texto:
+              "O pavio superior mostra que o preço chegou a uma região mais alta e não ficou — a rejeição é uma hipótese a considerar.",
+            tom: "quase",
+            feedback:
+              "Quase: o pavio mostra a visita à região alta, e a rejeição é uma hipótese razoável — mas ainda é interpretação, não fato.",
+          },
+          {
+            texto:
+              "É um sinal de que o mercado vai cair amanhã — um candle não prevê o próximo período.",
+            tom: "errada",
+            feedback:
+              "Não: um candle descreve o passado. O amanhã é hipótese que exige contexto, regra e risco.",
+          },
+          {
+            texto: "O período foi de forte domínio vendedor — um corpo curto não indica domínio.",
+            tom: "errada",
+            feedback:
+              "Não: domínio exige corpo longo. Corpo curto é disputa, mesmo que a cor seja de baixa.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O que o corpo de um candle representa?",
+        alternativas: [
+          "A distância entre a máxima e a mínima do período",
+          "A distância entre a abertura e o fechamento do período",
+          "O volume negociado no período",
+          "O tempo que o período levou",
+        ],
+        correta: 1,
+        explicacao: "O corpo liga abertura e fechamento; os pavios é que vão da máxima à mínima.",
+      },
+      {
+        pergunta: "Um candle é de alta quando...",
+        alternativas: [
+          "o fechamento fica acima da abertura",
+          "a máxima é maior que o fechamento",
+          "o pavio superior é maior que o inferior",
+          "a cor do gráfico é verde",
+        ],
+        correta: 0,
+        explicacao:
+          "Alta é definida pela comparação abertura/fechamento; a cor é só consequência dessa comparação.",
+      },
+      {
+        pergunta: "Pavios longos em um candle indicam que...",
+        alternativas: [
+          "o preço visitou regiões distantes do corpo e não segurou lá",
+          "o próximo candle vai virar",
+          "a tendência mudou",
+          "a venda é obrigatória",
+        ],
+        correta: 0,
+        explicacao:
+          "Pavio mostra o alcance do preço no período — o que aconteceu, não o que vai acontecer.",
+      },
+    ],
+  },
+  {
+    slug: "a-historia-do-pavio",
+    ordem: 2,
+    nivel: 1,
+    titulo: "Lição 2 — A história do pavio",
+    resumo:
+      "O pavio mostra que o preço esteve numa região — sozinho, ele não determina o que fazer.",
+    problema: {
+      titulo: "O pavio que 'previu' a queda",
+      texto:
+        "Luciana viu um pavio superior longo e vendeu 'porque o mercado ia cair'. Caiu de fato, no dia seguinte — e ela passou a tratar todo pavio longo como ordem de venda. Até o dia em que o mesmo formato apareceu numa região de suporte: o preço subiu e subiu. O pavio não tinha 'previsto' nada — ele contava uma história que precisava de contexto.",
+      pergunta: "O que um pavio sozinho realmente diz?",
+    },
+    conceitos: [
+      {
+        titulo: "O pavio é uma visita",
+        corpo: `
+O pavio superior longo diz um fato: o preço **esteve naquela região** e voltou para perto do corpo.
+
+Interpretar isso como "rejeição" é uma hipótese — razoável, mas ainda uma hipótese. O mesmo formato pode aparecer:
+
+- numa subida com força: pode ser apenas o alcance máximo do período, com o fechamento perto dele;
+- numa queda: pode ser um teste de exaustão;
+- numa região de suporte: pode ser o último retrocesso antes de o preço voltar a subir.
+
+**Observação e interpretação são camadas diferentes.** Misturar as duas é onde a leitura vira superstição.
+        `,
+      },
+      {
+        titulo: "Sozinho, ele não decide nada",
+        corpo: `
+O pavio sozinho não diz:
+
+- que o mercado vai cair;
+- que a resistência está confirmada;
+- que você deve vender.
+
+O pavio + **região** + **tendência** + **sua regra** + **seu risco** é que podem formar uma evidência para uma decisão — se a sua regra permitir.
+        `,
+      },
+    ],
+    analogia:
+      "Um pavio é como uma pegada na lama: ela prova que alguém passou por ali, não que vai voltar. A pegada em frente ao mercado diz uma coisa; a pegada no meio do mato, outra.",
+    naPratica: {
+      titulo: "Antes de tratar um pavio como rejeição",
+      passos: [
+        "Separe o fato (o preço esteve lá) da interpretação (houve rejeição).",
+        "Pergunte em que região o pavio aconteceu.",
+        "Pergunte se a tendência vinha perdendo força.",
+        "Só então pergunte se a sua regra permite alguma ação — e qual o risco.",
+      ],
+    },
+    missao: {
+      titulo: "Confronte o pavio",
+      situacao:
+        "Depois de cinco candles seguidos de alta, um candle fecha com pavio superior longo, no fim da sessão, encostando numa região onde o preço já havia parado duas vezes.",
+      pergunta: "O que o pavio superior pode representar?",
+      opcoes: [
+        {
+          texto:
+            "Compradores dominaram todo o período — se dominassem, o fechamento ficaria perto da máxima.",
+          tom: "errada",
+          feedback:
+            "Não: se os compradores tivessem dominado, o fechamento ficaria próximo da máxima. O pavio conta outra história.",
+        },
+        {
+          texto:
+            "Houve rejeição daquela região — o preço esteve lá e não ficou; é uma hipótese que depende do contexto.",
+          tom: "correta",
+          feedback:
+            "O pavio mostra que o preço esteve naquela região, mas sozinho não determina o que fazer. Rejeição é uma hipótese — depende do contexto para virar evidência.",
+        },
+        {
+          texto: "Significa obrigatoriamente venda — padrão não é ordem.",
+          tom: "errada",
+          feedback:
+            "Padrão não é ordem. O mesmo pavio pode ter leituras diferentes conforme a região e a regra pessoal.",
+        },
+        {
+          texto:
+            "Não é possível saber — parte é possível: o fato é que o preço esteve lá; a interpretação disso é que depende do contexto.",
+          tom: "quase",
+          feedback:
+            "Quase: o fato (preço esteve lá e voltou) é observável. O que essa visita significa é que depende do contexto e da regra.",
+        },
+      ],
+      termosExplicacao: ["pavio", "rejeição", "região"],
+      aindaPratique:
+        "Pegar o último gráfico que você viu e listar, separadamente, o que era fato e o que era interpretação.",
+      transferencia: {
+        titulo: "O pavio inferior no suporte",
+        situacao:
+          "Um ativo em queda encosta num suporte que já segurou o preço duas vezes. No candle do toque, o pavio inferior é longo e o fechamento vem acima da abertura.",
+        pergunta: "O que é possível afirmar sobre esse período?",
+        opcoes: [
+          {
+            texto:
+              "O preço esteve naquela região de suporte e voltou — o que isso significa depende do contexto e da sua regra.",
+            tom: "correta",
+            feedback:
+              "Correto: o fato é a visita ao suporte; o significado (força, exaustão, teste) depende do contexto e da regra.",
+          },
+          {
+            texto:
+              "A queda perdeu força no suporte — é uma hipótese razoável, mas ainda uma hipótese, não um fato.",
+            tom: "quase",
+            feedback:
+              "Quase: é uma hipótese razoável de perda de força — mas hipótese a testar, não conclusão.",
+          },
+          {
+            texto: "É uma ordem de compra — o padrão não decide por você.",
+            tom: "errada",
+            feedback: "Não: padrão não é ordem. Decisão exige regra e risco conhecido.",
+          },
+          {
+            texto:
+              "A mínima do período confirma a continuação da queda — o fechamento acima da abertura conta o contrário no período.",
+            tom: "errada",
+            feedback:
+              "Não: o fechamento acima da abertura e o pavio inferior longo mostram disputa na região — não continuidade confirmada.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O que o pavio superior pode representar?",
+        alternativas: [
+          "Compradores dominaram todo o período",
+          "Houve rejeição daquela região",
+          "Significa obrigatoriamente venda",
+          "Não é possível saber",
+        ],
+        correta: 1,
+        explicacao:
+          "O pavio mostra que o preço esteve naquela região, mas sozinho não determina o que fazer — rejeição é uma hipótese dependente de contexto.",
+      },
+      {
+        pergunta: "Qual afirmação separa corretamente fato de interpretação?",
+        alternativas: [
+          "O fato é que o preço esteve na região do pavio; a rejeição é uma interpretação",
+          "O fato é que haverá rejeição; a interpretação é que o preço subiu",
+          "O pavio longo é um fato e a venda é uma interpretação óbvia",
+          "Tudo num gráfico é interpretação",
+        ],
+        correta: 0,
+        explicacao:
+          "O alcance do preço é observável; o significado que você dá a ele é interpretação.",
+      },
+      {
+        pergunta: "Um pavio superior longo na mesma região, em contextos diferentes...",
+        alternativas: [
+          "pode ter leituras diferentes — o contexto muda a interpretação",
+          "tem sempre o mesmo significado",
+          "é sempre um sinal de reversão",
+          "invalida o gráfico",
+        ],
+        correta: 0,
+        explicacao: "Padrão + contexto + regra + risco = evidência. Padrão sozinho não é sinal.",
+      },
+    ],
+  },
+  {
+    slug: "forca-e-sequencia",
+    ordem: 3,
+    nivel: 1,
+    titulo: "Lição 3 — Força e sequência",
+    resumo: "Força não é a cor do candle: é o tamanho do corpo, a sequência e o contexto.",
+    problema: {
+      titulo: "Dois verdes e uma certeza",
+      texto:
+        "Dois candles de alta seguidos e Mariana já se sentia no direito de 'subir a aposta'. Mas o que ela estava chamando de força eram dois corpos curtos — disputa — num mercado parado. Força não é a cor do candle; é o tamanho do corpo, a sequência e o contexto.",
+      pergunta: "Como reconhecer força (ou a falta dela) no gráfico?",
+    },
+    conceitos: [
+      {
+        titulo: "Magnitude: corpo longo ou disputa",
+        corpo: `
+A **magnitude** de um candle é a distância entre abertura e fechamento em relação ao tamanho dos períodos recentes.
+
+- **Corpo longo** — um lado dominou o período; movimento decidido.
+- **Corpo curto** — abertura e fechamento colados; o período foi uma disputa.
+
+Magnitude é comparação: um corpo que é longo no gráfico de hoje pode ser curto se o mercado ficar mais agressivo amanhã.
+        `,
+      },
+      {
+        titulo: "Sequência: a série conta",
+        corpo: `
+Força não é um candle isolado. Observe a **sequência**:
+
+- Vários corpos longos na mesma direção, com poucas correções → movimento sustentado.
+- Corpos longos alternando direção → disputa, não direção.
+- Corpos que vão encolhendo numa sequência → o movimento está perdendo força.
+
+E o limite: mesmo uma sequência forte **não prevê** a próxima. Ela descreve o que está acontecendo — você ainda precisa de hipótese, regra e risco.
+        `,
+      },
+    ],
+    analogia:
+      "Força é como um atleta: um dia de treino intenso é um corpo longo; dias seguidos de treino pesado são uma sequência. Treinar uma vez não é preparação — e nenhum treino garante a vitória da próxima.",
+    naPratica: {
+      titulo: "Lendo magnitude e sequência",
+      passos: [
+        "Meça o corpo do candle contra os últimos períodos (longo ou disputa?).",
+        "Olhe os últimos 5 a 10 candles: há sequência ou alternância?",
+        "Os corpos crescem ou encolhem ao longo da sequência?",
+        "Escreva a observação sem previsão: o que está acontecendo, não o que 'vai' acontecer.",
+      ],
+    },
+    missao: {
+      titulo: "Interprete a sequência",
+      situacao:
+        "Você observa seis candles: três de alta com corpos longos e crescentes, um de baixa com corpo curto, e mais dois de alta com corpo longo. O preço avançou em degraus, sempre com corpos longos na direção do movimento.",
+      pergunta: "Qual hipótese descreve melhor o que você está vendo?",
+      opcoes: [
+        {
+          texto:
+            "O movimento tem sustentação: corpos longos na direção, correção curta — hipótese de força que ainda precisa de regra e risco.",
+          tom: "correta",
+          feedback:
+            "Correto: corpos longos alinhados com correção curta sustentam a hipótese de força. Ainda é hipótese — regra e risco vêm antes da decisão.",
+        },
+        {
+          texto:
+            "O movimento está perdendo força — mas os corpos estão crescendo, o oposto do encolhimento que indica perda de força.",
+          tom: "quase",
+          feedback:
+            "Quase: os corpos crescem — o sinal de perda de força seria o encolhimento. A leitura aponta o contrário.",
+        },
+        {
+          texto:
+            "É garantia de que o próximo candle será de alta — nenhuma sequência prevê o próximo período.",
+          tom: "errada",
+          feedback:
+            "Não: a sequência descreve o passado. O próximo período é incerto — por isso existe risco.",
+        },
+        {
+          texto:
+            "O mercado está em disputa — corpos longos e alinhados indicam domínio, não disputa.",
+          tom: "errada",
+          feedback:
+            "Não: disputa é corpo curto. Corpos longos alinhados indicam domínio na direção.",
+        },
+      ],
+      termosExplicacao: ["corpo", "sequência", "magnitude"],
+      aindaPratique:
+        "Encontrar no gráfico do seu ativo uma sequência de corpos longos e escrever o que ela descreve — sem prever o próximo candle.",
+      transferencia: {
+        titulo: "Corpos que encolhem",
+        situacao:
+          "Um ativo sobe por seis candles, mas os corpos de alta vão ficando cada vez menores — o último é quase um fio. O preço ainda está acima dos fechamentos anteriores.",
+        pergunta: "O que a sequência sugere como hipótese?",
+        opcoes: [
+          {
+            texto:
+              "O movimento pode estar perdendo força — corpos que encolhem são uma hipótese a testar, não uma certeza.",
+            tom: "correta",
+            feedback:
+              "Correto: encolhimento progressivo é leitura de perda de força — hipótese a verificar com regra e risco.",
+          },
+          {
+            texto: "A subida continua forte — corpos encolhendo são o oposto de força crescente.",
+            tom: "quase",
+            feedback:
+              "Quase: a continuação é possível, mas a leitura de magnitude aponta perda de força, não aceleração.",
+          },
+          {
+            texto: "É o momento de vender — perda de força é hipótese, não ordem.",
+            tom: "errada",
+            feedback: "Não: observação não é ordem. Decisão exige regra, risco e simulação.",
+          },
+          {
+            texto: "O próximo candle será de baixa — a sequência descreve o passado.",
+            tom: "errada",
+            feedback: "Não: a sequência descreve o que aconteceu; o futuro é hipótese incerta.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "Um candle com corpo longo indica...",
+        alternativas: [
+          "que um lado dominou o período",
+          "que o próximo período seguirá a mesma direção",
+          "que o mercado está parado",
+          "que a tendência mudou",
+        ],
+        correta: 0,
+        explicacao:
+          "Corpo longo = abertura e fechamento distantes = domínio no período. Não prevê o próximo.",
+      },
+      {
+        pergunta: "Corpos que vão encolhendo numa sequência de alta sugerem...",
+        alternativas: [
+          "perda de força — uma hipótese a verificar",
+          "aceleração do movimento",
+          "que o mercado está em congestão",
+          "nada, corpos não importam",
+        ],
+        correta: 0,
+        explicacao:
+          "Encolhimento progressivo é uma leitura de perda de força — hipótese, não certeza.",
+      },
+      {
+        pergunta: "Por que uma sequência de corpos longos não é uma ordem de compra?",
+        alternativas: [
+          "porque a sequência descreve o que aconteceu, não o que vai acontecer",
+          "porque corpos longos são raros",
+          "porque sequência só vale no day trade",
+          "porque o gráfico não importa para decisões",
+        ],
+        correta: 0,
+        explicacao: "Observação alimenta hipótese; decisão exige regra e risco conhecido.",
+      },
+    ],
+  },
+  {
+    slug: "congestao-e-expansao",
+    ordem: 4,
+    nivel: 1,
+    titulo: "Lição 4 — Congestão e expansão",
+    resumo: "Congestão é acumulação de decisões numa faixa — informação, nunca vazio.",
+    problema: {
+      titulo: "O mercado que ficou mudo",
+      texto:
+        "André passou uma tarde inteira vendo o preço andar de um lado para o outro num espaço apertado. 'Não está acontecendo nada', concluiu. Mas estava acontecendo muita coisa: o mercado estava se acumulando numa região — e essa região depois se mostrou importante.",
+      pergunta: "O que significa quando o preço fica preso numa faixa?",
+    },
+    conceitos: [
+      {
+        titulo: "Regiões de congestão",
+        corpo: `
+**Congestão** é uma faixa onde o preço fica preso por vários períodos: corpos curtos, pavios dos dois lados, sem progressão.
+
+O que ela é: uma **região de acordo** — compradores e vendedores aceitando preços parecidos, período após período.
+
+O que ela não é: ausência de informação. Uma congestão longa e bem definida cria uma **região de referência** que o mercado costuma lembrar depois.
+        `,
+      },
+      {
+        titulo: "Expansão e contração",
+        corpo: `
+O preço alterna entre dois comportamentos:
+
+- **Expansão** — corpos longos, direção definida, o preço sai da faixa.
+- **Contração** — corpos curtos, disputa, o preço converge para uma faixa.
+
+Uma congestão que encolhe (faixas cada vez menores) é uma hipótese de saída próxima — a energia acumulada tem que sair. Uma congestão que alarga é o preço buscando um novo acordo.
+
+Ler congestão e expansão é ler **ritmo** — e ritmo não é sinal: é contexto para a sua hipótese.
+        `,
+      },
+    ],
+    analogia:
+      "Congestão é um engarrafamento: ninguém anda, mas os carros estão todos ali, acumulados. Quando o trânsito solta, a avenida inteira anda de uma vez — a pergunta é para onde, e isso você decide com regra e risco.",
+    naPratica: {
+      titulo: "Lendo o ritmo",
+      passos: [
+        "Identifique a faixa: onde o preço andou de lado nas últimas horas ou dias.",
+        "Descreva a congestão: longa, curta, encolhendo ou alargando?",
+        "Identifique a expansão: quando o preço saiu da faixa, com que corpo?",
+        "Use a faixa como região de referência — nunca como gatilho.",
+      ],
+    },
+    missao: {
+      titulo: "Observe o ritmo",
+      situacao:
+        "Um ativo passou a manhã preso entre R$ 10,00 e R$ 10,20, com corpos curtos e pavios dos dois lados. No fim da tarde, um candle de corpo longo fecha em R$ 10,40, fora da faixa, com os candles seguintes continuando longe dela.",
+      pergunta: "O que aconteceu neste gráfico?",
+      opcoes: [
+        {
+          texto:
+            "O preço ficou em congestão pela manhã e depois expandiu, saindo da faixa — ritmo de contração seguido de expansão.",
+          tom: "correta",
+          feedback:
+            "Correto: a manhã foi contração (faixa apertada) e a tarde expansão (corpo longo fora da faixa). O desfecho da expansão é hipótese.",
+        },
+        {
+          texto:
+            "A expansão indica que o preço vai continuar subindo — a expansão descreve o que aconteceu; a continuação é hipótese.",
+          tom: "quase",
+          feedback:
+            "Quase: a expansão é o que aconteceu; a continuação é uma hipótese que precisa de regra e risco.",
+        },
+        {
+          texto:
+            "Nada aconteceu pela manhã — a congestão criou uma região de referência, que é informação.",
+          tom: "errada",
+          feedback:
+            "Não: a congestão é informação — uma região de acordo que o mercado pode lembrar depois.",
+        },
+        {
+          texto:
+            "A congestão prova que o mercado estava vazio — congestão é acordo de preços, não ausência de participantes.",
+          tom: "errada",
+          feedback:
+            "Não: congestão é acúmulo de decisões numa faixa — participação intensa, não vazio.",
+        },
+      ],
+      termosExplicacao: ["congestão", "corpos curtos", "expansão"],
+      aindaPratique:
+        "Achar no seu ativo a última congestão e escrever onde ela começou e terminou — a faixa.",
+      transferencia: {
+        titulo: "A faixa que encolhe",
+        situacao:
+          "Você observa três faixas seguidas: o preço trava entre R$ 20,00 e R$ 20,40, depois entre R$ 20,20 e R$ 20,35, depois entre R$ 20,25 e R$ 20,30 — corpos cada vez mais curtos, faixas cada vez menores.",
+        pergunta: "Qual hipótese o ritmo sugere?",
+        opcoes: [
+          {
+            texto:
+              "A contração está apertando — a energia acumulada tende a sair, mas para onde e quando é hipótese, não previsão.",
+            tom: "correta",
+            feedback:
+              "Correto: faixas que encolhem acumulam energia. A saída é hipótese — direção e timing não são previsíveis.",
+          },
+          {
+            texto:
+              "O preço vai parar de se mover — contração costuma preceder expansão, não paralisia.",
+            tom: "quase",
+            feedback:
+              "Quase: o padrão clássico é contração → expansão; a paralisia total contraria o ritmo.",
+          },
+          {
+            texto: "É hora de comprar a faixa — ritmo não é gatilho.",
+            tom: "errada",
+            feedback: "Não: ritmo é contexto para a hipótese — nunca um gatilho de compra.",
+          },
+          {
+            texto: "O mercado está distribuindo para cair — a faixa encolher não indica direção.",
+            tom: "errada",
+            feedback:
+              "Não: contração não aponta direção. Energia acumulada pode sair para qualquer lado.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "Uma região de congestão representa...",
+        alternativas: [
+          "uma faixa de acordo entre compradores e vendedores",
+          "um mercado sem participantes",
+          "uma ordem de compra",
+          "o fim da tendência",
+        ],
+        correta: 0,
+        explicacao: "Congestão é acumulação de decisões numa faixa — informação, não vazio.",
+      },
+      {
+        pergunta: "Expansão se caracteriza por...",
+        alternativas: [
+          "corpos longos com direção definida",
+          "corpos curtos alternando",
+          "pavios dos dois lados iguais",
+          "preço travado numa faixa",
+        ],
+        correta: 0,
+        explicacao: "Expansão é o preço saindo da faixa com magnitude.",
+      },
+      {
+        pergunta: "Faixas que vão encolhendo sucessivamente sugerem...",
+        alternativas: [
+          "acúmulo de energia — hipótese de saída",
+          "que o mercado morreu",
+          "que a direção é de queda",
+          "que o volume sumiu",
+        ],
+        correta: 0,
+        explicacao: "Contração que aperta é leitura de energia acumulada — o desfecho é hipótese.",
+      },
+    ],
+  },
+  {
+    slug: "tendencia-e-lateralizacao",
+    ordem: 5,
+    nivel: 2,
+    titulo: "Lição 5 — Tendência e lateralização",
+    resumo: "Tendência é progressão de máximas e mínimas; lateralização é o preço sem progressão.",
+    problema: {
+      titulo: "A compra na queda que virou lateralização",
+      texto:
+        "Renato comprou porque 'estava caindo e ia voltar'. O preço não voltou: entrou num corredor estreito e ficou lá por semanas. Ele tinha lido uma queda como oportunidade — sem perguntar se havia tendência, lateralização ou transição. O gráfico responde à pergunta certa, se você fizer a pergunta certa.",
+      pergunta: "Como distinguir tendência de lateralização?",
+    },
+    conceitos: [
+      {
+        titulo: "Tendência: progressão de máximas e mínimas",
+        corpo: `
+**Tendência de alta**: máximas crescentes **e** mínimas crescentes. Cada impulso supera o anterior, e as correções não devolvem o movimento.
+
+**Tendência de baixa**: o oposto — mínimas e máximas decrescentes.
+
+A tendência é formada por **impulsos** (movimento na direção) e **correções** (movimento contra, que não apaga o impulso). A pergunta não é "a cor de hoje"; é "as máximas e mínimas estão progredindo?"
+        `,
+      },
+      {
+        titulo: "Lateralização: o preço sem progressão",
+        corpo: `
+**Lateralização**: máximas e mínimas na mesma faixa, período após período. O preço se move — mas não progride.
+
+O mesmo candle de alta pode significar coisas diferentes:
+
+- dentro de uma tendência de alta: continuação plausível;
+- no topo de uma lateralização: apenas mais um ciclo dentro da faixa;
+- dentro de uma tendência de baixa: correção.
+
+**Padrão não é sinal automático.** O contexto (tendência, região, sua regra) é que dá significado.
+
+| Aspecto | Tendência | Lateralização |
+|---|---|---|
+| Máximas | crescentes ou decrescentes | na mesma faixa |
+| Mínimas | acompanham as máximas | na mesma faixa |
+| Impulso | progride | recicla |
+| Leitura de um candle de alta | depende da tendência | mais um ciclo da faixa |
+        `,
+      },
+    ],
+    analogia:
+      "Tendência é uma escada rolante: os degraus sempre avançam, mesmo quando alguém desce um degrau (correção). Lateralização é uma esteira: todo mundo anda, mas ninguém chega a lugar nenhum.",
+    naPratica: {
+      titulo: "Antes de chamar de tendência",
+      passos: [
+        "Marque as últimas máximas: elas progridem ou ficam na mesma faixa?",
+        "Marque as últimas mínimas: acompanham?",
+        "Classifique: tendência de alta, tendência de baixa ou lateralização?",
+        "Depois é que você decide se a sua regra permite alguma coisa.",
+      ],
+    },
+    missao: {
+      titulo: "Interprete a estrutura",
+      situacao:
+        "Você observa um gráfico: máximas crescentes, mínimas crescentes, correções curtas que não devolvem o impulso anterior. No meio da sequência, um candle de baixa com corpo curto aparece num dia de corpos pequenos.",
+      pergunta: "Qual descrição é a mais coerente com o que você está vendo?",
+      opcoes: [
+        {
+          texto:
+            "Tendência de alta com correção de baixa intensidade — máximas e mínimas progredindo, o candle de baixa é um ruído dentro da progressão.",
+          tom: "correta",
+          feedback:
+            "Correto: a estrutura (máximas e mínimas crescentes) define a tendência; um corpo curto isolado não muda a estrutura.",
+        },
+        {
+          texto:
+            "A tendência acabou por causa do candle de baixa — um corpo curto não apaga a progressão das máximas e mínimas.",
+          tom: "quase",
+          feedback:
+            "Quase: o candle de baixa é ruído; a progressão das máximas e mínimas continua valendo.",
+        },
+        {
+          texto: "Lateralização — máximas e mínimas crescentes são o oposto de uma faixa.",
+          tom: "errada",
+          feedback:
+            "Não: lateralização exige máximas e mínimas na mesma faixa — aqui elas progridem.",
+        },
+        {
+          texto: "Tendência de baixa — o candle de baixa isolado não define a estrutura.",
+          tom: "errada",
+          feedback: "Não: a estrutura é de máximas e mínimas crescentes — tendência de alta.",
+        },
+      ],
+      termosExplicacao: ["tendência", "lateralização", "máximas e mínimas"],
+      aindaPratique:
+        "Classificar o último gráfico que você viu em tendência de alta, tendência de baixa ou lateralização — e anotar o porquê.",
+      transferencia: {
+        titulo: "A faixa depois da tendência",
+        situacao:
+          "Um ativo subiu por semanas, sempre com máximas crescentes. Nas últimas três semanas, as máximas param de subir e o preço passa a oscilar entre R$ 30,00 e R$ 32,00, com corpos alternados.",
+        pergunta: "O que mudou na estrutura?",
+        opcoes: [
+          {
+            texto:
+              "A tendência deu lugar a uma lateralização — as máximas pararam de progredir; a faixa é a nova região de referência.",
+            tom: "correta",
+            feedback:
+              "Correto: sem progressão de máximas, a estrutura virou lateralização — a faixa passa a ser a referência.",
+          },
+          {
+            texto:
+              "A tendência de alta continua — máximas que param de subir não são mais progressão.",
+            tom: "quase",
+            feedback:
+              "Quase: a progressão parou; continuar chamando de tendência é ignorar a estrutura.",
+          },
+          {
+            texto: "É uma ordem de venda — a lateralização não é sinal de venda.",
+            tom: "errada",
+            feedback: "Não: lateralização é contexto, não gatilho de venda.",
+          },
+          {
+            texto: "Nada mudou — a faixa de R$ 2,00 é um detalhe sem informação.",
+            tom: "errada",
+            feedback: "Não: a faixa é a nova região de referência — informação central do período.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O que caracteriza uma tendência de alta?",
+        alternativas: [
+          "máximas e mínimas crescentes",
+          "máximas crescentes e mínimas na mesma faixa",
+          "apenas candles de alta",
+          "preço subindo num único dia",
+        ],
+        correta: 0,
+        explicacao: "Tendência exige progressão das duas: máximas E mínimas.",
+      },
+      {
+        pergunta: "Um candle de alta dentro de uma lateralização...",
+        alternativas: [
+          "pode ser apenas mais um ciclo da faixa",
+          "é sempre o começo de uma tendência",
+          "invalida a lateralização",
+          "significa que a faixa acabou",
+        ],
+        correta: 0,
+        explicacao:
+          "O mesmo padrão muda de significado com o contexto — padrão não é sinal automático.",
+      },
+      {
+        pergunta: "Correção em uma tendência é...",
+        alternativas: [
+          "movimento contra a tendência que não apaga o impulso anterior",
+          "sinal de que a tendência acabou",
+          "o mesmo que lateralização",
+          "uma ordem para reduzir a posição",
+        ],
+        correta: 0,
+        explicacao:
+          "Impulso + correção formam a progressão; a correção é parte do movimento, não seu fim.",
+      },
+    ],
+  },
+  {
+    slug: "suporte-resistencia-e-rompimento",
+    ordem: 6,
+    nivel: 2,
+    titulo: "Lição 6 — Suporte, resistência e rompimento",
+    resumo: "Regiões onde o preço parou antes — e o checklist que separa rompimento de armadilha.",
+    problema: {
+      titulo: "O rompimento que virou armadilha",
+      texto:
+        "O preço rompeu a resistência e Rafael comprou na hora, sem fazer nenhuma pergunta. O preço subiu três ticks e voltou para dentro da região. Ele não tinha observado o volume, não tinha regra para rompimentos e não tinha definido o risco se falhasse. O rompimento não era mentira — a leitura dele é que estava incompleta.",
+      pergunta: "O que separa um rompimento de um falso rompimento?",
+    },
+    conceitos: [
+      {
+        titulo: "Suporte e resistência: regiões de memória",
+        corpo: `
+**Suporte**: região onde o preço parou de cair antes — compradores apareceram lá. **Resistência**: região onde o preço parou de subir antes — vendedores apareceram lá.
+
+São **regiões**, não linhas de tinta: quanto mais toques e quanto mais tempo o preço passou lá, mais relevante a região tende a ser.
+
+Suporte e resistência não preveem nada: são **regiões de referência** — lugares onde o mercado já mostrou comportamento.
+        `,
+      },
+      {
+        titulo: "Rompimento: continuação ou teste?",
+        corpo: `
+O rompimento atravessa a região. O que separa as leituras:
+
+- **Com aumento de volume**: mais participantes empurrando — hipótese de continuação mais forte.
+- **Sem volume**: o preço atravessou, mas sem participação — hipótese de teste.
+- **Retorno à região**: o preço rompe, não continua e volta — **falso rompimento** (perda de força), o risco mais caro de ignorar.
+
+O fluxo antes de qualquer decisão com rompimento:
+
+1. Contexto — qual região e ela era consolidada?
+2. Observação — houve aumento de volume?
+3. Hipótese — continuação ou teste?
+4. Regra — minha regra permite operar rompimentos?
+5. Risco — o que acontece se falhar?
+6. Simular — o cenário contrário está dimensionado?
+7. Registrar — a tese está escrita antes do gatilho?
+        `,
+      },
+    ],
+    analogia:
+      "Rompimento é como atravessar uma porta que estava trancada: se ela destrancou de vez (volume), a passagem é real; se foi só o vento (sem volume), a porta volta a fechar no seu dedo. A pergunta nunca é 'a porta abriu?' — é 'ela vai continuar aberta?'.",
+    naPratica: {
+      titulo: "Checklist do rompimento",
+      passos: [
+        "Desenhe a região: quantos toques? quanto tempo?",
+        "Observe o volume no candle do rompimento: aumentou?",
+        "Confronte a sua regra: ela permite essa operação?",
+        "Defina o risco se o preço voltar para a região — antes do gatilho.",
+      ],
+    },
+    missao: {
+      titulo: "Confronte o rompimento",
+      situacao:
+        "O preço rompe uma resistência de três toques com um candle de corpo longo, e o volume dobra em relação aos períodos anteriores. Sua regra pessoal só permite operar rompimentos com volume e com risco de retorno definido. O preço ainda está 0,5% acima da região.",
+      pergunta: "O que o seu processo manda fazer antes de qualquer coisa?",
+      opcoes: [
+        {
+          texto:
+            "Confrontar a regra: volume dobrou e o risco de retorno é definível — se a regra permite, simular e registrar a tese antes do gatilho.",
+          tom: "correta",
+          feedback:
+            "Correto: o processo vem antes do gatilho — observar, confrontar a regra, dimensionar o risco e registrar a tese.",
+        },
+        {
+          texto:
+            "Comprar imediatamente — o rompimento com volume é uma condição, não uma ordem; o processo vem antes.",
+          tom: "quase",
+          feedback:
+            "Quase: as condições favoráveis existem, mas comprar sem concluir o processo (regra, risco, registro) é pular o ciclo.",
+        },
+        {
+          texto:
+            "Ignorar, porque rompimento é sempre armadilha — a observação (volume + região consolidada) não é ignorável.",
+          tom: "errada",
+          feedback:
+            "Não: ignorar uma observação válida é outro erro — o processo existe para avaliar, não para negar.",
+        },
+        {
+          texto:
+            "Vender a região — rompimento com volume é hipótese de continuação, não de reversão.",
+          tom: "errada",
+          feedback:
+            "Não: a hipótese mais razoável com volume é continuação — vender contraria a própria observação.",
+        },
+      ],
+      termosExplicacao: ["volume", "regra", "risco"],
+      aindaPratique:
+        "Encontrar um rompimento no seu ativo e responder às sete perguntas do checklist antes de decidir qualquer coisa.",
+      transferencia: {
+        titulo: "O rompimento sem volume",
+        situacao:
+          "O preço atravessa um suporte antigo num pregão de volume baixo, sem aumentar a participação, e no dia seguinte volta para cima da região. Você estava de fora.",
+        pergunta: "O que a leitura do conjunto sugere?",
+        opcoes: [
+          {
+            texto:
+              "Falso rompimento provável — atravessou sem volume e retornou; a região continua sendo a referência.",
+            tom: "correta",
+            feedback:
+              "Correto: atravessar sem volume e voltar é o roteiro do falso rompimento — a região permanece de referência.",
+          },
+          {
+            texto: "A queda vai continuar — o retorno para a região contradiz a continuação.",
+            tom: "quase",
+            feedback:
+              "Quase: o retorno indica perda de força — a continuação perdeu a principal evidência.",
+          },
+          {
+            texto: "É hora de comprar o retorno — o retorno à região não é sinal de compra.",
+            tom: "errada",
+            feedback: "Não: o retorno é observação de perda de força — não um gatilho de compra.",
+          },
+          {
+            texto:
+              "O suporte deixou de existir — regiões continuam sendo regiões depois de um teste falho.",
+            tom: "errada",
+            feedback:
+              "Não: a região sobrevive ao teste — foi visitada e rejeitada por falta de força.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O que fortalece a hipótese de que um rompimento é real?",
+        alternativas: [
+          "aumento de volume no rompimento",
+          "um único candle curto atravessando",
+          "o preço voltando para a região",
+          "nenhum toque anterior na região",
+        ],
+        correta: 0,
+        explicacao: "Volume é participação: sem ela, o atravessar é um teste, não uma continuação.",
+      },
+      {
+        pergunta: "Um falso rompimento é...",
+        alternativas: [
+          "o preço atravessa a região, não continua e retorna",
+          "o preço atravessa a região com volume e segue",
+          "o preço para antes da região",
+          "o preço encosta na região sem atravessar",
+        ],
+        correta: 0,
+        explicacao: "Falso rompimento = atravessou + não continuou + voltou (perda de força).",
+      },
+      {
+        pergunta: "Suporte e resistência são...",
+        alternativas: [
+          "regiões de referência onde o mercado mostrou comportamento",
+          "linhas que preveem o futuro",
+          "ordens automáticas de compra e venda",
+          "o mesmo que médias móveis",
+        ],
+        correta: 0,
+        explicacao:
+          "São memória de comportamento — contexto para a hipótese, nunca gatilho sozinho.",
+      },
+    ],
+  },
+  {
+    slug: "o-que-e-opcao",
+    ordem: 7,
     nivel: 1,
     titulo: "Lição 1 — O que é uma opção",
     resumo: "O direito (não a obrigação) de comprar ou vender uma ação a um preço combinado.",
@@ -224,7 +1187,7 @@ Na **B3**, quase todas as opções sobre ações são **americanas** (podem ser 
   },
   {
     slug: "call-vs-put",
-    ordem: 2,
+    ordem: 8,
     nivel: 1,
     titulo: "Lição 2 — Call vs Put",
     resumo: "Call = direito de comprar. Put = direito de vender. Aprenda a decifrar o código B3.",
@@ -371,7 +1334,7 @@ Ex: **PETRK38**
   },
   {
     slug: "vencimento-e-exercicio",
-    ordem: 3,
+    ordem: 9,
     nivel: 1,
     titulo: "Lição 3 — Vencimento, exercício e liquidez",
     resumo:
@@ -537,7 +1500,7 @@ Regra prática: opções com strike próximo do preço atual e vencimento mais c
   },
   {
     slug: "premio-e-strike",
-    ordem: 4,
+    ordem: 10,
     nivel: 2,
     titulo: "Lição 4 — Prêmio & Strike",
     resumo: "Valor intrínseco vs. extrínseco: onde mora o preço da opção.",
@@ -676,7 +1639,7 @@ Call PETRK36 (strike 36) sendo negociada a R$2,80:
   },
   {
     slug: "moneyness",
-    ordem: 5,
+    ordem: 11,
     nivel: 2,
     titulo: "Lição 5 — Moneyness: ITM, ATM e OTM",
     resumo:
@@ -826,7 +1789,7 @@ O erro clássico do iniciante é comprar OTM muito distante porque "está barato
   },
   {
     slug: "theta-e-tempo",
-    ordem: 6,
+    ordem: 12,
     nivel: 2,
     titulo: "Lição 6 — Theta: o tempo corrói o comprador",
     resumo:
@@ -996,7 +1959,7 @@ Se sua tese depende de um evento com data (balanço, decisão de juros), escolha
   },
   {
     slug: "compra-a-seco",
-    ordem: 8,
+    ordem: 14,
     nivel: 3,
     titulo: "Lição 8 — Compra a seco (call/put seca)",
     resumo:
@@ -1186,7 +2149,7 @@ O risco não está na perda máxima — está na **frequência**. Você pode per
   },
   {
     slug: "venda-coberta",
-    ordem: 9,
+    ordem: 15,
     nivel: 3,
     titulo: "Lição 9 — Venda coberta",
     resumo:
@@ -1392,7 +2355,7 @@ Você vendeu a **alta acima do strike**. Em troca, recebeu um prêmio fixo. Isso
   },
   {
     slug: "rolagem",
-    ordem: 16,
+    ordem: 22,
     nivel: 3,
     titulo: "Lição 16 — Rolagem (Roll)",
     resumo: "Roll Out, Roll Up, Roll Down, Roll Up and Out — e a armadilha do rolar demais.",
@@ -1558,7 +2521,7 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
   },
   {
     slug: "trava-de-alta",
-    ordem: 11,
+    ordem: 17,
     nivel: 3,
     titulo: "Lição 11 — Trava de Alta (Bull Call Spread)",
     resumo:
@@ -1753,7 +2716,7 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
   },
   {
     slug: "trava-de-baixa",
-    ordem: 12,
+    ordem: 18,
     nivel: 3,
     titulo: "Lição 12 — Trava de Baixa (Bear Put Spread)",
     resumo:
@@ -1949,7 +2912,7 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
   },
   {
     slug: "rolagem-defensiva",
-    ordem: 17,
+    ordem: 23,
     nivel: 3,
     titulo: "Lição 17 — Rolagem defensiva na prática",
     resumo: "Quando rolar salva a operação e quando é só empurrar prejuízo com o pé.",
@@ -2110,7 +3073,7 @@ Vendeu call PETRK40 por R$1,00. PETR4 subiu pra R$41.
   },
   {
     slug: "gestao-de-risco-travas",
-    ordem: 18,
+    ordem: 24,
     nivel: 3,
     titulo: "Lição 18 — Gestão de risco em travas",
     resumo: "Position sizing, stop de perda e regra do 1% do patrimônio por operação.",
@@ -2283,7 +3246,7 @@ Defina no diário **antes de abrir**:
   },
   {
     slug: "volatilidade-e-vega",
-    ordem: 7,
+    ordem: 13,
     nivel: 2,
     titulo: "Lição 7 — Volatilidade e o preço da ansiedade",
     resumo:
@@ -2436,7 +3399,7 @@ Um prêmio caro pode ser apenas "o mercado já sabe do evento". Você não paga 
   },
   {
     slug: "protective-put",
-    ordem: 10,
+    ordem: 16,
     nivel: 3,
     titulo: "Lição 10 — Protective Put (o seguro da posição)",
     resumo: "Ações + PUT comprada: você mantém a tese de alta e compra um piso para a queda.",
@@ -2624,7 +3587,7 @@ O protective put é **ter as ações e comprar uma PUT** no strike que você nã
   },
   {
     slug: "straddle",
-    ordem: 13,
+    ordem: 19,
     nivel: 3,
     titulo: "Lição 13 — Straddle (movimento grande, qualquer direção)",
     resumo:
@@ -2823,7 +3786,7 @@ O straddle compra **movimento** — não direção. Ele perde para o tempo e par
   },
   {
     slug: "strangle",
-    ordem: 14,
+    ordem: 20,
     nivel: 3,
     titulo: "Lição 14 — Strangle (movimento maior, custo menor)",
     resumo:
@@ -3006,7 +3969,7 @@ O strangle não é um straddle 'com defeito': é a mesma hipótese com **exigên
   },
   {
     slug: "iron-condor",
-    ordem: 15,
+    ordem: 21,
     nivel: 3,
     titulo: "Lição 15 — Iron Condor (lateralização com risco limitado)",
     resumo:
@@ -3189,7 +4152,7 @@ O iron condor não é "vender volatilidade": é **expressar a hipótese de que o
   },
   {
     slug: "comparar-estruturas-de-alta",
-    ordem: 19,
+    ordem: 25,
     nivel: 4,
     titulo: "Lição 19 — Comparar: estruturas para hipótese de alta",
     resumo:
@@ -3374,7 +4337,7 @@ A resposta a essas perguntas — não a direção sozinha — escolhe a estrutur
   },
   {
     slug: "comparar-estruturas-neutras",
-    ordem: 20,
+    ordem: 26,
     nivel: 4,
     titulo: "Lição 20 — Comparar: estruturas para hipótese neutra",
     resumo:
@@ -3572,7 +4535,7 @@ A pergunta que separa tudo: **você espera movimento ou calmaria?** Compra movim
   },
   {
     slug: "gestao-da-decisao",
-    ordem: 21,
+    ordem: 27,
     nivel: 5,
     titulo: "Lição 21 — Gestão da decisão: o ciclo completo",
     resumo:
@@ -3737,7 +4700,7 @@ Essa é a fronteira entre educação financeira e recomendação. O Zero ao Trad
   },
   {
     slug: "tributacao-basica",
-    ordem: 22,
+    ordem: 28,
     nivel: "pratica",
     titulo: "Lição 22 — Tributação de opções (básico)",
     resumo:
@@ -3897,7 +4860,7 @@ Prejuízo de um mês **abate lucro futuro** — sem prazo de validade. Registre 
   },
   {
     slug: "darf-e-compensacao",
-    ordem: 23,
+    ordem: 29,
     nivel: "pratica",
     titulo: "Lição 23 — DARF, compensação de prejuízo e controle mensal",
     resumo:
@@ -4074,7 +5037,7 @@ Planilha própria ou o **diário do Zero ao Trade** — os campos de resultado a
   },
   {
     slug: "o-que-e-um-futuro",
-    ordem: 24,
+    ordem: 30,
     nivel: 1,
     dominio: "futuros",
     titulo: "Lição 1 — O que é um contrato futuro",
@@ -4232,7 +5195,7 @@ Na B3, os contratos mais negociados são o **WIN** (mini índice) e o **WDO** (m
   },
   {
     slug: "valor-do-ponto-e-tick",
-    ordem: 25,
+    ordem: 31,
     nivel: 1,
     dominio: "futuros",
     titulo: "Lição 2 — Valor do ponto e tick",
@@ -4369,7 +5332,7 @@ O hábito do dia: sempre transformar pontos em reais antes de decidir. "O índic
   },
   {
     slug: "margem-e-alavancagem",
-    ordem: 26,
+    ordem: 32,
     nivel: 1,
     dominio: "futuros",
     titulo: "Lição 3 — Margem e alavancagem",
@@ -4522,7 +5485,7 @@ Traduzindo: **1% de movimento do índice** (~1.300 pontos) vale **R$ 260** na su
   },
   {
     slug: "pregao-e-sessao",
-    ordem: 27,
+    ordem: 33,
     nivel: 2,
     dominio: "futuros",
     titulo: "Lição 4 — Pregão e sessão",
@@ -4696,7 +5659,7 @@ Sempre confira **qual vencimento** você está olhando antes de entrar.
   },
   {
     slug: "stop-e-dimensionamento",
-    ordem: 28,
+    ordem: 34,
     nivel: 2,
     dominio: "futuros",
     titulo: "Lição 5 — Stop e dimensionamento",
@@ -4871,7 +5834,7 @@ No simulador de futuros, contratos = risco ÷ (stop × valor do ponto), e o risc
   },
   {
     slug: "day-trade-vs-swing",
-    ordem: 29,
+    ordem: 35,
     nivel: 2,
     dominio: "futuros",
     titulo: "Lição 6 — Day trade vs swing",
@@ -5035,7 +5998,7 @@ A modalidade é uma **decisão antes de entrar** — não uma descoberta depois 
   },
   {
     slug: "slippage-e-execucao",
-    ordem: 30,
+    ordem: 36,
     nivel: 3,
     dominio: "futuros",
     titulo: "Lição 7 — Slippage e execução",
@@ -5196,7 +6159,7 @@ Um 'lucro teórico' de 5 ticks vira 3 ticks reais. A simulação sem custos ment
   },
   {
     slug: "ajuste-diario",
-    ordem: 31,
+    ordem: 37,
     nivel: 3,
     dominio: "futuros",
     titulo: "Lição 8 — Ajuste diário",
@@ -5352,7 +6315,7 @@ O ajuste não é taxa: é a mecânica de liquidação do contrato.
   },
   {
     slug: "armadilha-da-alavancagem",
-    ordem: 32,
+    ordem: 38,
     nivel: 3,
     dominio: "futuros",
     titulo: "Lição 9 — A armadilha da alavancagem",
@@ -5501,7 +6464,7 @@ A alavancagem multiplica os pontos em direção ao limite: o risco real é a rot
   },
   {
     slug: "win-vs-wdo",
-    ordem: 33,
+    ordem: 39,
     nivel: 4,
     dominio: "futuros",
     titulo: "Lição 10 — WIN vs WDO",
@@ -5674,7 +6637,7 @@ Setup não se transporta: se recalcula.
   },
   {
     slug: "futuro-vs-opcao",
-    ordem: 34,
+    ordem: 40,
     nivel: 4,
     dominio: "futuros",
     titulo: "Lição 11 — Futuro vs opção",
@@ -5850,7 +6813,7 @@ Ferramentas não têm lado bom: têm **condições de uso**.
   },
   {
     slug: "decisao-no-day-trade",
-    ordem: 35,
+    ordem: 41,
     nivel: 5,
     dominio: "futuros",
     titulo: "Lição 12 — A decisão no day trade",
@@ -6007,7 +6970,7 @@ Decisão não é pressentimento: é a execução de um plano que já incluiu o p
   },
   {
     slug: "tributacao-day-trade",
-    ordem: 36,
+    ordem: 42,
     nivel: 5,
     dominio: "futuros",
     titulo: "Lição 13 — Tributação do day trade",
@@ -6158,7 +7121,7 @@ Sem IRRF suficiente, paga a diferença; se o IRRF superar o devido (prejuízo), 
   },
   {
     slug: "darf-day-trade",
-    ordem: 37,
+    ordem: 43,
     nivel: "pratica",
     dominio: "futuros",
     titulo: "Lição 14 — DARF na prática",
@@ -6307,7 +7270,7 @@ Não é burocracia: é a continuação da sua gestão — o dinheiro do imposto 
   },
   {
     slug: "aprofundamento-win",
-    ordem: 38,
+    ordem: 44,
     nivel: 4,
     dominio: "futuros",
     instrumento: "win",
@@ -6484,7 +7447,7 @@ O WIN amplifica o índice: cada ponto de variação do Ibovespa vale R$ 0,20 por
   },
   {
     slug: "aprofundamento-wdo",
-    ordem: 39,
+    ordem: 45,
     nivel: 4,
     dominio: "futuros",
     instrumento: "wdo",
@@ -6711,6 +7674,10 @@ export function nivelLabel(nivel: LessonNivel): string {
 export type Tema = string;
 
 export const TEMAS: Record<Tema, { nome: string; desc: string }> = {
+  leitura: {
+    nome: "Leitura de mercado",
+    desc: "Observar e interpretar o que o preço conta — candle, força, congestão e rompimento — antes de qualquer hipótese.",
+  },
   fundamentos: {
     nome: "Fundamentos",
     desc: "O que é uma opção, prêmio, strike, vencimento, o efeito do tempo e da volatilidade.",
@@ -6758,6 +7725,12 @@ export const TEMAS: Record<Tema, { nome: string; desc: string }> = {
 };
 
 export const TEMA_LICOES: Record<string, Tema> = {
+  "lendo-um-candle": "leitura",
+  "a-historia-do-pavio": "leitura",
+  "forca-e-sequencia": "leitura",
+  "congestao-e-expansao": "leitura",
+  "tendencia-e-lateralizacao": "leitura",
+  "suporte-resistencia-e-rompimento": "leitura",
   "o-que-e-opcao": "fundamentos",
   "call-vs-put": "fundamentos",
   "vencimento-e-exercicio": "fundamentos",

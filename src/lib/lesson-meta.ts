@@ -15,6 +15,12 @@ export type LessonVisualKind =
   | "coberta"
   | "roll"
   | "risco"
+  | "candle"
+  | "pavio"
+  | "forca"
+  | "congestao"
+  | "tendencia"
+  | "rompimento"
   | "none";
 
 export type LessonMeta = {
@@ -34,6 +40,102 @@ const DEFAULT_META: LessonMeta = {
 };
 
 export const LESSON_META: Record<string, Partial<LessonMeta>> = {
+  "lendo-um-candle": {
+    objetivo:
+      "Ler um candle em duas linhas: quem venceu, onde o preço esteve e o que o corpo conta.",
+    tempoMin: 5,
+    visual: "candle",
+    erroComum: {
+      titulo: "Ler o candle como opinião do mercado",
+      texto:
+        "O candle é registro, não conselho: mostra onde o preço esteve, não para onde ele vai. Confundir registro com previsão é o começo de toda leitura errada.",
+    },
+    resumoPontos: [
+      "Abertura e fechamento contam o vencedor do período",
+      "Pavios registram o que foi rejeitado",
+      "Corpo é a parte do movimento que se sustentou",
+      "Candle descreve — nunca recomenda",
+    ],
+  },
+  "a-historia-do-pavio": {
+    objetivo:
+      "Interpretar um pavio superior como rejeição em um nível — e saber o que ele não diz.",
+    tempoMin: 6,
+    visual: "pavio",
+    erroComum: {
+      titulo: "Transformar pavio em gatilho automático de venda",
+      texto:
+        "Pavio mostra onde o preço esteve e foi rejeitado — mas rejeição não é ordem de venda. Ela só vira contexto quando aparece junto com o resto da história.",
+    },
+    resumoPontos: [
+      "Pavio = região onde a venda venceu aquele duelo",
+      "Sozinho, não determina o que fazer",
+      "O contexto (força, sequência, nível) decide a interpretação",
+    ],
+  },
+  "forca-e-sequencia": {
+    objetivo: "Comparar a magnitude de dois movimentos em reais — não em tamanho de vela.",
+    tempoMin: 6,
+    visual: "forca",
+    erroComum: {
+      titulo: "Comparar forças de períodos diferentes pelo gráfico",
+      texto:
+        "Vela grande em período pequeno pode ser ruído: força se compara em reais e em sequência, não pelo tamanho desenhado na tela.",
+    },
+    resumoPontos: [
+      "Força = quantos pontos o movimento andou",
+      "Sequência = como os fechamentos se acumulam",
+      "Mesma quantidade de velas, resultados diferentes",
+    ],
+  },
+  "congestao-e-expansao": {
+    objetivo:
+      "Distinguir a faixa que acumula da faixa que se move — e o que o relógio diz quando o mercado fica parado.",
+    tempoMin: 6,
+    visual: "congestao",
+    erroComum: {
+      titulo: "Achar que congestão 'precisa' romper",
+      texto:
+        "Congestão pode continuar congestionada: mercado parado por muito tempo também fala — e continuar parado é uma resposta válida.",
+    },
+    resumoPontos: [
+      "Congestão: preço em faixa estreita, sem escolher lado",
+      "Expansão: o preço começa a andar com volume de verdade",
+      "O mercado pode ficar congestionado indefinidamente",
+    ],
+  },
+  "tendencia-e-lateralizacao": {
+    objetivo:
+      "Classificar o mercado em tendência ou lateralização a partir do que os toques nos níveis mostram.",
+    tempoMin: 7,
+    visual: "tendencia",
+    erroComum: {
+      titulo: "Traçar linha de tendência por cima de qualquer coisa",
+      texto:
+        "Linha não cria tendência: ela só descreve um padrão de toques que já existe. Se os fechamentos não respeitam o nível, a linha é uma opinião sua, não do mercado.",
+    },
+    resumoPontos: [
+      "Tendência: toques ascendentes ou descendentes",
+      "Lateralização: o mercado respeita os dois lados",
+      "Rompimento fecha o padrão — até lá é especulação",
+    ],
+  },
+  "suporte-resistencia-e-rompimento": {
+    objetivo:
+      "Descrever um rompimento como evento, não como convite — e rodar o checklist completo antes de qualquer intenção.",
+    tempoMin: 8,
+    visual: "rompimento",
+    erroComum: {
+      titulo: "Entrar no rompimento sem verificar o que veio antes",
+      texto:
+        "Rompimento é o capítulo final de uma história: sem volume, contexto e registro, é só uma vela que furou um nível. O checklist existe para você não comprar o ruído.",
+    },
+    resumoPontos: [
+      "Rompimento = evento, não ordem",
+      "Checklist: contexto → movimento → nível → volume → risco → simulação → registro",
+      "Se o contexto não apareceu, o nível não foi rompido de verdade",
+    ],
+  },
   "o-que-e-opcao": {
     objetivo: "Explicar, com suas palavras, o que você compra quando compra uma opção.",
     tempoMin: 5,

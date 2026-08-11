@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { LessonVisualKind } from "@/lib/lesson-meta";
+import { LeituraVisual } from "./LeituraVisuals";
 import {
   ArrowDown,
   ArrowRight,
@@ -492,6 +493,13 @@ export function LessonVisual({ kind }: { kind: LessonVisualKind }) {
       return <RollVisual />;
     case "risco":
       return <RiscoVisual />;
+    case "candle":
+    case "pavio":
+    case "forca":
+    case "congestao":
+    case "tendencia":
+    case "rompimento":
+      return <LeituraVisual kind={kind} />;
     default:
       return null;
   }
