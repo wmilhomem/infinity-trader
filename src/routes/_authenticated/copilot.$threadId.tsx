@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 import { Headphones, Mic, Send, Volume2, VolumeX, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -190,7 +191,9 @@ function ChatThread() {
               ) : (
                 <>
                   <div className="max-w-[80%] text-sm">
-                    <ReactMarkdown components={mdComponents}>{m.content}</ReactMarkdown>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                      {m.content}
+                    </ReactMarkdown>
                   </div>
                   {speechOut.disponivel && (
                     <button

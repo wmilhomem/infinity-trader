@@ -1,6 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 import { MessageCircle, Mic, Send, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -164,7 +165,9 @@ export function CopilotBubble() {
                 </div>
               ) : (
                 <div key={m.id ?? i} className="max-w-[92%] text-xs">
-                  <ReactMarkdown components={mdComponents}>{m.content}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                    {m.content}
+                  </ReactMarkdown>
                 </div>
               ),
             )}

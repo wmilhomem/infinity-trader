@@ -1,4 +1,5 @@
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { LessonConceito } from "@/lib/lessons";
 import { mdComponents } from "@/components/markdown-components";
 
@@ -19,7 +20,9 @@ export function ConceptCard({ conceito, i, total }: Props) {
       <h2 className="mt-3 text-2xl font-semibold tracking-tight">{conceito.titulo}</h2>
       <div className="mt-4 max-w-xl">
         <article className="text-[16px] leading-relaxed">
-          <ReactMarkdown components={mdComponents}>{conceito.corpo}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+            {conceito.corpo}
+          </ReactMarkdown>
         </article>
       </div>
     </div>
