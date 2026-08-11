@@ -8,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useSpeechInput } from "@/hooks/useSpeechInput";
 import { useSpeechOutput } from "@/hooks/useSpeechOutput";
+import { mdComponents } from "@/components/markdown-components";
 
 export const Route = createFileRoute("/_authenticated/copilot/$threadId")({
   head: () => ({ meta: [{ title: "Conversa · Zero ao Trade" }] }),
@@ -188,8 +189,8 @@ function ChatThread() {
                 </div>
               ) : (
                 <>
-                  <div className="max-w-[80%] text-sm prose prose-invert prose-sm prose-p:my-2 prose-headings:font-semibold prose-strong:text-primary">
-                    <ReactMarkdown>{m.content}</ReactMarkdown>
+                  <div className="max-w-[80%] text-sm">
+                    <ReactMarkdown components={mdComponents}>{m.content}</ReactMarkdown>
                   </div>
                   {speechOut.disponivel && (
                     <button

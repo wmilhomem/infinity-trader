@@ -6,6 +6,7 @@ import { MessageCircle, Mic, Send, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSpeechInput } from "@/hooks/useSpeechInput";
+import { mdComponents } from "@/components/markdown-components";
 import { moduloAtual, SUGESTOES_GLOBAIS } from "@/lib/modulos-copilot";
 import {
   Sheet,
@@ -162,11 +163,8 @@ export function CopilotBubble() {
                   </div>
                 </div>
               ) : (
-                <div
-                  key={m.id ?? i}
-                  className="max-w-[92%] text-xs prose prose-invert prose-sm prose-p:my-1.5 prose-strong:text-primary"
-                >
-                  <ReactMarkdown>{m.content}</ReactMarkdown>
+                <div key={m.id ?? i} className="max-w-[92%] text-xs">
+                  <ReactMarkdown components={mdComponents}>{m.content}</ReactMarkdown>
                 </div>
               ),
             )}

@@ -2466,7 +2466,7 @@ O protective put é **ter as ações e comprar uma PUT** no strike que você nã
       {
         titulo: "O que a proteção faz com o resultado",
         corpo: `
-| | Só ações | Ações + PUT |
+| Resultado | Só ações | Ações + PUT |
 |---|---|---|
 | Perda se cair | Toda a queda | Limitada até o strike do seguro |
 | Lucro se subir | Todo o ganho | Ganho − prêmio do seguro |
@@ -2657,7 +2657,7 @@ O straddle é **comprar uma CALL e uma PUT no mesmo strike e mesmo vencimento**.
         corpo: `
 O straddle compra **movimento** — não direção. Ele perde para o tempo e para a queda de IV, e ganha quando o ativo anda mais do que o custo total.
 
-| | Straddle |
+| Aspecto | Straddle |
 |---|---|
 | Hipótese | Movimento grande, direção incerta |
 | Perda máxima | Prêmio total (as duas opções) |
@@ -2854,7 +2854,7 @@ O strangle é **comprar uma CALL OTM e uma PUT OTM** no mesmo vencimento.
       {
         titulo: "A troca que você faz",
         corpo: `
-| | Straddle | Strangle |
+| Aspecto | Straddle | Strangle |
 |---|---|---|
 | Custo | Maior | Menor |
 | Movimento necessário | Menor | Maior |
@@ -3036,7 +3036,7 @@ O iron condor é **vender uma call e uma put OTM, cada uma protegida por uma com
       {
         titulo: "A troca que você faz",
         corpo: `
-| | Strangle vendido (sem proteção) | Iron condor |
+| Aspecto | Strangle vendido (sem proteção) | Iron condor |
 |---|---|---|
 | Risco | Ilimitado (call) | Limitado (largura − crédito) |
 | Colateral | Alto | Menor |
@@ -3218,7 +3218,7 @@ A resposta a essas perguntas — não a direção sozinha — escolhe a estrutur
       {
         titulo: "As três estruturas lado a lado",
         corpo: `
-| | CALL comprada | Trava de alta | Venda coberta |
+| Aspecto | CALL comprada | Trava de alta | Venda coberta |
 |---|---|---|---|
 | Exige ter ações? | Não | Não | Sim |
 | Perda máxima | Prêmio | Débito | A queda das ações − prêmio |
@@ -3394,7 +3394,7 @@ A hipótese neutra tem duas versões — e elas são opostas:
 **1. Vai andar, não sei pra onde** (compra movimento): *straddle* e *strangle*.
 **2. Vai ficar parado dentro de um range** (venda de movimento): *iron condor*.
 
-| | Compra de movimento | Venda de movimento |
+| Aspecto | Compra de movimento | Venda de movimento |
 |---|---|---|
 | Lucro quando | O ativo anda mais que o custo | O ativo fica dentro do range |
 | Inimigo | Theta e IV crush | Fuga do range (movimento grande) |
@@ -3404,7 +3404,7 @@ A hipótese neutra tem duas versões — e elas são opostas:
       {
         titulo: "As três estruturas lado a lado",
         corpo: `
-| | Straddle | Strangle | Iron condor |
+| Aspecto | Straddle | Strangle | Iron condor |
 |---|---|---|---|
 | O que faz | Compra call + put ATM | Compra call + put OTM | Vende call/put OTM protegidas |
 | Custo | Alto | Médio | Recebe crédito |
@@ -4897,7 +4897,7 @@ No futuro, o swing convive com o **ajuste diário**: mesmo dormindo com a posiç
       {
         titulo: "Consequências práticas",
         corpo: `
-| | Day trade | Swing |
+| Aspecto | Day trade | Swing |
 |---|---|---|
 | Alíquota | **20%** | **15%** |
 | Compensação | day trade com day trade | swing com swing |
@@ -5516,7 +5516,7 @@ A alavancagem multiplica os pontos em direção ao limite: o risco real é a rot
       {
         titulo: "A tabela que resolve tudo",
         corpo: `
-| | WIN (Mini Índice) | WDO (Mini Dólar) |
+| Aspecto | WIN (Mini Índice) | WDO (Mini Dólar) |
 |---|---|---|
 | Ativo | Ibovespa (pontos) | Dólar (pontos × R$ 0,10) |
 | Valor do ponto | **R$ 0,20** | **R$ 10,00** |
@@ -5690,7 +5690,7 @@ Setup não se transporta: se recalcula.
       {
         titulo: "A régua do risco",
         corpo: `
-| | Futuro | Opção comprada |
+| Aspecto | Futuro | Opção comprada |
 |---|---|---|
 | Perda máxima | a posição (pode ser enorme) | o prêmio pago |
 | Margem | exigida todo dia | só na venda |
