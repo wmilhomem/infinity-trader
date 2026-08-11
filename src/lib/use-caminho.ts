@@ -26,8 +26,13 @@ export function useCaminho() {
 export async function definirCaminho(caminho: Caminho): Promise<boolean> {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) return false;
-  const { error } = await supabase.from("profiles").update({ caminho }).eq("id", user.user.id);
-  return !error;
+  const { data: atualizados, error } = await supabase
+    .from("profiles")
+    .update({ caminho })
+    .eq("id", user.user.id)
+    .select("id");
+  if (error || !atualizados || atualizados.length === 0) return false;
+  return true;
 }
 
 export function useAtualizarCaminho() {

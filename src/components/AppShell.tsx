@@ -2,6 +2,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { CopilotBubble } from "@/components/copilot/CopilotBubble";
 import { useState, type ReactNode } from "react";
+import { toast } from "sonner";
 import { useAtualizarCaminho, useCaminho } from "@/lib/use-caminho";
 import { CAMINHO_INFO, CAMINHOS } from "@/lib/caminho";
 import { cn } from "@/lib/utils";
@@ -58,7 +59,12 @@ function SeletorCaminho() {
                 key={c}
                 onClick={() => {
                   void atualizar(c).then((ok) => {
-                    if (!ok) return;
+                    if (!ok) {
+                      toast.error(
+                        "Não foi possível trocar o caminho. Recarregue a página e tente de novo.",
+                      );
+                      return;
+                    }
                     setAberto(false);
                   });
                 }}

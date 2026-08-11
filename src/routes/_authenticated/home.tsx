@@ -186,6 +186,7 @@ function Home() {
   const doneSlugs = new Set(progress.filter((p) => p.completed_at).map((p) => p.lesson_slug));
   const trilha = liçõesDeFoco(caminho, caminho === "futuros" ? foco : undefined);
   const proximaLicao = trilha.find((l) => !doneSlugs.has(l.slug)) ?? trilha[trilha.length - 1];
+  const proximas = trilha.filter((l) => !doneSlugs.has(l.slug)).slice(0, 3);
   const primeiroNome = (profileQ.data?.nome ?? "").trim().split(" ")[0];
 
   // ---- Painel de voo -----------------------------------------------------
@@ -511,6 +512,45 @@ function Home() {
               ))}
           </div>
         )}
+      </div>
+
+      {/* Próximas lições do caminho — segue o seletor de caminho no topo */}
+      <div className="mt-4 rounded-xl border border-border bg-card p-6">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            <BookOpen size={13} /> Próximas lições do seu caminho
+          </div>
+          <Link to="/trilha" className="shrink-0 text-xs font-medium text-primary hover:underline">
+            Ver a trilha completa <ArrowRight size={12} className="ml-0.5 inline" />
+          </Link>
+        </div>
+        <ol className="mt-3 space-y-1">
+          {proximas.length === 0 ? (
+            <li className="text-sm text-muted-foreground">
+              Você concluiu todas as lições deste caminho. Explore a trilha completa para revisar.
+            </li>
+          ) : (
+            proximas.map((l, i) => (
+              <li key={l.slug}>
+                {i > 0 && <div className="ml-[0.6rem] h-4 w-px bg-border" />}
+                <Link
+                  to="/licao/$slug"
+                  params={{ slug: l.slug }}
+                  className="group flex items-center gap-3 rounded-md py-1.5 pr-2 hover:text-primary"
+                >
+                  <span className="grid size-5 shrink-0 place-items-center rounded-full border border-primary/50 font-mono text-[10px] text-primary">
+                    {l.ordem}
+                  </span>
+                  <span className="truncate text-sm">{l.titulo}</span>
+                  <ArrowRight
+                    size={14}
+                    className="ml-auto shrink-0 opacity-0 transition-opacity group-hover:opacity-70"
+                  />
+                </Link>
+              </li>
+            ))
+          )}
+        </ol>
       </div>
 
       {/* Previsão de comportamento — não do mercado */}

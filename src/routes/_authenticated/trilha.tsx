@@ -167,11 +167,15 @@ function Trilha() {
 
       {temas.map(({ tema, lições }, i) => {
         const info = TEMAS[tema] ?? TEMAS.outros;
+        const nome =
+          tema === "aprofundamento" && caminho === "futuros"
+            ? `Aprofundamento · ${FOCO_INFO[foco].curto}`
+            : info.nome;
         return (
           <TemaAccordion
             key={tema}
             indice={i + 1}
-            nome={info.nome}
+            nome={nome}
             desc={info.desc}
             lições={lições}
             done={done}

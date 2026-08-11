@@ -26,11 +26,13 @@ export function useFoco() {
 export async function definirFoco(foco: FocoFuturos): Promise<boolean> {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) return false;
-  const { error } = await supabase
+  const { data: atualizados, error } = await supabase
     .from("profiles")
     .update({ foco_futuros: foco })
-    .eq("id", user.user.id);
-  return !error;
+    .eq("id", user.user.id)
+    .select("id");
+  if (error || !atualizados || atualizados.length === 0) return false;
+  return true;
 }
 
 export function useAtualizarFoco() {
