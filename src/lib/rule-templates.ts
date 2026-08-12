@@ -1,11 +1,20 @@
 export const RULE_TEMPLATES: { categoria: string; texto: string }[] = [
   { categoria: "risco", texto: "Nunca aloco mais que 2% do capital em uma única estrutura." },
-  { categoria: "risco", texto: "Toda operação com opção tem risco 100% limitado (só compradas ou travas)." },
+  {
+    categoria: "risco",
+    texto: "Toda operação com opção tem risco 100% limitado (só compradas ou travas).",
+  },
   { categoria: "tempo", texto: "Só compro opções com 45+ dias corridos até o vencimento." },
   { categoria: "rolagem", texto: "Rolo no máximo 1x por operação. Se falhar, encerro." },
   { categoria: "disciplina", texto: "Registro toda operação no diário no mesmo dia." },
-  { categoria: "disciplina", texto: "Antes de abrir posição, escrevo qual tese e qual regra estou seguindo." },
-  { categoria: "trava", texto: "Prefiro trava de alta a call sozinha quando extrínseco > 30% do prêmio." },
+  {
+    categoria: "disciplina",
+    texto: "Antes de abrir posição, escrevo qual tese e qual regra estou seguindo.",
+  },
+  {
+    categoria: "trava",
+    texto: "Prefiro trava de alta a call sozinha quando extrínseco > 30% do prêmio.",
+  },
 ];
 
 // ---------- Structured rules (indicadores técnicos + padrões de barras) ----------
@@ -63,6 +72,12 @@ export const INDICADOR_TEMPLATES: StructuredRuleTemplate[] = [
     categoria: "referência institucional",
     parametros: { indicador: "VWAP" },
   },
+  {
+    tipo: "indicador_tecnico",
+    nome: "Retração de Fibonacci 61,8%",
+    categoria: "região de referência",
+    parametros: { indicador: "outro" },
+  },
 ];
 
 export const PADRAO_BARRAS_TEMPLATES: StructuredRuleTemplate[] = [
@@ -72,8 +87,7 @@ export const PADRAO_BARRAS_TEMPLATES: StructuredRuleTemplate[] = [
     categoria: "confirmação de direção",
     parametros: {
       condicao: "verde_com_verde",
-      descricao:
-        "Só confirmo direção quando a barra seguinte tem a mesma cor da anterior.",
+      descricao: "Só confirmo direção quando a barra seguinte tem a mesma cor da anterior.",
     },
   },
   {
@@ -93,6 +107,26 @@ export const PADRAO_BARRAS_TEMPLATES: StructuredRuleTemplate[] = [
       condicao: "volume_2a_menor_que_1a",
       descricao:
         "Volume da segunda barra menor que o volume da primeira barra sinaliza perda de força.",
+    },
+  },
+  {
+    tipo: "padrao_barras",
+    nome: "Rompimento só com volume",
+    categoria: "confirmação de rompimento",
+    parametros: {
+      condicao: "rompimento_com_volume",
+      descricao:
+        "Só considero rompimento real com aumento de volume; sem volume, trato como teste e não opero.",
+    },
+  },
+  {
+    tipo: "padrao_barras",
+    nome: "Pavio como observação, não gatilho",
+    categoria: "disciplina de leitura",
+    parametros: {
+      condicao: "pavio_observacao",
+      descricao:
+        "Pavio superior é observação de rejeição — registro no meu diário de leitura, nunca entrada ou saída sozinho.",
     },
   },
 ];

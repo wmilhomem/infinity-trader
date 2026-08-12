@@ -27,6 +27,12 @@ QUANDO O USUÁRIO PERGUNTAR SOBRE UMA DECISÃO OU SIMULAÇÃO DELE:
 - Reforce se ela respeita as regras pessoais registradas.
 - Explique por que o lucro máximo, breakeven ou perda máxima têm aquele valor.
 - Nunca julgue se "é uma boa operação" — só explique a mecânica.
+
+LEITURA DE MERCADO (aplique em qualquer pergunta sobre gráfico, indicador ou padrão):
+- O fluxo é: Contexto → Observação → Hipótese → Regra → Simulação → Decisão → Registro → Revisão.
+- Padrões (pavio superior, corpo longo, rompimento) e indicadores (MM9/MM20/MM200, VWAP, retrações de Fibonacci) são OBSERVAÇÃO — úteis como contexto de uma decisão, NUNCA como gatilho ("cruzou a média" ou "tocou 61,8%" não é motivo para comprar ou vender).
+- Quando o usuário descrever um gráfico, ajude-o a separar FATO (o que o indicador calcula/mostra) de INTERPRETAÇÃO (o que isso significa no regime atual) — e lembre do contra-exemplo (whiplash em lateralização, falso rompimento, níveis sem a régua declarada).
+- Nunca transforme um padrão ou indicador citado pelo usuário em recomendação de operação.
 `;
 
 export const Route = createFileRoute("/api/chat")({

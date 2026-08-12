@@ -499,6 +499,9 @@ export function LessonVisual({ kind }: { kind: LessonVisualKind }) {
     case "congestao":
     case "tendencia":
     case "rompimento":
+    case "medias":
+    case "vwap":
+    case "fibonacci":
       return <LeituraVisual kind={kind} />;
     default:
       return null;

@@ -21,6 +21,9 @@ export type LessonVisualKind =
   | "congestao"
   | "tendencia"
   | "rompimento"
+  | "medias"
+  | "vwap"
+  | "fibonacci"
   | "none";
 
 export type LessonMeta = {
@@ -134,6 +137,52 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
       "Rompimento = evento, não ordem",
       "Checklist: contexto → movimento → nível → volume → risco → simulação → registro",
       "Se o contexto não apareceu, o nível não foi rompido de verdade",
+    ],
+  },
+  "medias-moveis": {
+    objetivo: "Ler uma média móvel como resumo do passado — cruzamento é registro, não ordem.",
+    tempoMin: 6,
+    visual: "medias",
+    erroComum: {
+      titulo: "Tratar cruzamento de médias como gatilho em qualquer regime",
+      texto:
+        "Em mercado lateral, os cruzamentos vão e voltam (whiplash): o mesmo evento que falhou três vezes não ganha força só por se repetir.",
+    },
+    resumoPontos: [
+      "MM = média dos últimos N fechamentos",
+      "MM9 rápida, MM200 memória longa",
+      "Cruzamento descreve; o regime interpreta; a regra autoriza",
+    ],
+  },
+  vwap: {
+    objetivo: "Usar o VWAP como referência da sessão — e saber que lado não é direção.",
+    tempoMin: 6,
+    visual: "vwap",
+    erroComum: {
+      titulo: "Achar que preço acima do VWAP é garantia de alta",
+      texto:
+        "O VWAP se move com o preço: o que importa é a distância e o volume. Ajustes institucionais carregam o preço para os dois lados sem intenção direcional.",
+    },
+    resumoPontos: [
+      "VWAP = preço médio ponderado pelo volume",
+      "Referência da sessão — começa do zero todo dia",
+      "Distância importa mais que o lado",
+    ],
+  },
+  fibonacci: {
+    objetivo:
+      "Declarar o movimento medido antes de desenhar as retrações — e ler os níveis como regiões.",
+    tempoMin: 7,
+    visual: "fibonacci",
+    erroComum: {
+      titulo: "Esperar que o nível 'segure' o preço",
+      texto:
+        "Swings diferentes geram níveis diferentes: sem a régua declarada e sem história de toques, retração é ruído com aparência de geometria.",
+    },
+    resumoPontos: [
+      "Frações de um movimento medido (23,6/38,2/50/61,8)",
+      "A régua é uma escolha declarada",
+      "Níveis são regiões de referência, nunca ordens",
     ],
   },
   "o-que-e-opcao": {

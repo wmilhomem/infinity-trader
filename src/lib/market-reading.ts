@@ -121,6 +121,68 @@ export function evidenciaDe(padrao: Padrao, contexto: ContextoDeMercado): Eviden
   };
 }
 
+/**
+ * Fase 3 — Indicadores e instrumentos.
+ * Os indicadores seguem a MESMA arquitetura de evidência dos padrões:
+ * calculam um fato, dependem de contexto e nunca são gatilho.
+ */
+export type Indicador = {
+  nome: string;
+  calculo: string;
+  oQueSeVe: string;
+  naoDiz: string;
+  dependeDe: string;
+  interpretacaoPossivel: string;
+  contraExemplo: string;
+};
+
+export const INDICADORES: Indicador[] = [
+  {
+    nome: "Médias móveis (MM9 / MM20 / MM200)",
+    calculo: "Média aritmética dos fechamentos das últimas N velas.",
+    oQueSeVe: "Uma curva que resume onde o preço andou em média nas últimas N velas.",
+    naoDiz: "Para onde o preço vai; em mercado lateral, os cruzamentos vão e voltam (whiplash).",
+    dependeDe:
+      "Do período escolhido (MM9 é rápida, MM200 é lenta) e do regime (tendência vs lateralização).",
+    interpretacaoPossivel:
+      "Fechamentos mantidos acima da média recente descrevem força relativa recente — uma observação, não uma ordem.",
+    contraExemplo:
+      "Num mercado lateral, o preço cruza a média para cima e para baixo sem que nada tenha mudado de verdade.",
+  },
+  {
+    nome: "VWAP",
+    calculo: "Preço médio ponderado pelo volume da sessão: Σ(preço × volume) ÷ Σ(volume).",
+    oQueSeVe: "A referência média de preço onde a sessão transacionou até agora.",
+    naoDiz: "Quem vai vencer a sessão; preço acima do VWAP não é garantia de continuação.",
+    dependeDe: "Da participação da sessão (volume) e de quanto do pregão já passou.",
+    interpretacaoPossivel:
+      "Preço negocia acima do VWAP = a sessão, em média, é negociada acima do preço médio ponderado — força relativa do dia.",
+    contraExemplo:
+      "Ajustes de posições institucionais podem carregar o preço acima do VWAP sem intenção direcional.",
+  },
+  {
+    nome: "Retrações de Fibonacci",
+    calculo:
+      "Frações de um movimento medido (23,6% / 38,2% / 50% / 61,8%) desenhadas sobre o swing.",
+    oQueSeVe:
+      "Regiões onde o preço, ao retrair um movimento, pode cruzar com quem participou dele.",
+    naoDiz: "Se a retração vai parar; os níveis não são ordens nem linhas mágicas.",
+    dependeDe: "Do movimento que você escolhe medir e de a região ser lembrada pelo mercado.",
+    interpretacaoPossivel:
+      "Uma retração de 61,8% sobre um movimento consolidado cria região de referência — observe o que o preço faz lá.",
+    contraExemplo:
+      "O mesmo gráfico com swings diferentes gera níveis diferentes: desenho feito de qualquer jeito é ruído.",
+  },
+];
+
+/** Interpreta um indicador como evidência técnica — indicador é contexto, nunca gatilho. */
+export function indicadorComoEvidencia(ind: Indicador, contexto: ContextoDeMercado): Evidencia {
+  return {
+    camada: "tecnico",
+    descricao: `${ind.nome}: ${ind.oQueSeVe} Em contexto de ${contexto.estrutura}, a leitura possível é: ${ind.interpretacaoPossivel}. O indicador não diz ${ind.naoDiz}.`,
+  };
+}
+
 /** Quiz pedagógico do pavio superior — reforça que observação não determina ação. */
 export const QUIZ_PAVIO_SUPERIOR = {
   pergunta: "O que o pavio superior pode representar?",

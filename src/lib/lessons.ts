@@ -1052,8 +1052,547 @@ O fluxo antes de qualquer decisão com rompimento:
     ],
   },
   {
-    slug: "o-que-e-opcao",
+    slug: "medias-moveis",
     ordem: 7,
+    nivel: 2,
+    titulo: "Lição 7 — Médias móveis: a memória recente do preço",
+    resumo:
+      "MM9, MM20 e MM200 resumem o passado recente do preço — e só isso. Cruzamento é observação, não ordem.",
+    problema: {
+      titulo: "A linha que virou oráculo",
+      texto:
+        "Lucas colocou uma média de 200 períodos no gráfico e passou a tratar qualquer cruzamento como sinal. Comprou quando o preço cruzou a média acima, vendeu quando cruzou de volta. Perdeu nas duas vezes: o mercado estava lateral. A média não estava errada — ele é que pediu a ela algo que ela não faz: prever.",
+      pergunta: "O que uma média móvel pode fazer — e o que ela não pode?",
+    },
+    conceitos: [
+      {
+        titulo: "O que a média calcula",
+        corpo: `
+Uma **média móvel** (MM) é a média aritmética dos fechamentos das últimas N velas. Ela resume o passado recente — e contém **zero** informação sobre o próximo fechamento.
+
+A escolha do período muda a régua:
+
+| Aspecto | MM9 | MM20 | MM200 |
+|---|---|---|---|
+| O que resume | o trecho mais recente | as últimas semanas | a memória longa |
+| Velocidade de reação | rápida | média | lenta |
+| Sensibilidade a ruído | alta | média | baixa |
+
+Quanto menor o período, mais perto do preço a média anda — e mais vezes ela é atravessada sem significado.
+        `,
+      },
+      {
+        titulo: "Cruzamento é registro, não ordem",
+        corpo: `
+Quando o **fechamento** fica acima da média, o preço recente está acima do preço médio recente — uma descrição de força relativa. Quando a MM9 cruza a MM20, o curto prazo ficou mais forte que o médio prazo — também é registro.
+
+Em **tendência**, esses fatos costumam se sustentar. Em **lateralização**, eles vão e voltam (**whiplash**): cruza para cima, cruza para baixo, sem que nada tenha mudado de verdade.
+
+A leitura completa junta o indicador ao **regime**: média acompanhando tendência = contexto de continuidade possível; média em congestão = ruído. O indicador nunca decide sozinho — ele descreve, o contexto interpreta e a regra autoriza.
+        `,
+      },
+    ],
+    analogia:
+      "Uma média móvel é a média das suas notas no trimestre: ela resume o que você já fez — não diz quanto você vai tirar na próxima prova.",
+    naPratica: {
+      titulo: "Ler a média sem pedir previsão",
+      passos: [
+        "Abra o gráfico do seu ativo e desenhe MM9, MM20 e MM200.",
+        "Escreva um fato: os fechamentos estão acima ou abaixo de cada média?",
+        "Escreva a interpretação: em que regime esse fato se sustenta?",
+        "Compare com o cruzamento anterior: o mesmo evento já aconteceu sem continuação?",
+      ],
+    },
+    missao: {
+      titulo: "Interprete o cruzamento",
+      situacao:
+        "O WIN (130.000 pontos) negocia há um mês entre 128.000 e 132.000. Hoje a MM9 cruzou a MM20 para cima pela quarta vez no período, e o preço fechou 50 pontos acima dela. Você está escrevendo seu processo antes de pensar em operar.",
+      pergunta: "O que a média descreve nesse contexto?",
+      opcoes: [
+        {
+          texto:
+            "Cruzamento numa faixa lateral já aconteceu três vezes sem continuação — o fato atual é o mesmo registro, sem força nova descrita.",
+          tom: "correta",
+          feedback:
+            "Correto: o indicador descreve o mesmo tipo de evento que falhou três vezes; o regime lateral é o contexto que muda a interpretação.",
+        },
+        {
+          texto:
+            "O cruzamento indica o começo de uma tendência — em faixa lateral, cruzamento roda sem virar tendência; é registro, não início.",
+          tom: "quase",
+          feedback:
+            "Quase: o cruzamento descreve força curta recente, mas numa faixa isso já se repetiu sem virar movimento.",
+        },
+        {
+          texto:
+            "É ordem de compra — indicador descreve, nunca ordena; confronte o registro com o regime e com a sua regra.",
+          tom: "errada",
+          feedback:
+            "Não: o cruzamento é observação; decisão exige contexto, regra pessoal e risco dimensionado.",
+        },
+        {
+          texto:
+            "A média está errada porque não previu os cruzamentos anteriores — a média resume; exigir previsão dela é o erro de leitura.",
+          tom: "errada",
+          feedback:
+            "Não: a média nunca prometeu previsão — ela é um resumo do passado, e o erro está em quem pede o futuro.",
+        },
+      ],
+      termosExplicacao: ["média", "MM9", "cruzamento", "regime"],
+      aindaPratique:
+        "Comparar, no seu ativo, como MM9 e MM200 se comportam em tendência e em lateralização — só no papel, só observando.",
+      transferencia: {
+        titulo: "A MM200 em tendência",
+        situacao:
+          "Em outro ativo, o preço vem fazendo máximas e mínimas crescentes há dois meses e a MM200 acompanha a alta sem ser cruzada. Uma correção trouxe o preço até a média, sem atravessá-la.",
+        pergunta: "O que a leitura do conjunto sugere?",
+        opcoes: [
+          {
+            texto:
+              "A média descreve a memória longa do movimento — o toque sem cruzar é observação de sustentação, contexto para a hipótese.",
+            tom: "correta",
+            feedback:
+              "Correto: tendência + MM longa inclinada na mesma direção = contexto de continuação possível; o toque é região de referência.",
+          },
+          {
+            texto:
+              "O toque na média é a prova de que a correção acabou — toque registra onde o preço encontrou atividade, não garante a virada.",
+            tom: "quase",
+            feedback:
+              "Quase: o toque é registro relevante, mas a virada é hipótese — depende de volume, regime e regra.",
+          },
+          {
+            texto:
+              "Agora é hora de vender — o toque em média dentro de tendência é observação, não ordem de reversão.",
+            tom: "errada",
+            feedback:
+              "Não: vender por um toque em média contraria a própria observação — o conjunto continua descrevendo tendência.",
+          },
+          {
+            texto:
+              "A média prevê que o preço vai voltar a subir — médias descrevem o passado; previsão é hipótese com regra e risco.",
+            tom: "errada",
+            feedback:
+              "Não: a média não prevê; quem transforma média em previsão está lendo o segundo tempo de uma partida já encerrada.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O que uma média móvel descreve?",
+        alternativas: [
+          "a média dos últimos fechamentos — um resumo do passado",
+          "o preço que vai fechar no próximo período",
+          "o volume negociado no período",
+          "a direção recomendada pelo mercado",
+        ],
+        correta: 0,
+        explicacao:
+          "Média aritmética dos fechamentos das últimas N velas: resumo, nunca previsão.",
+      },
+      {
+        pergunta: "Cruzamento de MM9 e MM20 em mercado lateral...",
+        alternativas: [
+          "tende a se repetir sem continuação (whiplash)",
+          "é sempre o início de uma tendência",
+          "invalida a lateralização",
+          "é ordem de saída",
+        ],
+        correta: 0,
+        explicacao:
+          "Sem regime de tendência, o cruzamento vai e volta — o registro se repete sem nova informação.",
+      },
+      {
+        pergunta: "MM200 inclinada para cima em tendência de alta descreve...",
+        alternativas: [
+          "memória longa sustentando o movimento — contexto, não gatilho",
+          "que a alta vai continuar para sempre",
+          "uma ordem de compra na média",
+          "que o mercado está parado",
+        ],
+        correta: 0,
+        explicacao:
+          "A média longa acompanhando o movimento é contexto de sustentação — evidência se completa com regime, regra e risco.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "Fato e interpretação",
+        enunciado:
+          "No ativo X, o fechamento está 0,3% acima da MM200 num mercado lateral de dois meses. Escreva o fato (o que a média mostra) e a interpretação possível (o que isso significa no regime).",
+        gabarito:
+          "Fato: fechamento acima da média longa. Interpretação: em mercado lateral, toques acima da MM200 são registros que já se repetiram; a interpretação depende do volume e da sua regra — a média sozinha não sustenta hipótese.",
+      },
+    ],
+  },
+  {
+    slug: "vwap",
+    ordem: 8,
+    nivel: 2,
+    titulo: "Lição 8 — VWAP: a referência média da sessão",
+    resumo:
+      "O preço médio ponderado pelo volume mostra onde a sessão negocia em média — acima ou abaixo dele é contexto, não sinal.",
+    problema: {
+      titulo: "A sessão que esqueceu o próprio preço médio",
+      texto:
+        "Marina viu o preço 'acima do VWAP' e segurou a posição a tarde inteira achando que o mercado estava forte. O VWAP subiu junto com o preço e ela não percebeu que a distância ficava pequena. O que ela usou de âncora não era uma opinião do mercado — era a média do que a própria sessão tinha negociado, recalculada a cada minuto.",
+      pergunta: "O que significa dizer que o preço está acima do VWAP?",
+    },
+    conceitos: [
+      {
+        titulo: "Como o VWAP é calculado",
+        corpo: `
+O VWAP soma (preço × volume) de cada negócio da sessão e divide pelo volume total: é o **preço médio ponderado por participação**.
+
+- Negócios **pesados** puxam mais a referência — volume grande pesa mais que preço sozinho.
+- O VWAP **começa do zero a cada dia**: é a referência da sessão atual.
+
+O VWAP não transita entre dias: se ontem o mercado fechou em um nível e hoje abriu em outro, o VWAP de hoje nasce do pregão de hoje.
+        `,
+      },
+      {
+        titulo: "Acima e abaixo: o que isso registra",
+        corpo: `
+Preço **acima do VWAP**: a sessão negocia, em média, acima do preço médio ponderado — quem comprou na referência está no azul hoje (força relativa do dia).
+
+Preço **abaixo do VWAP**: o inverso — a sessão média está no vermelho.
+
+| Relação com o VWAP | O que registra | O que não registra |
+|---|---|---|
+| Preço acima | sessão negociada, em média, acima da referência | continuação garantida |
+| Preço abaixo | sessão negociada, em média, abaixo da referência | reversão garantida |
+| Preço colado | sessão transacionando na própria média | quem vai sair na frente |
+
+O que o lado não diz: quem vence o resto do dia. Ajustes institucionais carregam o preço para os dois lados sem intenção direcional — e o VWAP se move com o preço: a **distância** importa mais que o lado. Em regiões consolidadas, o VWAP vira referência da sessão: observe o que o preço faz nos dois lados dela.
+        `,
+      },
+    ],
+    analogia:
+      "O VWAP é a nota média da turma até agora: mostra como a turma está, não a nota da sua próxima prova — e ela muda a cada prova nova (a cada negócio).",
+    naPratica: {
+      titulo: "Ler o VWAP em três perguntas",
+      passos: [
+        "Abra o gráfico intradiário com o VWAP e note onde o preço está em relação a ele.",
+        "Meça a distância: o preço está colado ou afastado da referência?",
+        "Confira o volume: a sessão participa do movimento ou o preço andou sozinho?",
+        "Escreva o fato e a interpretação antes de qualquer hipótese.",
+      ],
+    },
+    missao: {
+      titulo: "Interprete a distância",
+      situacao:
+        "Numa sessão de volume baixo, o WIN sobe 300 pontos e encosta no VWAP vindo de baixo. O volume do movimento é fraco, e metade do pregão ainda não passou. Você só observa.",
+      pergunta: "O que a leitura do conjunto descreve?",
+      opcoes: [
+        {
+          texto:
+            "O preço alcançou a referência média da sessão — sem volume, é mais um registro de aproximação do que de força; o dia ainda tem metade pela frente.",
+          tom: "correta",
+          feedback:
+            "Correto: VWAP é referência da sessão; aproximação com volume fraco descreve teste da referência, não continuação.",
+        },
+        {
+          texto:
+            "A alta é forte porque o preço andou — movimento sem volume descreve pouca participação; a distância importa mais que o lado.",
+          tom: "quase",
+          feedback:
+            "Quase: o andar sem volume é observação de pouca participação — falta a força que sustentaria a leitura.",
+        },
+        {
+          texto:
+            "É hora de comprar a cruzada do VWAP — cruzamento de indicador é registro, nunca ordem; confronte volume, regime e regra.",
+          tom: "errada",
+          feedback:
+            "Não: indicador descreve; decisão exige contexto, regra e risco — o processo vem antes do gatilho.",
+        },
+        {
+          texto:
+            "O VWAP previu que o preço ia subir — o VWAP é a média da sessão; ele não prevê nada.",
+          tom: "errada",
+          feedback:
+            "Não: pedir previsão ao VWAP é confundir registro com oráculo — o indicador só descreve onde a sessão está.",
+        },
+      ],
+      termosExplicacao: ["VWAP", "volume", "referência"],
+      aindaPratique:
+        "Numa sessão ao vivo, anotar três horários com a posição do preço em relação ao VWAP e a distância — só observação, sem decisão.",
+      transferencia: {
+        titulo: "O preço colado",
+        situacao:
+          "O WDO passa a tarde inteira alternando 5 pontos para os dois lados, sempre em cima do VWAP, com volume constante e baixo. O mercado não escolheu lado.",
+        pergunta: "O que a leitura sugere?",
+        opcoes: [
+          {
+            texto:
+              "A sessão transaciona na própria referência média — preço colado no VWAP com volume constante é observação de equilíbrio, contexto de mercado sem escolha.",
+            tom: "correta",
+            feedback:
+              "Correto: preço colado no VWAP com volume constante = sessão equilibrada; leitura de equilíbrio, não de força.",
+          },
+          {
+            texto:
+              "É o momento de operar a volta do VWAP — equilíbrio é contexto, não gatilho; espere a sessão mostrar direção com volume.",
+            tom: "quase",
+            feedback:
+              "Quase: a congestão sobre o VWAP é contexto rico — mas contexto não opera; regra e risco sim.",
+          },
+          {
+            texto:
+              "A lateralidade é sinal de venda — equilíbrio em cima da referência não é observação de queda.",
+            tom: "errada",
+            feedback:
+              "Não: equilíbrio não aponta direção — ler venda onde há equilíbrio é inventar informação.",
+          },
+          {
+            texto:
+              "O VWAP está errado porque o preço não afastou — o preço colado é justamente o que o VWAP registra; não há erro no indicador.",
+            tom: "errada",
+            feedback:
+              "Não: o indicador descreve a sessão — e a sessão está exatamente colada na própria média.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "O VWAP é...",
+        alternativas: [
+          "o preço médio ponderado pelo volume da sessão",
+          "o preço de fechamento do pregão anterior",
+          "a média dos últimos 200 pregões",
+          "uma linha de suporte mágica",
+        ],
+        correta: 0,
+        explicacao:
+          "Σ(preço × volume) ÷ Σ(volume) da sessão atual — começa do zero todo dia.",
+      },
+      {
+        pergunta: "Preço acima do VWAP com volume forte descreve...",
+        alternativas: [
+          "a sessão negociando, em média, acima da referência com participação — contexto de força relativa",
+          "que o restante do dia vai continuar subindo",
+          "uma ordem de compra",
+          "que os vendedores desapareceram",
+        ],
+        correta: 0,
+        explicacao:
+          "É registro de força relativa da sessão — hipótese possível, nunca garantia ou ordem.",
+      },
+      {
+        pergunta: "Aproximação do preço ao VWAP com volume fraco...",
+        alternativas: [
+          "registra pouco apoio — teste da referência sem participação",
+          "confirma a continuação da alta",
+          "invalida o VWAP",
+          "é motivo para vender",
+        ],
+        correta: 0,
+        explicacao:
+          "Sem volume, a aproximação descreve teste — a referência continua sendo referência.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "VWAP em reais",
+        enunciado:
+          "No WDO, o VWAP está em 5.412 e o preço em 5.424, com volume comum. Descreva o fato e a interpretação possível em uma frase cada.",
+        gabarito:
+          "Fato: o preço negocia 12 pontos acima do preço médio ponderado da sessão. Interpretação: a sessão está no azul em relação à própria referência — força relativa do dia, que vira hipótese só com regime, regra e risco.",
+      },
+    ],
+  },
+  {
+    slug: "fibonacci",
+    ordem: 9,
+    nivel: 2,
+    titulo: "Lição 9 — Retrações de Fibonacci: onde o movimento deixou marcas",
+    resumo:
+      "Frações de um movimento medido viram regiões de referência — o desenho depende do movimento que você escolhe medir.",
+    problema: {
+      titulo: "O nível que ninguém mediu do mesmo jeito",
+      texto:
+        "Dois operadores desenharam Fibonacci no mesmo gráfico: um mediu do fundo de junho ao topo de julho, o outro do fundo de julho ao topo de agosto. Cada um viu o seu 61,8% em um lugar diferente. Os dois esperavam o preço respeitar o nível — e nenhum dos dois tinha definido o que observaria se o preço atravessasse.",
+      pergunta: "Por que os dois 61,8% estavam em lugares diferentes?",
+    },
+    conceitos: [
+      {
+        titulo: "Medir o movimento primeiro",
+        corpo: `
+Retrações de Fibonacci são frações de um **movimento medido**: 23,6%, 38,2%, 50% e 61,8% de volta de um swing (por exemplo, do mínimo ao máximo).
+
+O desenho depende de **quem você mede**: swings diferentes geram níveis diferentes no mesmo gráfico. Uma retração de 50% do movimento A pode ser 38,2% do movimento B.
+
+Por isso o indicador não é mágico: ele só ganha sentido com uma **escolha declarada** do movimento — e com a história de toques da região. Desenhar sem declarar a régua vira ruído com aparência de geometria.
+        `,
+      },
+      {
+        titulo: "Retração é região de referência",
+        corpo: `
+Quando o preço retrai um movimento, ele pode cruzar com **quem participou dele**: compradores da base segurando acima do fundo, vendedores do topo aceitando retornos mais favoráveis.
+
+O valor pedagógico está nas **regiões**:
+
+| Nível de retração | O que descreve | Pergunta para a observação |
+|---|---|---|
+| 23,6% | retração rasa | o impulso segue sem desaparecer? |
+| 38,2% | retração média | os compradores do fundo seguem ativos? |
+| 50% | metade do movimento | o mercado devolve metade do que andou? |
+| 61,8% | retração profunda | quem entrou no topo segura a região? |
+
+O que o preço faz nesses níveis é observação — e só vira hipótese com contexto (regime, volume, história de toques).
+        `,
+      },
+      {
+        titulo: "Indicador é contexto, nunca gatilho",
+        corpo: `
+Os três indicadores da camada seguem a mesma arquitetura: calculam um **fato**, dependem de **contexto** e terminam numa **evidência** — nunca num sinal.
+
+- **Médias móveis**: descrevem a memória recente do preço.
+- **VWAP**: descreve a referência média da sessão.
+- **Fibonacci**: descreve regiões de retração de um movimento medido.
+
+Qualquer um deles citado sozinho ("o preço tocou 61,8%" ou "a MM9 cruzou") é observação incompleta: falta o contexto, a regra pessoal e o risco. A evidência completa é padrão/indicador + contexto + regra + risco.
+        `,
+      },
+    ],
+    analogia:
+      "Retrações de Fibonacci são as marcas de pneu de uma estrada: mostram por onde os carros passaram e onde eles frearam — não dizem para onde o próximo carro vai.",
+    naPratica: {
+      titulo: "Desenhar sem se enganar",
+      passos: [
+        "Escolha e declare o movimento que vai medir (fundo → topo ou topo → fundo).",
+        "Desenhe 38,2%, 50% e 61,8% e anote os preços dos três níveis.",
+        "Antes de observar toques, escreva o que você observaria se o preço atravessar cada nível.",
+        "Confronte com a sua regra e o seu risco — níveis não são ordem.",
+      ],
+    },
+    missao: {
+      titulo: "Confronte o nível",
+      situacao:
+        "O PETR4 subiu de R$ 30,00 para R$ 36,00 em três semanas e agora recua. Você mediu o movimento e o preço acabou de tocar os 61,8% (R$ 32,29) num pregão de volume baixo. Nenhuma das suas regras menciona Fibonacci.",
+      pergunta: "O que o processo manda fazer com esse toque?",
+      opcoes: [
+        {
+          texto:
+            "Registrar o toque como observação e confrontar a própria regra: sem regra que use Fibonacci, o nível é contexto, não condição de entrada.",
+          tom: "correta",
+          feedback:
+            "Correto: o nível é região de referência; sem regra pessoal que o use, a observação alimenta o contexto — não autoriza nada.",
+        },
+        {
+          texto:
+            "Considerar o toque uma entrada automática — nível não é ordem; a regra pessoal decide se essa observação vira condição.",
+          tom: "quase",
+          feedback:
+            "Quase: a observação está registrada, mas transformá-la em entrada exige regra própria — que você ainda não tem.",
+        },
+        {
+          texto:
+            "Vender porque o preço rejeitou o nível — rejeição em um nível é leitura possível, não ordem; exige contexto e regra.",
+          tom: "errada",
+          feedback:
+            "Não: rejeição em nível descreve onde o preço parou — é observação, não autorização para operar.",
+        },
+        {
+          texto:
+            "Ignorar o gráfico todo — a retração de um movimento consolidado é informação; ignorar também é decidir sem processo.",
+          tom: "errada",
+          feedback:
+            "Não: descartar observação válida é pular o ciclo — o processo existe para avaliar, não para negar.",
+        },
+      ],
+      termosExplicacao: ["Fibonacci", "retração", "61,8", "regra"],
+      aindaPratique:
+        "Medir um movimento real do seu ativo, anotar os três níveis e acompanhar por uma semana só observando os toques.",
+      transferencia: {
+        titulo: "O mesmo gráfico, dois desenhos",
+        situacao:
+          "Você e outro operador desenham Fibonacci no mesmo gráfico e discordam sobre onde está o 50%. Os dois esperam o preço parar no seu nível.",
+        pergunta: "O que essa discordância mostra?",
+        opcoes: [
+          {
+            texto:
+              "O desenho depende do movimento medido — a discordância é esperada; o processo exige declarar o movimento antes de desenhar.",
+            tom: "correta",
+            feedback:
+              "Correto: o indicador não é objetivo — a escolha do swing é a escolha da régua; declará-la é parte do registro.",
+          },
+          {
+            texto:
+              "Um dos dois está errado — com réguas diferentes os dois podem estar certos; o problema é tratar nível como fato universal.",
+            tom: "quase",
+            feedback:
+              "Quase: a régua é uma escolha declarada, não um fato — a discordância não torna nenhum dos dois 'errado'.",
+          },
+          {
+            texto:
+              "O indicador funciona: um dos níveis vai segurar — retração não prevê; regiões são referência, não previsão.",
+            tom: "errada",
+            feedback:
+              "Não: esperar que um nível 'segure' é pedir previsão ao indicador — ele só marca regiões.",
+          },
+          {
+            texto:
+              "É hora de operar os dois níveis — operar níveis conflitantes sem regra é adivinhar duas vezes.",
+            tom: "errada",
+            feedback:
+              "Não: sem regra pessoal, os dois níveis são só observação — operar neles é pular o processo.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "Retrações de Fibonacci são...",
+        alternativas: [
+          "frações de um movimento medido — regiões de referência",
+          "linhas que preveem o futuro",
+          "médias de preço ponderadas por volume",
+          "ordens automáticas de entrada",
+        ],
+        correta: 0,
+        explicacao:
+          "Frações (23,6% / 38,2% / 50% / 61,8%) de um swing escolhido por você — regiões, nunca previsão.",
+      },
+      {
+        pergunta: "O mesmo gráfico pode gerar retrações diferentes porque...",
+        alternativas: [
+          "o desenho depende do movimento que você escolhe medir",
+          "o gráfico muda de preço sozinho",
+          "o indicador é aleatório",
+          "existe apenas um nível correto",
+        ],
+        correta: 0,
+        explicacao:
+          "Swings diferentes → réguas diferentes. Declarar a régua é parte do processo.",
+      },
+      {
+        pergunta: "Um toque em 61,8% de um movimento consolidado...",
+        alternativas: [
+          "é observação de uma região de referência — contexto para a hipótese",
+          "é uma ordem de compra",
+          "garante que o preço vai parar ali",
+          "invalida a tendência anterior",
+        ],
+        correta: 0,
+        explicacao:
+          "O toque registra onde o preço encontrou atividade; a leitura completa junta contexto, regra e risco.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "A régua declarada",
+        enunciado:
+          "O ativo fez um fundo em R$ 40,00 e um topo em R$ 50,00. Calcule os preços de 38,2%, 50% e 61,8% de retração desse movimento.",
+        gabarito:
+          "Faixa do movimento = R$ 10,00. 61,8% → 50 − 6,18 = R$ 43,82; 50% → R$ 45,00; 38,2% → 50 − 3,82 = R$ 46,18. Os níveis são regiões: o que o preço fizer neles é a observação.",
+      },
+    ],
+  },
+  {
+    slug: "o-que-e-opcao",
+    ordem: 10,
     nivel: 1,
     titulo: "Lição 1 — O que é uma opção",
     resumo: "O direito (não a obrigação) de comprar ou vender uma ação a um preço combinado.",
@@ -1187,7 +1726,7 @@ Na **B3**, quase todas as opções sobre ações são **americanas** (podem ser 
   },
   {
     slug: "call-vs-put",
-    ordem: 8,
+    ordem: 11,
     nivel: 1,
     titulo: "Lição 2 — Call vs Put",
     resumo: "Call = direito de comprar. Put = direito de vender. Aprenda a decifrar o código B3.",
@@ -1334,7 +1873,7 @@ Ex: **PETRK38**
   },
   {
     slug: "vencimento-e-exercicio",
-    ordem: 9,
+    ordem: 12,
     nivel: 1,
     titulo: "Lição 3 — Vencimento, exercício e liquidez",
     resumo:
@@ -1500,7 +2039,7 @@ Regra prática: opções com strike próximo do preço atual e vencimento mais c
   },
   {
     slug: "premio-e-strike",
-    ordem: 10,
+    ordem: 13,
     nivel: 2,
     titulo: "Lição 4 — Prêmio & Strike",
     resumo: "Valor intrínseco vs. extrínseco: onde mora o preço da opção.",
@@ -1639,7 +2178,7 @@ Call PETRK36 (strike 36) sendo negociada a R$2,80:
   },
   {
     slug: "moneyness",
-    ordem: 11,
+    ordem: 14,
     nivel: 2,
     titulo: "Lição 5 — Moneyness: ITM, ATM e OTM",
     resumo:
@@ -1789,7 +2328,7 @@ O erro clássico do iniciante é comprar OTM muito distante porque "está barato
   },
   {
     slug: "theta-e-tempo",
-    ordem: 12,
+    ordem: 15,
     nivel: 2,
     titulo: "Lição 6 — Theta: o tempo corrói o comprador",
     resumo:
@@ -1959,7 +2498,7 @@ Se sua tese depende de um evento com data (balanço, decisão de juros), escolha
   },
   {
     slug: "compra-a-seco",
-    ordem: 14,
+    ordem: 17,
     nivel: 3,
     titulo: "Lição 8 — Compra a seco (call/put seca)",
     resumo:
@@ -2149,7 +2688,7 @@ O risco não está na perda máxima — está na **frequência**. Você pode per
   },
   {
     slug: "venda-coberta",
-    ordem: 15,
+    ordem: 18,
     nivel: 3,
     titulo: "Lição 9 — Venda coberta",
     resumo:
@@ -2355,7 +2894,7 @@ Você vendeu a **alta acima do strike**. Em troca, recebeu um prêmio fixo. Isso
   },
   {
     slug: "rolagem",
-    ordem: 22,
+    ordem: 25,
     nivel: 3,
     titulo: "Lição 16 — Rolagem (Roll)",
     resumo: "Roll Out, Roll Up, Roll Down, Roll Up and Out — e a armadilha do rolar demais.",
@@ -2521,7 +3060,7 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
   },
   {
     slug: "trava-de-alta",
-    ordem: 17,
+    ordem: 20,
     nivel: 3,
     titulo: "Lição 11 — Trava de Alta (Bull Call Spread)",
     resumo:
@@ -2716,7 +3255,7 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
   },
   {
     slug: "trava-de-baixa",
-    ordem: 18,
+    ordem: 21,
     nivel: 3,
     titulo: "Lição 12 — Trava de Baixa (Bear Put Spread)",
     resumo:
@@ -2912,7 +3451,7 @@ Rolar uma operação é aceitar que **a tese original falhou** e apostar de novo
   },
   {
     slug: "rolagem-defensiva",
-    ordem: 23,
+    ordem: 26,
     nivel: 3,
     titulo: "Lição 17 — Rolagem defensiva na prática",
     resumo: "Quando rolar salva a operação e quando é só empurrar prejuízo com o pé.",
@@ -3073,7 +3612,7 @@ Vendeu call PETRK40 por R$1,00. PETR4 subiu pra R$41.
   },
   {
     slug: "gestao-de-risco-travas",
-    ordem: 24,
+    ordem: 27,
     nivel: 3,
     titulo: "Lição 18 — Gestão de risco em travas",
     resumo: "Position sizing, stop de perda e regra do 1% do patrimônio por operação.",
@@ -3246,7 +3785,7 @@ Defina no diário **antes de abrir**:
   },
   {
     slug: "volatilidade-e-vega",
-    ordem: 13,
+    ordem: 16,
     nivel: 2,
     titulo: "Lição 7 — Volatilidade e o preço da ansiedade",
     resumo:
@@ -3399,7 +3938,7 @@ Um prêmio caro pode ser apenas "o mercado já sabe do evento". Você não paga 
   },
   {
     slug: "protective-put",
-    ordem: 16,
+    ordem: 19,
     nivel: 3,
     titulo: "Lição 10 — Protective Put (o seguro da posição)",
     resumo: "Ações + PUT comprada: você mantém a tese de alta e compra um piso para a queda.",
@@ -3587,7 +4126,7 @@ O protective put é **ter as ações e comprar uma PUT** no strike que você nã
   },
   {
     slug: "straddle",
-    ordem: 19,
+    ordem: 22,
     nivel: 3,
     titulo: "Lição 13 — Straddle (movimento grande, qualquer direção)",
     resumo:
@@ -3786,7 +4325,7 @@ O straddle compra **movimento** — não direção. Ele perde para o tempo e par
   },
   {
     slug: "strangle",
-    ordem: 20,
+    ordem: 23,
     nivel: 3,
     titulo: "Lição 14 — Strangle (movimento maior, custo menor)",
     resumo:
@@ -3969,7 +4508,7 @@ O strangle não é um straddle 'com defeito': é a mesma hipótese com **exigên
   },
   {
     slug: "iron-condor",
-    ordem: 21,
+    ordem: 24,
     nivel: 3,
     titulo: "Lição 15 — Iron Condor (lateralização com risco limitado)",
     resumo:
@@ -4152,7 +4691,7 @@ O iron condor não é "vender volatilidade": é **expressar a hipótese de que o
   },
   {
     slug: "comparar-estruturas-de-alta",
-    ordem: 25,
+    ordem: 28,
     nivel: 4,
     titulo: "Lição 19 — Comparar: estruturas para hipótese de alta",
     resumo:
@@ -4337,7 +4876,7 @@ A resposta a essas perguntas — não a direção sozinha — escolhe a estrutur
   },
   {
     slug: "comparar-estruturas-neutras",
-    ordem: 26,
+    ordem: 29,
     nivel: 4,
     titulo: "Lição 20 — Comparar: estruturas para hipótese neutra",
     resumo:
@@ -4535,7 +5074,7 @@ A pergunta que separa tudo: **você espera movimento ou calmaria?** Compra movim
   },
   {
     slug: "gestao-da-decisao",
-    ordem: 27,
+    ordem: 30,
     nivel: 5,
     titulo: "Lição 21 — Gestão da decisão: o ciclo completo",
     resumo:
@@ -4700,7 +5239,7 @@ Essa é a fronteira entre educação financeira e recomendação. O Zero ao Trad
   },
   {
     slug: "tributacao-basica",
-    ordem: 28,
+    ordem: 31,
     nivel: "pratica",
     titulo: "Lição 22 — Tributação de opções (básico)",
     resumo:
@@ -4860,7 +5399,7 @@ Prejuízo de um mês **abate lucro futuro** — sem prazo de validade. Registre 
   },
   {
     slug: "darf-e-compensacao",
-    ordem: 29,
+    ordem: 32,
     nivel: "pratica",
     titulo: "Lição 23 — DARF, compensação de prejuízo e controle mensal",
     resumo:
@@ -5037,7 +5576,7 @@ Planilha própria ou o **diário do Zero ao Trade** — os campos de resultado a
   },
   {
     slug: "o-que-e-um-futuro",
-    ordem: 30,
+    ordem: 33,
     nivel: 1,
     dominio: "futuros",
     titulo: "Lição 1 — O que é um contrato futuro",
@@ -5195,7 +5734,7 @@ Na B3, os contratos mais negociados são o **WIN** (mini índice) e o **WDO** (m
   },
   {
     slug: "valor-do-ponto-e-tick",
-    ordem: 31,
+    ordem: 34,
     nivel: 1,
     dominio: "futuros",
     titulo: "Lição 2 — Valor do ponto e tick",
@@ -5332,7 +5871,7 @@ O hábito do dia: sempre transformar pontos em reais antes de decidir. "O índic
   },
   {
     slug: "margem-e-alavancagem",
-    ordem: 32,
+    ordem: 35,
     nivel: 1,
     dominio: "futuros",
     titulo: "Lição 3 — Margem e alavancagem",
@@ -5485,7 +6024,7 @@ Traduzindo: **1% de movimento do índice** (~1.300 pontos) vale **R$ 260** na su
   },
   {
     slug: "pregao-e-sessao",
-    ordem: 33,
+    ordem: 36,
     nivel: 2,
     dominio: "futuros",
     titulo: "Lição 4 — Pregão e sessão",
@@ -5659,7 +6198,7 @@ Sempre confira **qual vencimento** você está olhando antes de entrar.
   },
   {
     slug: "stop-e-dimensionamento",
-    ordem: 34,
+    ordem: 37,
     nivel: 2,
     dominio: "futuros",
     titulo: "Lição 5 — Stop e dimensionamento",
@@ -5834,7 +6373,7 @@ No simulador de futuros, contratos = risco ÷ (stop × valor do ponto), e o risc
   },
   {
     slug: "day-trade-vs-swing",
-    ordem: 35,
+    ordem: 38,
     nivel: 2,
     dominio: "futuros",
     titulo: "Lição 6 — Day trade vs swing",
@@ -5998,7 +6537,7 @@ A modalidade é uma **decisão antes de entrar** — não uma descoberta depois 
   },
   {
     slug: "slippage-e-execucao",
-    ordem: 36,
+    ordem: 39,
     nivel: 3,
     dominio: "futuros",
     titulo: "Lição 7 — Slippage e execução",
@@ -6159,7 +6698,7 @@ Um 'lucro teórico' de 5 ticks vira 3 ticks reais. A simulação sem custos ment
   },
   {
     slug: "ajuste-diario",
-    ordem: 37,
+    ordem: 40,
     nivel: 3,
     dominio: "futuros",
     titulo: "Lição 8 — Ajuste diário",
@@ -6315,7 +6854,7 @@ O ajuste não é taxa: é a mecânica de liquidação do contrato.
   },
   {
     slug: "armadilha-da-alavancagem",
-    ordem: 38,
+    ordem: 41,
     nivel: 3,
     dominio: "futuros",
     titulo: "Lição 9 — A armadilha da alavancagem",
@@ -6464,7 +7003,7 @@ A alavancagem multiplica os pontos em direção ao limite: o risco real é a rot
   },
   {
     slug: "win-vs-wdo",
-    ordem: 39,
+    ordem: 42,
     nivel: 4,
     dominio: "futuros",
     titulo: "Lição 10 — WIN vs WDO",
@@ -6637,7 +7176,7 @@ Setup não se transporta: se recalcula.
   },
   {
     slug: "futuro-vs-opcao",
-    ordem: 40,
+    ordem: 43,
     nivel: 4,
     dominio: "futuros",
     titulo: "Lição 11 — Futuro vs opção",
@@ -6813,7 +7352,7 @@ Ferramentas não têm lado bom: têm **condições de uso**.
   },
   {
     slug: "decisao-no-day-trade",
-    ordem: 41,
+    ordem: 44,
     nivel: 5,
     dominio: "futuros",
     titulo: "Lição 12 — A decisão no day trade",
@@ -6970,7 +7509,7 @@ Decisão não é pressentimento: é a execução de um plano que já incluiu o p
   },
   {
     slug: "tributacao-day-trade",
-    ordem: 42,
+    ordem: 45,
     nivel: 5,
     dominio: "futuros",
     titulo: "Lição 13 — Tributação do day trade",
@@ -7121,7 +7660,7 @@ Sem IRRF suficiente, paga a diferença; se o IRRF superar o devido (prejuízo), 
   },
   {
     slug: "darf-day-trade",
-    ordem: 43,
+    ordem: 46,
     nivel: "pratica",
     dominio: "futuros",
     titulo: "Lição 14 — DARF na prática",
@@ -7270,7 +7809,7 @@ Não é burocracia: é a continuação da sua gestão — o dinheiro do imposto 
   },
   {
     slug: "aprofundamento-win",
-    ordem: 44,
+    ordem: 47,
     nivel: 4,
     dominio: "futuros",
     instrumento: "win",
@@ -7447,7 +7986,7 @@ O WIN amplifica o índice: cada ponto de variação do Ibovespa vale R$ 0,20 por
   },
   {
     slug: "aprofundamento-wdo",
-    ordem: 45,
+    ordem: 48,
     nivel: 4,
     dominio: "futuros",
     instrumento: "wdo",
@@ -7678,6 +8217,10 @@ export const TEMAS: Record<Tema, { nome: string; desc: string }> = {
     nome: "Leitura de mercado",
     desc: "Observar e interpretar o que o preço conta — candle, força, congestão e rompimento — antes de qualquer hipótese.",
   },
+  indicadores: {
+    nome: "Indicadores e instrumentos",
+    desc: "Médias móveis, VWAP e retrações de Fibonacci como evidência — indicador descreve, o contexto interpreta.",
+  },
   fundamentos: {
     nome: "Fundamentos",
     desc: "O que é uma opção, prêmio, strike, vencimento, o efeito do tempo e da volatilidade.",
@@ -7731,6 +8274,9 @@ export const TEMA_LICOES: Record<string, Tema> = {
   "congestao-e-expansao": "leitura",
   "tendencia-e-lateralizacao": "leitura",
   "suporte-resistencia-e-rompimento": "leitura",
+  "medias-moveis": "indicadores",
+  vwap: "indicadores",
+  fibonacci: "indicadores",
   "o-que-e-opcao": "fundamentos",
   "call-vs-put": "fundamentos",
   "vencimento-e-exercicio": "fundamentos",

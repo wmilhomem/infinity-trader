@@ -1,7 +1,14 @@
 import { useState } from "react";
 import type { LessonVisualKind } from "@/lib/lesson-meta";
 import { CHECKLIST_ROMPIMENTO } from "@/lib/market-reading";
-import { Activity, CheckCircle2, MousePointerClick, TrendingDown, TrendingUp } from "lucide-react";
+import {
+  Activity,
+  ChartCandlestick,
+  CheckCircle2,
+  MousePointerClick,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 
 function CandleVisual() {
   const [sel, setSel] = useState<string | null>("fechamento");
@@ -662,6 +669,350 @@ function RompimentoVisual() {
   );
 }
 
+function linha(pontos: [number, number][], cor: string, largura: number) {
+  const d = pontos.map(([x, y], i) => `${i === 0 ? "M" : "L"} ${x} ${y}`).join(" ");
+  return (
+    <path
+      d={d}
+      fill="none"
+      stroke={cor}
+      strokeWidth={largura}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  );
+}
+
+function MediasVisual() {
+  const [modo, setModo] = useState<"tendencia" | "lateral">("tendencia");
+  const preco: [number, number][] =
+    modo === "tendencia"
+      ? [
+          [10, 150],
+          [40, 140],
+          [70, 143],
+          [100, 128],
+          [130, 132],
+          [160, 115],
+          [190, 118],
+          [220, 100],
+          [250, 104],
+          [280, 86],
+        ]
+      : [
+          [10, 120],
+          [40, 145],
+          [70, 112],
+          [100, 140],
+          [130, 115],
+          [160, 138],
+          [190, 118],
+          [220, 135],
+          [250, 120],
+          [280, 132],
+        ];
+  const mm9: [number, number][] =
+    modo === "tendencia"
+      ? [
+          [10, 148],
+          [40, 142],
+          [70, 141],
+          [100, 132],
+          [130, 130],
+          [160, 120],
+          [190, 116],
+          [220, 104],
+          [250, 100],
+          [280, 92],
+        ]
+      : [
+          [10, 124],
+          [40, 138],
+          [70, 118],
+          [100, 134],
+          [130, 122],
+          [160, 132],
+          [190, 124],
+          [220, 130],
+          [250, 126],
+          [280, 127],
+        ];
+  const mm200: [number, number][] =
+    modo === "tendencia"
+      ? [
+          [10, 154],
+          [40, 148],
+          [70, 143],
+          [100, 136],
+          [130, 131],
+          [160, 124],
+          [190, 119],
+          [220, 112],
+          [250, 107],
+          [280, 102],
+        ]
+      : [
+          [10, 128],
+          [40, 128],
+          [70, 128],
+          [100, 128],
+          [130, 128],
+          [160, 128],
+          [190, 128],
+          [220, 128],
+          [250, 128],
+          [280, 128],
+        ];
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <button
+          onClick={() => setModo("tendencia")}
+          className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors ${modo === "tendencia" ? "border-primary/50 bg-primary/10 text-primary" : "border-border hover:bg-accent"}`}
+        >
+          <TrendingUp size={14} /> Tendência
+        </button>
+        <button
+          onClick={() => setModo("lateral")}
+          className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors ${modo === "lateral" ? "border-primary/50 bg-primary/10 text-primary" : "border-border hover:bg-accent"}`}
+        >
+          <TrendingDown size={14} /> Lateralização
+        </button>
+      </div>
+      <svg viewBox="0 0 320 175" className="w-full">
+        {linha(mm200, "var(--loss)", 3)}
+        {linha(mm9, "var(--chart-2)", 2)}
+        {linha(preco, "var(--success)", 2)}
+        {modo === "lateral" && (
+          <circle
+            cx="100"
+            cy="134"
+            r="6"
+            fill="none"
+            stroke="var(--primary)"
+            strokeWidth="2"
+            strokeDasharray="3 3"
+          />
+        )}
+        <text x="230" y="24" fontSize="12" fill="var(--loss)">
+          MM200
+        </text>
+        <text x="230" y="40" fontSize="12" fill="var(--chart-2)">
+          MM9
+        </text>
+        <text x="230" y="56" fontSize="12" fill="var(--success)">
+          preço
+        </text>
+      </svg>
+      <p className="mt-3 text-sm">
+        {modo === "tendencia" ? (
+          <>
+            Fechamentos mantidos <strong>acima</strong> da média descrevem força relativa recente —
+            contexto para a hipótese, não ordem.
+          </>
+        ) : (
+          <>
+            Em lateralização, a MM9 cruza a MM200 <strong>sem continuação</strong> (whiplash): o
+            mesmo evento se repete sem força nova.
+          </>
+        )}
+      </p>
+    </div>
+  );
+}
+
+function VwapVisual() {
+  const [lado, setLado] = useState<"acima" | "abaixo">("acima");
+  const vwap: [number, number][] = [
+    [10, 150],
+    [50, 145],
+    [90, 146],
+    [130, 138],
+    [170, 139],
+    [210, 130],
+    [250, 132],
+    [290, 128],
+  ];
+  const precoAcima: [number, number][] = [
+    [10, 140],
+    [50, 136],
+    [90, 133],
+    [130, 128],
+    [170, 124],
+    [210, 118],
+    [250, 116],
+    [290, 110],
+  ];
+  const precoAbaixo: [number, number][] = [
+    [10, 160],
+    [50, 162],
+    [90, 158],
+    [130, 156],
+    [170, 152],
+    [210, 150],
+    [250, 148],
+    [290, 146],
+  ];
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <button
+          onClick={() => setLado("acima")}
+          className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors ${lado === "acima" ? "border-primary/50 bg-primary/10 text-primary" : "border-border hover:bg-accent"}`}
+        >
+          <TrendingUp size={14} /> Preço acima
+        </button>
+        <button
+          onClick={() => setLado("abaixo")}
+          className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors ${lado === "abaixo" ? "border-primary/50 bg-primary/10 text-primary" : "border-border hover:bg-accent"}`}
+        >
+          <TrendingDown size={14} /> Preço abaixo
+        </button>
+      </div>
+      <svg viewBox="0 0 320 175" className="w-full">
+        {linha(vwap, "var(--loss)", 3)}
+        {linha(lado === "acima" ? precoAcima : precoAbaixo, "var(--success)", 2)}
+        <text x="222" y="24" fontSize="12" fill="var(--loss)">
+          VWAP
+        </text>
+        <text x="222" y="40" fontSize="12" fill="var(--success)">
+          preço
+        </text>
+        {lado === "acima" && (
+          <text x="16" y="118" fontSize="12" fill="var(--primary)">
+            distância — importa mais que o lado
+          </text>
+        )}
+      </svg>
+      <p className="mt-3 text-sm">
+        {lado === "acima" ? (
+          <>
+            A sessão negocia, em média, <strong>acima</strong> da referência ponderada — força
+            relativa do dia, contexto, não garantia.
+          </>
+        ) : (
+          <>
+            A sessão média está <strong>abaixo</strong> da referência — registro do pregão, não
+            ordem de venda.
+          </>
+        )}
+      </p>
+    </div>
+  );
+}
+
+function FibonacciVisual() {
+  const niveis = [
+    {
+      id: "236",
+      rotulo: "23,6%",
+      y: 96,
+      texto: "Retração rasa — o impulso ainda segura a maior parte do movimento.",
+    },
+    {
+      id: "382",
+      rotulo: "38,2%",
+      y: 112,
+      texto: "Retração média — os compradores do fundo seguem ativos?",
+    },
+    {
+      id: "50",
+      rotulo: "50%",
+      y: 125,
+      texto: "Metade do movimento devolvida — o mercado entrega metade do que andou?",
+    },
+    {
+      id: "618",
+      rotulo: "61,8%",
+      y: 138,
+      texto: "Retração profunda — quem entrou no topo segura a região?",
+    },
+  ] as const;
+  const [sel, setSel] = useState<(typeof niveis)[number]["id"]>("618");
+  const ativo = niveis.find((n) => n.id === sel);
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+        <ChartCandlestick size={14} /> Retrações sobre o movimento medido — clique nos níveis
+      </div>
+      <div className="grid items-center gap-4 md:grid-cols-2">
+        <svg viewBox="0 0 320 200" className="w-full">
+          {linha(
+            [
+              [20, 180],
+              [80, 120],
+              [140, 70],
+              [200, 105],
+              [240, 122],
+              [280, 138],
+            ],
+            "var(--success)",
+            3,
+          )}
+          <line
+            x1="20"
+            y1="180"
+            x2="300"
+            y2="180"
+            stroke="var(--success)"
+            strokeWidth="1"
+            strokeDasharray="4 4"
+          />
+          <text x="12" y="172" fontSize="11" fill="var(--success)">
+            fundo
+          </text>
+          <text x="222" y="62" fontSize="11" fill="var(--success)">
+            topo
+          </text>
+          {niveis.map((n) => (
+            <g key={n.id} className="cursor-pointer" onClick={() => setSel(n.id)}>
+              <line
+                x1="30"
+                y1={n.y}
+                x2="292"
+                y2={n.y}
+                stroke={sel === n.id ? "var(--primary)" : "var(--muted-foreground)"}
+                strokeWidth={sel === n.id ? 2 : 1}
+                strokeDasharray="6 4"
+              />
+              <rect
+                x="30"
+                y={n.y - 11}
+                width="72"
+                height="22"
+                rx="5"
+                fill={sel === n.id ? "var(--primary)" : "var(--card)"}
+                fillOpacity={sel === n.id ? 0.15 : 0}
+                stroke={sel === n.id ? "var(--primary)" : "transparent"}
+                strokeWidth="1"
+              />
+              <text
+                x="36"
+                y={n.y + 4}
+                fontSize="12"
+                fontWeight={sel === n.id ? 700 : 400}
+                fill={sel === n.id ? "var(--primary)" : "var(--muted-foreground)"}
+              >
+                retração {n.rotulo}
+              </text>
+            </g>
+          ))}
+        </svg>
+        <div>
+          <div className="rounded-lg border border-primary/50 bg-primary/10 p-3 text-sm">
+            <div className="font-semibold">Retração {ativo?.rotulo}</div>
+            <p className="mt-1 text-muted-foreground">{ativo?.texto}</p>
+          </div>
+          <p className="mt-3 text-sm">
+            Níveis são <strong>regiões de referência</strong>, não ordens — e o desenho depende do
+            movimento que você declara medir.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function LeituraVisual({ kind }: { kind: LessonVisualKind }) {
   switch (kind) {
     case "candle":
@@ -676,6 +1027,12 @@ export function LeituraVisual({ kind }: { kind: LessonVisualKind }) {
       return <TendenciaVisual />;
     case "rompimento":
       return <RompimentoVisual />;
+    case "medias":
+      return <MediasVisual />;
+    case "vwap":
+      return <VwapVisual />;
+    case "fibonacci":
+      return <FibonacciVisual />;
     default:
       return null;
   }
