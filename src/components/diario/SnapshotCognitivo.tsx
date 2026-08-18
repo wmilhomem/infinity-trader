@@ -62,6 +62,16 @@ export function SnapshotCognitivo({ snap }: { snap: SnapshotCognitivoView }) {
             <dd className="font-medium">{snap.emocao}</dd>
           </div>
         )}
+        {snap.representacao && (
+          <div className="flex justify-between">
+            <dt className="text-muted-foreground">Lente do movimento</dt>
+            <dd className="font-medium">
+              {snap.representacao === "renko"
+                ? `Renko${snap.brickSize !== null ? ` · bloco ${brl(snap.brickSize)}` : ""}`
+                : "Candle"}
+            </dd>
+          </div>
+        )}
         {snap.resultado !== null && (
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Resultado</dt>

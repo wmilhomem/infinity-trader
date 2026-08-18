@@ -39,6 +39,10 @@ export type DecisionSnapshot = {
     alertas: Alerta[];
     regraAplicada: string | null;
     seguiuRegra: boolean | null;
+    marketReading?: {
+      representation: "candle" | "renko";
+      brickSize?: number;
+    } | null;
   };
   /** Quem estava decidindo: disciplina histórica, padrões presentes, emoção. */
   comportamento: {
@@ -91,6 +95,10 @@ export type DecisionSnapshotInput = {
     alertas: Alerta[];
     regraAplicada: string | null;
     seguiuRegra: boolean | null;
+    marketReading?: {
+      representation: "candle" | "renko";
+      brickSize?: number;
+    } | null;
   };
   comportamento: {
     disciplinaHistorica: number;
@@ -137,6 +145,7 @@ export function buildDecisionSnapshot(input: DecisionSnapshotInput): DecisionSna
       alertas: input.processo.alertas,
       regraAplicada: input.processo.regraAplicada,
       seguiuRegra: input.processo.seguiuRegra,
+      marketReading: input.processo.marketReading ?? null,
     },
     comportamento: {
       disciplinaHistorica: input.comportamento.disciplinaHistorica,

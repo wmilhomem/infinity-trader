@@ -129,6 +129,16 @@ export const PADRAO_BARRAS_TEMPLATES: StructuredRuleTemplate[] = [
         "Pavio superior é observação de rejeição — registro no meu diário de leitura, nunca entrada ou saída sozinho.",
     },
   },
+  {
+    tipo: "padrao_barras",
+    nome: "Sequência de blocos Renko como evidência",
+    categoria: "leitura de movimento",
+    parametros: {
+      condicao: "renko_sequencia_evidencia",
+      descricao:
+        "Sequência de blocos Renko na mesma direção é evidência de movimento passado — só considero tendência relevante com sequência de blocos E contexto (ex.: preço acima do VWAP); a sequência sozinha nunca abre operação.",
+    },
+  },
 ];
 
 export const STRUCTURED_TEMPLATES: StructuredRuleTemplate[] = [

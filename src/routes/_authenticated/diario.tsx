@@ -120,6 +120,8 @@ function Diario() {
   const [emocao, setEmocao] = useState<string>("");
   const [licao, setLicao] = useState("");
   const [check, setCheck] = useState<Record<string, boolean>>({});
+  const [representacao, setRepresentacao] = useState<"candle" | "renko">("candle");
+  const [brickSize, setBrickSize] = useState<string>("");
   const [salvando, setSalvando] = useState(false);
   const [celebraPrimeira, setCelebraPrimeira] = useState(false);
 
@@ -254,6 +256,10 @@ function Diario() {
               alertas,
               regraAplicada: ruleId || null,
               seguiuRegra: seguiu,
+              marketReading: {
+                representation: representacao,
+                brickSize: representacao === "renko" && brickSize ? Number(brickSize) : undefined,
+              },
             },
             comportamento: {
               disciplinaHistorica,
@@ -310,6 +316,8 @@ function Diario() {
       setEmocao("");
       setLicao("");
       setCheck({});
+      setRepresentacao("candle");
+      setBrickSize("");
       qc.invalidateQueries();
     } finally {
       setSalvando(false);
@@ -401,6 +409,38 @@ function Diario() {
                 >
                   <X size={12} className="inline mr-1" /> Furei a regra
                 </button>
+              </div>
+
+              <div>
+                <div className="text-xs uppercase text-muted-foreground">
+                  Como você está lendo o movimento?
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {(["candle", "renko"] as const).map((r) => (
+                    <button
+                      key={r}
+                      onClick={() => setRepresentacao(r)}
+                      className={`rounded-full border px-3 py-1 text-xs ${representacao === r ? "border-primary bg-primary/20 text-primary" : "border-border hover:bg-accent"}`}
+                    >
+                      {r === "candle" ? "Candle" : "Renko"}
+                    </button>
+                  ))}
+                </div>
+                {representacao === "renko" && (
+                  <input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="Tamanho do bloco (ex: 1.00)"
+                    value={brickSize}
+                    onChange={(e) => setBrickSize(e.target.value)}
+                    className="mt-2 w-full rounded-md border border-border bg-input px-3 py-2 text-sm font-mono"
+                  />
+                )}
+                <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">
+                  A representação registra como você leu o movimento — nunca vira sinal ou
+                  recomendação no seu snapshot.
+                </p>
               </div>
 
               <div>

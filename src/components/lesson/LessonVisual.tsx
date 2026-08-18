@@ -502,6 +502,9 @@ export function LessonVisual({ kind }: { kind: LessonVisualKind }) {
     case "medias":
     case "vwap":
     case "fibonacci":
+    case "renko-comparacao":
+    case "renko-resolucao":
+    case "renko-evidencia":
       return <LeituraVisual kind={kind} />;
     default:
       return null;

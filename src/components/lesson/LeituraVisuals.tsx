@@ -1013,7 +1013,165 @@ function FibonacciVisual() {
   );
 }
 
-export function LeituraVisual({ kind }: { kind: LessonVisualKind }) {
+function RenkoVisual({ mode }: { mode: "comparacao" | "resolucao" | "evidencia" }) {
+  const [val, setVal] = useState<number>(3);
+  const [showEv, setShowEv] = useState(false);
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+        <MousePointerClick size={14} />{" "}
+        {mode === "comparacao"
+          ? "Candle vs Renko — O mercado é o mesmo"
+          : mode === "resolucao"
+            ? "Tamanho do bloco — Mude a resolução"
+            : "Renko é evidência, não gatilho"}
+      </div>
+
+      {mode === "comparacao" && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-lg border border-border bg-background p-4 text-center">
+            <div className="mb-2 text-xs uppercase text-muted-foreground">
+              Candle (Tempo + Movimento)
+            </div>
+            <div className="font-mono text-xl h-24 flex items-center justify-center gap-2">
+              <span className="text-success">🟩</span>
+              <span className="text-success">🟩</span>
+              <span className="text-loss">🟥</span>
+              <span className="text-success">🟩</span>
+              <span className="text-loss">🟥</span>
+              <span className="text-loss">🟥</span>
+            </div>
+          </div>
+          <div className="rounded-lg border border-border bg-background p-4 text-center">
+            <div className="mb-2 text-xs uppercase text-muted-foreground">
+              Renko (Apenas Movimento)
+            </div>
+            <div className="font-mono text-xl h-24 flex items-center justify-center -space-x-1">
+              <div className="flex flex-col">
+                <span className="text-success">🟩</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-success">🟩</span>
+                <span className="text-transparent">🟩</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-loss">🟥</span>
+                <span className="text-transparent">🟩</span>
+                <span className="text-transparent">🟩</span>
+              </div>
+            </div>
+          </div>
+          <p className="mt-3 text-sm md:col-span-2">
+            A forma visual muda, mas a realidade do sistema financeiro é idêntica. Renko elimina
+            ruídos temporais e enfatiza sequências direcionais reais.
+          </p>
+        </div>
+      )}
+
+      {mode === "resolucao" && (
+        <div className="flex flex-col gap-4">
+          <input
+            type="range"
+            min="1"
+            max="5"
+            step="1"
+            value={val}
+            onChange={(e) => setVal(Number(e.target.value))}
+            className="w-full accent-primary"
+          />
+          <div className="text-center text-sm font-mono text-muted-foreground mb-2">
+            Tamanho do bloco: R$ {(val * 0.5).toFixed(2)}
+          </div>
+          <div className="rounded-lg border border-border bg-background p-4 pt-16 pb-8 h-32 flex items-center justify-center relative">
+            <div className="flex items-end -space-x-1">
+              {Array.from({ length: 6 - val }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col"
+                  style={{ transform: `translateY(-${i * 12}px)` }}
+                >
+                  <span className="text-success font-mono text-xl">🟩</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <p className="mt-3 text-sm">
+            Ao aumentar o bloco, o mercado ficou com menos volatilidade? <strong>Não.</strong> Você
+            apenas alterou a "resolução" sobre qual ele apresenta a mesma realidade.
+          </p>
+        </div>
+      )}
+
+      {mode === "evidencia" && (
+        <div className="flex flex-col gap-4">
+          <div className="rounded-lg border border-success/30 bg-success/10 p-4">
+            <div className="flex items-end justify-center h-16 mb-4 -space-x-1">
+              <div className="flex flex-col">
+                <span className="text-success font-mono text-xl">🟩</span>
+              </div>
+              <div className="flex flex-col" style={{ transform: "translateY(-12px)" }}>
+                <span className="text-success font-mono text-xl">🟩</span>
+              </div>
+              <div className="flex flex-col" style={{ transform: "translateY(-24px)" }}>
+                <span className="text-success font-mono text-xl">🟩</span>
+              </div>
+            </div>
+            <p className="text-sm text-center">
+              "O Renko mostra uma sequência de blocos na mesma direção."
+            </p>
+          </div>
+
+          <button
+            className="w-full py-2 rounded-lg bg-primary text-primary-foreground font-semibold"
+            onClick={() => setShowEv(true)}
+          >
+            Isso é suficiente para operar?
+          </button>
+
+          {showEv && (
+            <div className="grid md:grid-cols-2 gap-4 mt-2">
+              <div className="rounded-lg border border-success/30 bg-background p-4">
+                <div className="font-semibold text-sm text-success mb-2">O QUE ELE MOSTRA</div>
+                <ul className="text-sm text-muted-foreground list-disc pl-4 space-y-1">
+                  <li>Direção do movimento anterior</li>
+                  <li>Sequência</li>
+                  <li>Deslocamento relevante alcançado</li>
+                </ul>
+              </div>
+              <div className="rounded-lg border border-loss/30 bg-background p-4">
+                <div className="font-semibold text-sm text-loss mb-2">O QUE ELE NÃO DIZ</div>
+                <ul className="text-sm text-muted-foreground list-disc pl-4 space-y-1">
+                  <li>Que o preço vai continuar</li>
+                  <li>Que existe uma "entrada mágica"</li>
+                  <li>Que a operação lhe trará lucro</li>
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function LeituraVisual({
+  kind,
+}: {
+  kind:
+    | "candle"
+    | "pavio"
+    | "forca"
+    | "congestao"
+    | "tendencia"
+    | "rompimento"
+    | "medias"
+    | "vwap"
+    | "fibonacci"
+    | "renko-comparacao"
+    | "renko-resolucao"
+    | "renko-evidencia";
+}) {
   switch (kind) {
     case "candle":
       return <CandleVisual />;
@@ -1033,6 +1191,12 @@ export function LeituraVisual({ kind }: { kind: LessonVisualKind }) {
       return <VwapVisual />;
     case "fibonacci":
       return <FibonacciVisual />;
+    case "renko-comparacao":
+      return <RenkoVisual mode="comparacao" />;
+    case "renko-resolucao":
+      return <RenkoVisual mode="resolucao" />;
+    case "renko-evidencia":
+      return <RenkoVisual mode="evidencia" />;
     default:
       return null;
   }

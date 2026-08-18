@@ -24,6 +24,9 @@ export type LessonVisualKind =
   | "medias"
   | "vwap"
   | "fibonacci"
+  | "renko-comparacao"
+  | "renko-resolucao"
+  | "renko-evidencia"
   | "none";
 
 export type LessonMeta = {
@@ -669,6 +672,50 @@ export const LESSON_META: Record<string, Partial<LessonMeta>> = {
         "O contrato segue a referência do mercado (PTAX) — e o câmbio reage a juros, risco e atuação do BCB.",
     },
     resumoPontos: ["USDBRL em pontos", "Vence no último dia útil do mês", "Liquidação financeira"],
+  },
+  "renko-comparacao": {
+    objetivo: "Diferenciar a realidade do preço da sua representação visual.",
+    tempoMin: 5,
+    visual: "renko-comparacao",
+    erroComum: {
+      titulo: "Achar que o mercado ficou 'mais fácil' de ler",
+      texto:
+        "O gráfico de Renko é mais limpo, mas a realidade do preço é a mesma. O formato de tijolos apenas filtra ruídos temporais limitados.",
+    },
+    resumoPontos: [
+      "Candles trazem tempo e movimento",
+      "Renko traz apenas o movimento puro",
+      "Sintetizam o mesmo mercado",
+    ],
+  },
+  "renko-resolucao": {
+    objetivo: "Entender como o tamanho do bloco afeta o que você observa.",
+    tempoMin: 5,
+    visual: "renko-resolucao",
+    erroComum: {
+      titulo: "Aumentar o bloco para esconder a volatilidade",
+      texto:
+        "Mudar a proporção visual do tijolo não altera a volatilidade mecânica e contínua que já existe.",
+    },
+    resumoPontos: [
+      "Mais pontos = blocos maiores e menos sensíveis",
+      "Menos pontos = blocos menores e mais sensíveis",
+      "Resolução é zoom, não mudança no preço",
+    ],
+  },
+  "renko-evidencia": {
+    objetivo: "Reconhecer que tijolos não são preditivos, apenas evidenciais.",
+    tempoMin: 5,
+    visual: "renko-evidencia",
+    erroComum: {
+      titulo: "Encarar fechamento de Renko como trade obrigatório",
+      texto: "Um bloco isolado não cria o edge e nem justifica violar a regra de proteção base.",
+    },
+    resumoPontos: [
+      "Direção do movimento é indicativa",
+      "A observação constrói o contexto base",
+      "Sinal não é previsão de continuação",
+    ],
   },
 };
 

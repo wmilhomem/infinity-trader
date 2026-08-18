@@ -36,15 +36,15 @@ decisão — e o processo em torno dela — é sempre do usuário.
 - No caminho de futuros, escolha do contrato de foco (WIN ou WDO) persistida em
   `profiles.foco_futuros`.
 
-### Trilha de aprendizado (48 lições)
-- 3 caminhos: `opcoes` (32 lições), `futuros` (16 lições) e `geral` (tudo).
+### Trilha de aprendizado (51 lições)
+- 3 caminhos: `opcoes` (35 lições), `futuros` (16 lições) e `geral` (tudo).
 - 6 níveis conceituais: Entender (1), Pensar (2), Construir (3), Comparar (4),
   Decidir (5) e Prática (transversal — tributação).
-- 12 temas em seções expansíveis com progresso (TemaAccordion): Leitura de
-  mercado → Indicadores e instrumentos → Fundamentos → Estratégias e
-  estruturas → Comparação e decisão → Tributação → Mecânica do contrato →
-  Pregão e dimensionamento → Execução e risco → Comparação → Decisão e fiscal
-  → Aprofundamento.
+- 13 temas em seções expansíveis com progresso (TemaAccordion): Leitura de
+  mercado → Indicadores e instrumentos → Representação do movimento →
+  Fundamentos → Estratégias e estruturas → Comparação e decisão → Tributação →
+  Mecânica do contrato → Pregão e dimensionamento → Execução e risco →
+  Comparação → Decisão e fiscal → Aprofundamento.
 - Camada de Leitura de Mercado (lições 1–6, tema "Leitura de mercado"):
   lendo-um-candle, a-história-do-pavio, força-e-sequência,
   congestão-e-expansão, tendência-e-lateralização e
@@ -54,6 +54,12 @@ decisão — e o processo em torno dela — é sempre do usuário.
   instrumentos"): medias-moveis, vwap e fibonacci — na mesma arquitetura de
   evidência: calculam um fato, dependem de contexto e nunca são gatilho
   ("cruzou a média" ou "tocou 61,8%" é registro, não ordem).
+- Lições de representação do movimento (lições 49–51, tema "Representação do
+  movimento"): renko-comparacao, renko-resolucao e renko-evidencia — Renko
+  como lente do mesmo preço, não como mecanismo preditivo: a representação
+  muda o que se enxerga (resolução do bloco), nunca a realidade; sequência de
+  blocos é observação que entra na cadeia
+  Renko → Observação → Contexto → Regra → Risco → Decisão, jamais gatilho.
 - Lição com formato completo: problema → conceitos (com tabelas markdown) →
   analogia → na prática → missão interativa (opções com tom correta/quase/
   errada + feedback, termos de explicação, "ainda pratique") → transferência
@@ -87,6 +93,9 @@ decisão — e o processo em torno dela — é sempre do usuário.
 ### Diário de decisões
 - Registro estruturado: o que fez, em qual ativo/estrutura, por quê, qual
   regra pessoal aplicou, emoção, interpretação, resultado (quando souber).
+- Registra também a **lente de leitura do movimento** (Candle ou Renko, com o
+  tamanho do bloco) no snapshot cognitivo — como observação do processo,
+  nunca como sinal.
 - Puxa a última simulação para reduzir fricção; cada entrada alimenta o
   Decision Score e os padrões de comportamento.
 
@@ -130,8 +139,9 @@ decisão — e o processo em torno dela — é sempre do usuário.
 | 42–43 | Comparação (WIN vs WDO, futuro vs opção) | futuros |
 | 44–46 | Decisão e fiscal (decisão no day trade, tributação 20% e DARF) | futuros |
 | 47–48 | Aprofundamento (WIN: Ibovespa e vencimentos; WDO: câmbio e referência) | futuros (segundo o foco) |
+| 49–51 | Representação do movimento (Renko: lente vs realidade, resolução do bloco, evidência vs gatilho) | comum |
 
-Distribuição por nível: Entender 10, Pensar 12, Construir 14, Comparar 6,
+Distribuição por nível: Entender 10, Pensar 15, Construir 14, Comparar 6,
 Decidir 3, Prática 3.
 
 ## Arquitetura e stack
@@ -144,15 +154,17 @@ Decidir 3, Prática 3.
   tabelas das lições renderizadas com bordas, cabeçalho e zebra em todos os
   pontos (ConceptCard, CopilotBubble, thread do copilot).
 - **Backend**: Supabase (Auth + Postgres); núcleo de conteúdo 100% local em
-  `src/lib/lessons.ts` (48 lições) — não depende de dado de mercado externo.
+  `src/lib/lessons.ts` (51 lições) — não depende de dado de mercado externo.
 - **IA**: AI SDK com gateway openai-compatible (`src/lib/ai-gateway.server.ts`),
   prompt de sistema fixo com o conteúdo, as regras e o histórico do usuário.
 - **Decision OS**: módulos em `src/lib/` — `market-reading.ts` (camada de
   leitura: ciclo de decisão, padrões e indicadores com contra-exemplo,
   `evidenciaDe` e `indicadorComoEvidencia` — indicador é contexto, nunca
-  gatilho, checklist de rompimento), `payoff.ts` (curvas multi-perna),
-  `futuros.ts` (contratos WIN/WDO, dimensionamento), `rule-templates.ts`,
-  `strategy-read.ts`, `fichas-estrategias.ts`, `modulos-copilot.ts`, `voz.ts`.
+  gatilho, representações de preço em `REPRESENTACOES` (candle e Renko como
+  lentes da mesma realidade), checklist de rompimento), `payoff.ts` (curvas
+  multi-perna), `futuros.ts` (contratos WIN/WDO, dimensionamento),
+  `rule-templates.ts`, `strategy-read.ts`, `fichas-estrategias.ts`,
+  `modulos-copilot.ts`, `voz.ts`.
 
 ### Modelo de dados (Supabase)
 

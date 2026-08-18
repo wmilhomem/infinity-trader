@@ -21,6 +21,47 @@ export type Observacao = {
   interpretacao?: string;
 };
 
+export type RepresentacaoMercado = "candle" | "renko";
+
+export interface Representacao {
+  id: RepresentacaoMercado;
+  nome: string;
+  descricao: string;
+  evidencia: string;
+  oQueMostra: string[];
+  oQueNaoMostra: string[];
+  contraExemplo: string;
+}
+
+export const REPRESENTACOES: Representacao[] = [
+  {
+    id: "candle",
+    nome: "Candlestick",
+    descricao:
+      "Representação clássica baseada em abertura, fechamento, máxima e mínima por intervalo de tempo.",
+    evidencia:
+      "Detalha a volatilidade intraday e as rejeições em regiões específicas num dado período.",
+    oQueMostra: ["Abertura e fechamento", "Máxima e mínima do período", "Sensação temporal"],
+    oQueNaoMostra: ["Foco exclusivo no movimento (ignora o tempo lateral)"],
+    contraExemplo:
+      "Muitos candles pequenos laterais podem gerar ansiedade num regime sem mudança direcional verdadeira.",
+  },
+  {
+    id: "renko",
+    nome: "Renko",
+    descricao:
+      "Filtra o tempo e o ruído. Um novo bloco (tijolo) só é desenhado quando o preço atinge um deslocamento mínimo predefinido.",
+    evidencia: "Evidencia a manutenção da direção ou exaustão do movimento puro.",
+    oQueMostra: ["Direção clara do movimento", "Sequência", "Filtro de ruído temporal"],
+    oQueNaoMostra: [
+      "Que o preço vai continuar subindo (não é predição)",
+      "Pequenas rejeições que não formaram bloco isolado",
+    ],
+    contraExemplo:
+      "Uma sequência de blocos na mesma direção não é garantia de entrada, devendo ser confrontada com regiões de liquidez (contexto).",
+  },
+];
+
 export type EstruturaDeMercado =
   "tendencia-alta" | "tendencia-baixa" | "lateralizacao" | "transicao";
 

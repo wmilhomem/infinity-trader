@@ -1188,8 +1188,7 @@ A leitura completa junta o indicador ao **regime**: média acompanhando tendênc
           "a direção recomendada pelo mercado",
         ],
         correta: 0,
-        explicacao:
-          "Média aritmética dos fechamentos das últimas N velas: resumo, nunca previsão.",
+        explicacao: "Média aritmética dos fechamentos das últimas N velas: resumo, nunca previsão.",
       },
       {
         pergunta: "Cruzamento de MM9 e MM20 em mercado lateral...",
@@ -1364,8 +1363,7 @@ O que o lado não diz: quem vence o resto do dia. Ajustes institucionais carrega
           "uma linha de suporte mágica",
         ],
         correta: 0,
-        explicacao:
-          "Σ(preço × volume) ÷ Σ(volume) da sessão atual — começa do zero todo dia.",
+        explicacao: "Σ(preço × volume) ÷ Σ(volume) da sessão atual — começa do zero todo dia.",
       },
       {
         pergunta: "Preço acima do VWAP com volume forte descreve...",
@@ -1564,8 +1562,7 @@ Qualquer um deles citado sozinho ("o preço tocou 61,8%" ou "a MM9 cruzou") é o
           "existe apenas um nível correto",
         ],
         correta: 0,
-        explicacao:
-          "Swings diferentes → réguas diferentes. Declarar a régua é parte do processo.",
+        explicacao: "Swings diferentes → réguas diferentes. Declarar a régua é parte do processo.",
       },
       {
         pergunta: "Um toque em 61,8% de um movimento consolidado...",
@@ -8162,6 +8159,557 @@ O dólar não tem "cota certa": tem fluxo — e o contrato mede o fluxo em ponto
       },
     ],
   },
+  {
+    slug: "renko-comparacao",
+    ordem: 49,
+    nivel: 2,
+    titulo: "Lição 49 — O mercado não mudou. A representação mudou.",
+    resumo:
+      "Candle e Renko são lentes para o mesmo preço: uma guarda o tempo, a outra o filtra. A realidade é idêntica — o que muda é o que você enxerga.",
+    problema: {
+      titulo: "O gráfico que 'sumiu com o ruído'",
+      texto:
+        "Marina trocou o gráfico de candles por Renko e teve uma sensação estranha: o mercado parecia 'mais limpo', as entradas 'mais óbvias'. Ela achou que tinha encontrado um jeito melhor de prever. No fim do mês, o resultado era o mesmo de sempre. O Renko não mudou o mercado — mudou a lente. E ela não sabia que olhar por outra lente não é prever melhor.",
+      pergunta: "O que exatamente mudou quando o gráfico virou Renko?",
+    },
+    conceitos: [
+      {
+        titulo: "O que o Renko desenha",
+        corpo: `
+**Renko** é uma representação de preço em blocos (tijolos): um novo bloco só nasce quando o preço desloca um **tamanho mínimo predefinido** (ex.: R$ 1,00 ou 50 pontos) a partir do bloco anterior.
+
+| Aspecto | Candle | Renko |
+|---|---|---|
+| Base do desenho | intervalo de tempo (1min, 5min, 1 dia) | deslocamento mínimo de preço |
+| Guarda o tempo | sim — cada vela é um período | não — só nasce quando o preço anda |
+| Ruído | aparece em cada período | filtrado pela régua do bloco |
+| Pergunta que responde | o que aconteceu neste período? | o movimento atravessou a régua? |
+
+O tempo continua existindo no mercado — o Renko apenas **não o desenha**. Cada bloco pode nascer em 1 minuto ou em 1 hora: o gráfico não distingue.
+        `,
+      },
+      {
+        titulo: "Mesmo mercado, duas lentes",
+        corpo: `
+O preço é **um só**. O que muda é o filtro da lente:
+
+- O **candle** pergunta: "o que o preço fez neste período de tempo?"
+- O **Renko** pergunta: "o preço deslocou a régua mínima?"
+
+Por isso uma sequência de velas pequenas laterais vira **um bloco só** no Renko — ou nenhum. E um movimento que demorou três horas para andar um bloco aparece **igual** a um que andou o mesmo bloco em três minutos.
+
+A consequência pedagógica é central: **representação não é realidade**. O gráfico Renko é mais limpo, mas o mercado que ele descreve é o mesmo — com a mesma volatilidade, os mesmos participantes e o mesmo risco.
+        `,
+      },
+      {
+        titulo: "Representação é escolha, não previsão",
+        corpo: `
+Escolher a representação é escolher **o que observar**, não descobrir um atalho. A sequência de blocos descreve a manutenção da direção em blocos de tamanho fixo — uma **observação** com resolução diferente da dos candles.
+
+Assim como os indicadores, a representação termina numa evidência: padrão + representação + contexto + regra + risco. Nenhuma lente, sozinha, transforma leitura em ordem.
+        `,
+      },
+    ],
+    analogia:
+      "Ver o mesmo vale pela foto de satélite e pelo mapa topográfico: os dois descrevem o mesmo terreno. O mapa esconde árvores e casas (ruído), mas não muda a montanha — e nenhum dos dois te diz para onde caminhar.",
+    naPratica: {
+      titulo: "Trocar a lente sem se enganar",
+      passos: [
+        "Abra o mesmo trecho de preço em candle e em Renko, lado a lado.",
+        "Escreva o fato que cada um mostra — o candle mostra período; o Renko mostra deslocamento.",
+        "Pergunte: o que esta representação esconde de mim? (o tempo, no Renko; o ruído, no candle)",
+        "Anote a conclusão: a realidade do preço é a mesma — só a lente mudou.",
+      ],
+    },
+    missao: {
+      titulo: "A mesma semana, duas leituras",
+      situacao:
+        "Numa semana, o WIN oscilou 200 pontos dentro de uma faixa e fechou quase onde abriu. No gráfico de candles são dezenas de velas pequenas alternadas; no Renko com bloco de 50 pontos, apenas dois blocos — um verde, um vermelho. Você está descrevendo o que vê antes de qualquer hipótese.",
+      pergunta: "O que a diferença entre as duas representações descreve?",
+      opcoes: [
+        {
+          texto:
+            "O mesmo movimento sem direção: o candle mostra a agitação do tempo; o Renko mostra que nenhum deslocamento se sustentou.",
+          tom: "correta",
+          feedback:
+            "Correto: as duas lentes descrevem o mesmo fato — mercado sem direção sustentada. A diferença é resolução, não conteúdo.",
+        },
+        {
+          texto:
+            "O Renko escondeu a volatilidade da semana — esconder não é remover: o risco da faixa continua lá, só não está desenhado.",
+          tom: "quase",
+          feedback:
+            "Quase: o Renko filtra o desenho do ruído, mas a oscilação real continua existindo — é exatamente o que a lição alerta.",
+        },
+        {
+          texto:
+            "Dois blocos opostos indicam uma reversão iminente — dois blocos descrevem a ida e a volta; reversão é hipótese, não conclusão.",
+          tom: "errada",
+          feedback:
+            "Não: verde e vermelho lado a lado descrevem o movimento de ida e volta dentro da faixa — ninguém 'prevê' o próximo bloco.",
+        },
+        {
+          texto:
+            "O candle é superior porque mostra mais informação — informação diferente não é informação melhor; cada lente responde outra pergunta.",
+          tom: "errada",
+          feedback:
+            "Não: não existe lente superior — existe lente adequada à pergunta que você quer observar.",
+        },
+      ],
+      termosExplicacao: ["representação", "Renko", "candle", "deslocamento", "faixa"],
+      aindaPratique:
+        "No seu ativo, comparar a última semana em candle e Renko e anotar qual pergunta cada lente responde melhor.",
+      transferencia: {
+        titulo: "O bloco que 'previu' a queda",
+        situacao:
+          "Você mostra para um amigo um gráfico Renko em que três blocos verdes foram seguidos por um vermelho, e ele diz: 'o Renko previu a queda'. O preço, de fato, caiu depois.",
+        pergunta: "O que a sua leitura responde a ele?",
+        opcoes: [
+          {
+            texto:
+              "O bloco vermelho descreveu o que já aconteceu — a queda posterior é outra observação; descrever depois não é prever antes.",
+            tom: "correta",
+            feedback:
+              "Correto: o bloco nasce depois do deslocamento — ele é registro do passado, como qualquer candle.",
+          },
+          {
+            texto:
+              "Ele tem razão: três verdes e um vermelho é um padrão confiável — sequência descreve direção passada; confiabilidade é regra pessoal a testar.",
+            tom: "quase",
+            feedback:
+              "Quase: o padrão descreve o que aconteceu; chamá-lo de previsão é transformar observação em gatilho — o erro central da Rodada T.",
+          },
+          {
+            texto:
+              "O Renko só existe para quem opera curto — representação não tem contrato; Renko serve para qualquer mercado como lente.",
+            tom: "errada",
+            feedback:
+              "Não: a lente independe do contrato — o que muda é o tamanho da régua que faz sentido.",
+          },
+          {
+            texto:
+              "Devemos passar a usar Renko para prever quedas — usar representação como oráculo reproduz o mesmo erro dos indicadores-gatilho.",
+            tom: "errada",
+            feedback: "Não: representação é fonte de observação, nunca mecanismo preditivo.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "Um gráfico Renko nasce de:",
+        alternativas: [
+          "deslocamento mínimo de preço a partir do bloco anterior",
+          "intervalos fixos de tempo",
+          "volume acumulado da sessão",
+          "sorteios da B3",
+        ],
+        correta: 0,
+        explicacao:
+          "O bloco só nasce quando o preço desloca o tamanho mínimo predefinido — o tempo não desenha o Renko.",
+      },
+      {
+        pergunta: "Trocar candle por Renko:",
+        alternativas: [
+          "muda a lente, não a realidade do preço",
+          "elimina a volatilidade real",
+          "garante leituras mais fáceis de operar",
+          "transforma o gráfico em previsão",
+        ],
+        correta: 0,
+        explicacao:
+          "A representação filtra o que você enxerga — o mercado, o risco e o preço continuam idênticos.",
+      },
+      {
+        pergunta: "O tempo no gráfico Renko:",
+        alternativas: [
+          "existe no mercado, mas não é desenhado",
+          "é congelado pelo tamanho do bloco",
+          "é ignorado porque não importa",
+          "vira o eixo horizontal do gráfico",
+        ],
+        correta: 0,
+        explicacao:
+          "O tempo continua passando e os preços continuam sendo feitos no tempo — o Renko só não o desenha.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "A lente e o fato",
+        enunciado:
+          "Escreva, em duas linhas, o fato que cada representação mostraria numa sessão de WIN que andou 180 pontos para cima em três horas e devolveu 160 em quarenta minutos: (a) no candle de 5min; (b) no Renko de 50 pontos.",
+        gabarito:
+          "(a) O candle mostra dezenas de velas, subida longa e queda rápida, com o tempo evidente em cada período. (b) O Renko mostra blocos verdes na subida e vermelhos na devolução — sem mostrar quanto tempo cada bloco levou. Os dois descrevem o mesmo movimento.",
+      },
+    ],
+  },
+  {
+    slug: "renko-resolucao",
+    ordem: 50,
+    nivel: 2,
+    titulo: "Lição 50 — O tamanho do bloco muda o que você enxerga",
+    resumo:
+      "Bloco pequeno desenha cada respiro; bloco grande só desenha movimentos grossos. Mudar a régua não muda a volatilidade — muda a resolução da observação.",
+    problema: {
+      titulo: "O slider que 'acalmou' o gráfico",
+      texto:
+        "Caio achou o gráfico Renko 'estressante' com bloco de 25 pontos e aumentou a régua para 150 pontos. O gráfico ficou lindo: quase nada se movia, só grandes blocos espaçados. Ele respirou aliviado — achou que o mercado tinha ficado mais calmo. O mercado não tinha mudado: ele só tinha trocado o zoom da lente. A ansiedade voltou no primeiro trade.",
+      pergunta: "O que o tamanho do bloco realmente altera?",
+    },
+    conceitos: [
+      {
+        titulo: "Régua é resolução, não filtro de verdade",
+        corpo: `
+O tamanho do bloco define **o menor deslocamento que gera um novo bloco**. É uma régua de desenho:
+
+- **Bloco pequeno** (ex.: 25 pontos no WIN): cada respiro vira bloco — o gráfico fica detalhado e sensível.
+- **Bloco grande** (ex.: 150 pontos): só movimentos grossos desenham — o gráfico fica esparso, com poucos blocos.
+
+O que acontece com a **volatilidade real** quando você aumenta a régua? Nada. A oscilação dos preços é a mesma; o que muda é quantos blocos a representação usa para contá-la.
+        `,
+      },
+      {
+        titulo: "A pergunta que a régua decide",
+        corpo: `
+A régua escolhe **que tipo de movimento você observa**:
+
+| Régua | O que fica visível | O que fica escondido |
+|---|---|---|
+| Bloco pequeno | reações finas, micro-regiões | a árvore no meio dos galhos |
+| Bloco grande | direções grossas, sequências longas | os respiros que não deslocaram a régua |
+
+Nenhuma régua é 'certa': cada uma responde uma pergunta. O erro é achar que uma régua maior 'prova' que o mercado está calmo — ela só prova que você olhou de mais longe.
+        `,
+      },
+      {
+        titulo: "Metacognição: você mudou o gráfico, não o mercado",
+        corpo: `
+Quando o gráfico 'acalma', a sensação de controle melhora — mas o risco do ativo continua o mesmo. Essa é uma lição de **metacognição**: reconhecer que a emoção responde à representação, não à realidade.
+
+A verificação é simples: coloque o mesmo trecho em duas réguas e compare o **deslocamento total** em reais. O total é idêntico — só o número de blocos muda. Resolução é zoom; zoom não muda a estrada.
+        `,
+      },
+    ],
+    analogia:
+      "A régua do Renko é o zoom do satélite: com zoom alto você vê as árvores balançando; com zoom baixo, só o vale inteiro. O vento é o mesmo — você só decidiu o que cabe na tela.",
+    naPratica: {
+      titulo: "Escolher a régua com consciência",
+      passos: [
+        "Defina o tamanho do bloco antes de olhar — não depois de já ter desenhado.",
+        "Anote quantos blocos o mesmo trecho gera em duas réguas (ex.: 25 e 100 pontos).",
+        "Compare o deslocamento total em reais: é idêntico nas duas réguas?",
+        "Declare qual pergunta a sua régua responde — e o que ela esconde de você.",
+      ],
+    },
+    missao: {
+      titulo: "O gráfico que 'desapareceu'",
+      situacao:
+        "Você aumentou o bloco de 50 para 200 pontos no WIN e o gráfico passou a mostrar apenas dois blocos verdes numa manhã inteira. Você sente que 'nada aconteceu' e pensa em operar 'com mais calma'.",
+      pergunta: "O que é verdade nessa leitura?",
+      opcoes: [
+        {
+          texto:
+            "O mercado oscilou o dia todo em deslocamentos menores que 200 pontos — a régua não desenhou, mas o movimento existiu.",
+          tom: "correta",
+          feedback:
+            "Correto: a régua grande escondeu os movimentos finos — o que você não vê continua existindo e continua sendo risco.",
+        },
+        {
+          texto:
+            "O mercado ficou menos volátil — a volatilidade é do preço, não da régua; aumentar o bloco só mudou o desenho.",
+          tom: "quase",
+          feedback:
+            "Quase: a sensação de calma é real, mas ela descreve a lente, não o mercado — exatamente o erro da lição.",
+        },
+        {
+          texto:
+            "Dois blocos verdes confirmam que a compra é segura — sequência curta em régua grossa descreve pouco; segurança é hipótese com regra e risco.",
+          tom: "errada",
+          feedback:
+            "Não: dois blocos em régua grossa dizem que houve dois deslocamentos de 200 pontos — nada além disso.",
+        },
+        {
+          texto:
+            "É melhor operar sempre com bloco grande para reduzir o estresse — a régua que acalma é a mesma que esconde o risco fino.",
+          tom: "errada",
+          feedback:
+            "Não: escolher régua pelo conforto é trocar clareza por anestesia — o risco real continua lá.",
+        },
+      ],
+      termosExplicacao: ["bloco", "régua", "resolução", "200 pontos", "volatilidade"],
+      aindaPratique:
+        "Desenhar o mesmo trecho de 1 hora em 3 réguas (25/100/200 pontos) e anotar quantos blocos cada uma gera.",
+      transferencia: {
+        titulo: "A régua do colega",
+        situacao:
+          "Um colega diz que 'no Renko de 10 pontos o WDO está num rali fortíssimo', enquanto o seu Renko de 50 pontos não mostra nada há uma hora. Os dois olham o mesmo ativo.",
+        pergunta: "Como reconciliar as duas leituras?",
+        opcoes: [
+          {
+            texto:
+              "As réguas respondem perguntas diferentes: 10 pontos desenha cada respiro; 50 pontos só desenha movimentos grossos — não há contradição.",
+            tom: "correta",
+            feedback:
+              "Correto: a divergência é de resolução, não de conteúdo — o preço é o mesmo para os dois.",
+          },
+          {
+            texto:
+              "Um dos dois está errado — com réguas diferentes os dois estão certos; a régua é uma escolha declarada, não um fato.",
+            tom: "quase",
+            feedback:
+              "Quase: nenhuma régua é 'a certa' — cada uma mostra uma fatia do mesmo movimento.",
+          },
+          {
+            texto:
+              "A régua de 10 pontos prevê melhor o rali — régua menor desenha mais, não prevê mais.",
+            tom: "errada",
+            feedback:
+              "Não: desenho detalhado é observação detalhada — previsão não entra na conta.",
+          },
+          {
+            texto:
+              "O WDO está travado — o Renko de 50 pontos escondeu o que o de 10 mostrou; 'travado' é conclusão de uma régua só.",
+            tom: "errada",
+            feedback:
+              "Não: uma régua grossa não 'prova' paralisia — ela só não desenhou os respiros.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "Aumentar o tamanho do bloco no Renko:",
+        alternativas: [
+          "muda a resolução da representação",
+          "reduz a volatilidade real do ativo",
+          "elimina o risco da operação",
+          "torna o mercado mais previsível",
+        ],
+        correta: 0,
+        explicacao:
+          "A régua decide o que o gráfico desenha — a volatilidade do preço não sabe qual régua você escolheu.",
+      },
+      {
+        pergunta: "Com bloco grande, os movimentos finos:",
+        alternativas: [
+          "continuam existindo, mas não são desenhados",
+          "deixam de acontecer",
+          "viram blocos vermelhos",
+          "são convertidos em volume",
+        ],
+        correta: 0,
+        explicacao:
+          "O que a régua não desenha não deixa de existir — o risco fino continua presente no mercado.",
+      },
+      {
+        pergunta: "Bloco pequeno é melhor que bloco grande porque:",
+        alternativas: [
+          "não existe régua melhor — cada uma responde uma pergunta",
+          "mostra todas as oportunidades",
+          "elimina falsos sinais",
+          "é o padrão usado pelas corretoras",
+        ],
+        correta: 0,
+        explicacao:
+          "Não há régua 'certa': a escolha é qual pergunta você quer que a lente responda.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "A régua em números",
+        enunciado:
+          "Uma sessão do WIN deslocou 400 pontos no total, alternando subidas e descidas de 30–80 pontos. Quantos blocos aproximados essa sessão gera com régua de 25 pontos? E com régua de 200 pontos? O deslocamento total mudou?",
+        gabarito:
+          "Com 25 pontos, a sessão gera em torno de 16 blocos (400 ÷ 25); com 200 pontos, apenas 2 blocos (400 ÷ 200). O deslocamento total (400 pontos) é o mesmo — só a régua de desenho mudou.",
+      },
+    ],
+  },
+  {
+    slug: "renko-evidencia",
+    ordem: 51,
+    nivel: 2,
+    titulo: "Lição 51 — Renko é evidência, não gatilho",
+    resumo:
+      "Sequência de blocos na mesma direção descreve o que já aconteceu. Sozinha, ela não abre, segura ou fecha operação — falta contexto, regra e risco.",
+    problema: {
+      titulo: "Os cinco blocos verdes",
+      texto:
+        "Diego viu cinco blocos verdes seguidos no Renko e entrou comprado 'porque a tendência estava confirmada'. O preço virou na hora e ele tomou o stop. O Renko tinha mostrado a verdade: cinco deslocamentos de alta haviam acontecido. O erro não foi do gráfico — foi da pergunta: Diego pediu ao desenho do passado uma garantia de futuro.",
+      pergunta: "O que a sequência de blocos realmente mostra — e o que ela não mostra?",
+    },
+    conceitos: [
+      {
+        titulo: "O que a sequência mostra",
+        corpo: `
+Uma sequência de blocos na mesma direção descreve fatos já realizados:
+
+- **Direção**: os últimos deslocamentos foram na mesma direção.
+- **Sequência**: a direção se sustentou por N blocos (régua fixa).
+- **Deslocamento**: quanto o preço andou no total (N × tamanho do bloco).
+
+Isso é observação pura: nada foi previsto, nada foi prometido. O próximo bloco pode ser da mesma cor — ou não. A representação não tem opinião sobre o futuro.
+        `,
+      },
+      {
+        titulo: "O que a sequência não diz",
+        corpo: `
+A sequência **não diz** que o preço vai continuar; **não diz** que existe uma entrada; **não diz** que a operação dará lucro. Pedir essas respostas ao Renko é transformar observação em oráculo — o mesmo erro que os indicadores da Rodada T enfrentam.
+
+| Pergunta | Resposta do Renko |
+|---|---|
+| O que aconteceu? | uma sequência de N blocos na mesma direção |
+| O que vai acontecer? | nenhuma resposta — ele não prevê |
+| Devo operar? | nenhuma resposta — isso é decisão sua |
+| A operação vai dar lucro? | nenhuma resposta — risco é seu |
+        `,
+      },
+      {
+        titulo: "A cadeia da evidência",
+        corpo: `
+O Renko entra no processo como **fonte de observação** — exatamente no primeiro elo da cadeia:
+
+**Renko → Observação → Contexto → Regra → Risco → Decisão**
+
+Exemplo de cadeia completa: "O Renko mostra uma sequência de 6 blocos verdes (observação). O contexto é de tendência com volume presente (contexto). Minha regra só opera continuação com confirmação e stop dimensionado (regra). Se falhar, perco 1% (risco). Decido operar — ou não."
+
+Sem a cadeia, a sequência de blocos vira gatilho — e gatilho sem processo é aposta com gráfico bonito.
+        `,
+      },
+    ],
+    analogia:
+      "Cinco blocos verdes são como cinco ônibus que passaram no mesmo sentido: descrevem o que passou. Nenhum deles garante que o próximo ônibus também vai passar — e decidir embarcar sem saber o destino é a pressa que a lição combate.",
+    naPratica: {
+      titulo: "Usar Renko sem pedir previsão",
+      passos: [
+        "Descreva o fato: quantos blocos, em que direção, com que régua.",
+        "Nomeie o contexto: que estrutura o mercado mostra além do Renko?",
+        "Confronte sua regra: a sua regra menciona sequência de blocos?",
+        "Dimensione o risco: quanto você perde se o próximo bloco inverter?",
+        "Registre tudo antes de decidir — a sequência sozinha não abre operação.",
+      ],
+    },
+    missao: {
+      titulo: "A sequência que não decide",
+      situacao:
+        "O Renko (régua de 50 pontos) mostra oito blocos verdes seguidos no WIN, num dia de volume baixo e com o ativo chegando a uma região de resistência que o segurou três vezes no mês. Nenhuma das suas regras menciona Renko.",
+      pergunta: "O que o processo manda fazer com essa sequência?",
+      opcoes: [
+        {
+          texto:
+            "Registrar a sequência como observação e confrontar a própria regra: sem regra que use Renko, a sequência é contexto, não condição de entrada.",
+          tom: "correta",
+          feedback:
+            "Correto: a sequência descreve o passado; sem regra própria que a use, ela alimenta o contexto — não autoriza nada.",
+        },
+        {
+          texto:
+            "Entrar comprado — oito blocos verdes 'confirmam' a tendência; confirmação é leitura, não ordem; falta contexto, regra e risco.",
+          tom: "quase",
+          feedback:
+            "Quase: a observação está registrada, mas transformá-la em entrada exige regra própria — que você ainda não tem.",
+        },
+        {
+          texto:
+            "Vender porque a sequência está longa demais — 'longa demais' é interpretação sem régua declarada; inversão é hipótese, não ordem.",
+          tom: "errada",
+          feedback:
+            "Não: sequência longa descreve o que já andou — vender por isso é operar uma hipótese que você não declarou.",
+        },
+        {
+          texto:
+            "Ignorar o gráfico inteiro — a sequência é informação real; ignorá-la é decidir sem processo, igual a segui-la sem regra.",
+          tom: "errada",
+          feedback:
+            "Não: descartar observação válida é pular o ciclo — o processo existe para avaliar, não para negar.",
+        },
+      ],
+      termosExplicacao: ["sequência", "bloco", "observação", "regra", "resistência"],
+      aindaPratique:
+        "Acompanhar um Renko real por uma semana anotando apenas fatos (blocos, direção, régua) — sem nenhuma intenção de operar.",
+      transferencia: {
+        titulo: "A regra que usa Renko",
+        situacao:
+          "Você quer escrever uma regra pessoal que use Renko como evidência, por exemplo: 'só considero tendência relevante com sequência de blocos Renko e o preço acima do VWAP'. O mercado não emite parecer sobre a regra.",
+        pergunta: "Qual é o papel do sistema diante dessa regra?",
+        opcoes: [
+          {
+            texto:
+              "Registrar a regra como sua e perguntar se você a seguiu — o sistema organiza a sua regra, não a julga.",
+            tom: "correta",
+            feedback:
+              "Correto: o DOS preserva a autoria da regra e cobra o processo — 'você a seguiu?' é a pergunta que ele faz.",
+          },
+          {
+            texto:
+              "Aprovar a regra porque usa Renko e VWAP juntos — combinar fontes não torna a regra boa; ela é sua, com suas consequências.",
+            tom: "quase",
+            feedback:
+              "Quase: a regra é válida como escolha pessoal — mas a qualidade dela se prova na revisão, não na aprovação do sistema.",
+          },
+          {
+            texto:
+              "Bloquear a regra porque Renko não prevê — a regra usa Renko como evidência, não como previsão; evidência é uso legítimo.",
+            tom: "errada",
+            feedback:
+              "Não: usar Renko como evidência é exatamente o uso permitido — o bloqueio seria confundir evidência com gatilho.",
+          },
+          {
+            texto:
+              "Sugerir que você troque Renko por um indicador melhor — representações não competem; a sua régua é uma escolha declarada.",
+            tom: "errada",
+            feedback: "Não: o sistema não elege lentes — ele registra as suas e cobra o processo.",
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        pergunta: "Uma sequência de blocos verdes no Renko mostra:",
+        alternativas: [
+          "deslocamentos de alta já realizados",
+          "que a alta vai continuar",
+          "uma ordem de compra",
+          "que o mercado está calmo",
+        ],
+        correta: 0,
+        explicacao:
+          "O bloco nasce depois do deslocamento — a sequência é registro do passado, nada mais.",
+      },
+      {
+        pergunta: "O que falta para uma sequência de blocos virar decisão?",
+        alternativas: [
+          "contexto, regra pessoal e risco dimensionado",
+          "mais um bloco na mesma direção",
+          "aprovação de outro operador",
+          "nada — a sequência basta",
+        ],
+        correta: 0,
+        explicacao:
+          "A cadeia é Renko → Observação → Contexto → Regra → Risco → Decisão — a sequência é só o primeiro elo.",
+      },
+      {
+        pergunta: "Uma regra pessoal que usa Renko como evidência:",
+        alternativas: [
+          "é válida e o sistema pergunta se você a seguiu",
+          "é bloqueada por não ser preditiva",
+          "só funciona com opções",
+          "precisa de aprovação do mercado",
+        ],
+        correta: 0,
+        explicacao:
+          "Evidência é o uso legítimo de qualquer representação — a autoria da regra é sua e a cobrança do processo é do sistema.",
+      },
+    ],
+    exercicios: [
+      {
+        titulo: "A cadeia completa",
+        enunciado:
+          "Escreva a cadeia completa (Renko → Observação → Contexto → Regra → Risco → Decisão) para: WDO com quatro blocos vermelhos seguidos em régua de 10 pontos, numa sessão de leilão do BCB, com a sua regra de 'só operar com 2% de risco'.",
+        gabarito:
+          "Observação: quatro deslocamentos de 10 pontos para baixo já realizados. Contexto: sessão com leilão do BCB (fluxo institucional). Regra: só operar com risco de 2% dimensionado antes. Risco: perda máxima de 2% se a leitura falhar. Decisão: operar (ou não) com a cadeia toda registrada — nunca pela sequência sozinha.",
+      },
+    ],
+  },
 ];
 
 export function getLesson(slug: string) {
@@ -8221,6 +8769,10 @@ export const TEMAS: Record<Tema, { nome: string; desc: string }> = {
     nome: "Indicadores e instrumentos",
     desc: "Médias móveis, VWAP e retrações de Fibonacci como evidência — indicador descreve, o contexto interpreta.",
   },
+  representacao: {
+    nome: "Representação do movimento",
+    desc: "Candle e Renko como lentes do mesmo preço — a representação muda o que você enxerga, nunca a realidade.",
+  },
   fundamentos: {
     nome: "Fundamentos",
     desc: "O que é uma opção, prêmio, strike, vencimento, o efeito do tempo e da volatilidade.",
@@ -8277,6 +8829,9 @@ export const TEMA_LICOES: Record<string, Tema> = {
   "medias-moveis": "indicadores",
   vwap: "indicadores",
   fibonacci: "indicadores",
+  "renko-comparacao": "representacao",
+  "renko-resolucao": "representacao",
+  "renko-evidencia": "representacao",
   "o-que-e-opcao": "fundamentos",
   "call-vs-put": "fundamentos",
   "vencimento-e-exercicio": "fundamentos",

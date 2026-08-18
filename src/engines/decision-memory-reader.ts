@@ -18,6 +18,8 @@ export type SnapshotCognitivoView = {
   ivRank: number | null;
   resultado: number | null;
   status: string | null;
+  representacao: string | null;
+  brickSize: number | null;
 };
 
 export function num(v: unknown): number | null {
@@ -49,6 +51,7 @@ export function lerSnapshotCognitivo(contexto: Json | null): SnapshotCognitivoVi
         .map((p) => txt(obj(p)?.titulo))
         .filter((t): t is string => t !== null)
     : [];
+  const marketReading = obj(processo?.marketReading);
 
   return {
     estrategia: txt(strategy?.estrutura) ?? txt(c.estrategia),
@@ -62,5 +65,7 @@ export function lerSnapshotCognitivo(contexto: Json | null): SnapshotCognitivoVi
     ivRank: num(mercado?.ivRank),
     resultado: num(resultado?.resultado),
     status: txt(resultado?.status),
+    representacao: marketReading ? txt(marketReading.representation) : null,
+    brickSize: marketReading ? num(marketReading.brickSize) : null,
   };
 }
