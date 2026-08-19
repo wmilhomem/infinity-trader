@@ -18,6 +18,10 @@ import {
   validarCadeiaEvidencia,
   type CadeiaEvidencia,
 } from "@/lib/cadeia-evidencia";
+import { mercadoDoQuote } from "@/lib/mercado-snapshot";
+import { HttpGateway } from "@/market/http-gateway";
+import { LiveProvider, type ProviderQuote } from "@/market/providers";
+import { buildPortfolioContext, type PosicaoCarteira } from "@/engines/portfolio-engine";
 import { recomendarMissao } from "@/engines/missoes";
 import { preverTamanhoPosicao } from "@/engines/behavior-forecast";
 import { lerOrigem } from "@/lib/fichas-estrategias";
@@ -26,6 +30,23 @@ import type { DiaryEntry } from "@/engines/types";
 import type { Json } from "@/integrations/supabase/types";
 import { ScorePanel } from "@/components/ScorePanel";
 import { SnapshotCognitivo } from "@/components/diario/SnapshotCognitivo";
+
+/**
+ * PORTFOLIO CONTEXTO — exposição estimada no instante do registro.
+ * Posições da carteira manual + cotações do momento (LiveProvider).
+ * Falha de cotação → posição entra como ignorada (nunca chute).
+ */
+const liveCarteira = new LiveProvider(new HttpGateway());
+
+async function montarPortfolioContexto(
+  posicoes: PosicaoCarteira[] | null | undefined,
+): Promise<ReturnType<typeof buildPortfolioContext>> {
+  if (!posicoes || posicoes.length === 0) return null;
+  const ativos = [...new Set(posicoes.map((p) => p.ativo))];
+  const quotes = new Map<string, ProviderQuote | null>();
+  await Promise.all(ativos.map(async (a) => quotes.set(a, await liveCarteira.fetchQuote(a))));
+  return buildPortfolioContext(posicoes, quotes);
+}
 
 export const Route = createFileRoute("/_authenticated/diario")({
   head: () => ({
@@ -207,6 +228,13 @@ function Diario() {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
       const respostas = Object.fromEntries(CHECKLIST.map((c) => [c.k, !!check[c.k]]));
+      const { data: posicoes } = await supabase
+        .from("portfolio_positions")
+        .select("*")
+        .eq("user_id", u.user.id);
+      const portfolio = await montarPortfolioContexto(
+        posicoes as unknown as PosicaoCarteira[] | null,
+      );
       const { data: entry, error } = await supabase
         .from("diary_entries")
         .insert({
@@ -287,21 +315,13 @@ function Diario() {
                   try {
                     const raw = sessionStorage.getItem(`sim-quote:${sim}`);
                     if (!raw) return undefined;
-                    const q = JSON.parse(raw) as Record<string, unknown>;
-                    return {
-                      ivAtm: typeof q.ivAtm === "number" ? q.ivAtm : null,
-                      ivRank: typeof q.ivRank === "number" ? q.ivRank : null,
-                      diCurveState: null,
-                      liquidityScore:
-                        typeof q.liquidityScore === "string" ? q.liquidityScore : null,
-                      eventsImminent:
-                        typeof q.eventsImminent === "boolean" ? q.eventsImminent : null,
-                    };
+                    return mercadoDoQuote(JSON.parse(raw) as ProviderQuote | null) ?? undefined;
                   } catch {
                     return undefined;
                   }
                 })()
               : undefined,
+            portfolio: portfolio ?? undefined,
           }) as unknown as Json,
           resultado: resultado ? +resultado : null,
           emocao: emocao || null,

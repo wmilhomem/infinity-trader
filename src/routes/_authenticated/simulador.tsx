@@ -86,6 +86,7 @@ import { CenarioTempo } from "@/components/simulador/CenarioTempo";
 import { NarrativaEstrutura } from "@/components/simulador/NarrativaEstrutura";
 import { OsStatusBar } from "@/components/simulador/OsStatusBar";
 import { CadeiaEvidenciaForm } from "@/components/simulador/CadeiaEvidencia";
+import { CarteiraResumo } from "@/components/simulador/CarteiraResumo";
 import type { CadeiaEvidencia } from "@/lib/cadeia-evidencia";
 
 export const Route = createFileRoute("/_authenticated/simulador")({
@@ -765,9 +766,11 @@ function Simulador() {
         sessionStorage.setItem(
           `sim-quote:${data.id}`,
           JSON.stringify({
+            observadoEm: quote.quoteTime,
+            fonte: quote.provider,
+            spot: quote.spot,
             ivAtm: quote.ivAtm,
             ivRank: quote.ivRank,
-            spot: quote.spot,
             liquidityScore: quote.liquidityScore,
             eventsImminent: quote.eventsImminent,
           }),
@@ -1171,6 +1174,8 @@ function Simulador() {
                     {tese.trim().length < 40 && "· mínimo 40 para pontuar"}
                   </div>
                 </div>
+
+                <CarteiraResumo />
 
                 <CadeiaEvidenciaForm
                   hipoteseInicial={labBridge?.hipotese}

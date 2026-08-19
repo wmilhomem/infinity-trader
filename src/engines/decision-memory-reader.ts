@@ -1,6 +1,8 @@
 import type { Json } from "@/integrations/supabase/types";
 import type { CadeiaEvidencia } from "@/lib/cadeia-evidencia";
 import { lerCadeiaEvidencia } from "@/lib/cadeia-evidencia";
+import type { FonteMercado } from "@/lib/mercado-snapshot";
+import { mercadoObservadoTemFato } from "@/lib/mercado-snapshot";
 
 /**
  * DECISION MEMORY READER — lê o snapshot cognitivo gravado em
@@ -24,6 +26,33 @@ export type SnapshotCognitivoView = {
   brickSize: number | null;
   /** A cadeia de evidência registrada nesta decisão — ou null em decisões antigas. */
   cadeiaEvidencia: CadeiaEvidencia | null;
+  /** O mercado observado no instante (Rodada W) — null se não registrado. */
+  mercado: MercadoObservadoView | null;
+  /** Exposições líquidas da carteira no instante (Rodada W) — null sem posições. */
+  portfolio: PortfolioObservadoView | null;
+};
+
+export type MercadoObservadoView = {
+  observadoEm: string | null;
+  fonte: FonteMercado | null;
+  spot: number | null;
+  ivAtm: number | null;
+  ivRank: number | null;
+  diCurveState: string | null;
+  liquidityScore: string | null;
+  eventsImminent: boolean | null;
+};
+
+export type PortfolioObservadoView = {
+  source: string | null;
+  valuationSource: string | null;
+  valuatedAt: string | null;
+  netDelta: number | null;
+  netTheta: number | null;
+  netVega: number | null;
+  netRho: number | null;
+  marginUtilized: number | null;
+  topAssets: string[] | null;
 };
 
 export function temCadeiaEvidencia(snap: Pick<SnapshotCognitivoView, "cadeiaEvidencia">): boolean {
@@ -61,6 +90,52 @@ export function lerSnapshotCognitivo(contexto: Json | null): SnapshotCognitivoVi
     : [];
   const marketReading = obj(processo?.marketReading);
 
+  // Mercado observado — só vira objeto se carregar pelo menos um fato
+  // observado (ou proveniência). Bloco vazio/antigo = null (não observado).
+  const mercadoBruto = mercado
+    ? {
+        observadoEm: txt(mercado.observadoEm),
+        fonte: (txt(mercado.fonte) ?? null) as FonteMercado | null,
+        spot: num(mercado.spot),
+        ivAtm: num(mercado.ivAtm),
+        ivRank: num(mercado.ivRank),
+        diCurveState: txt(mercado.diCurveState),
+        liquidityScore: txt(mercado.liquidityScore),
+        eventsImminent: typeof mercado.eventsImminent === "boolean" ? mercado.eventsImminent : null,
+      }
+    : null;
+  const mercadoView = mercadoBruto && mercadoObservadoTemFato(mercadoBruto) ? mercadoBruto : null;
+
+  const portfolio = obj(c.portfolio);
+  const portfolioView: PortfolioObservadoView | null = portfolio
+    ? {
+        source: txt(portfolio.source),
+        valuationSource: txt(portfolio.valuationSource),
+        valuatedAt: txt(portfolio.valuatedAt),
+        netDelta: num(portfolio.netDelta),
+        netTheta: num(portfolio.netTheta),
+        netVega: num(portfolio.netVega),
+        netRho: num(portfolio.netRho),
+        marginUtilized: num(portfolio.marginUtilized),
+        topAssets: Array.isArray(portfolio.topAssets)
+          ? (portfolio.topAssets as unknown[])
+              .map((a) => txt(a))
+              .filter((t): t is string => t !== null)
+          : null,
+      }
+    : null;
+  // Bloco presente mas sem nenhum fato de exposição (source/valuationSource
+  // são metadados de proveniência, não fatos de exposição) = não observado.
+  // Nunca reconstruir o passado.
+  const portfolioTemFato =
+    portfolioView !== null &&
+    (portfolioView.netDelta !== null ||
+      portfolioView.netTheta !== null ||
+      portfolioView.netVega !== null ||
+      portfolioView.netRho !== null ||
+      portfolioView.marginUtilized !== null ||
+      (portfolioView.topAssets !== null && portfolioView.topAssets.length > 0));
+
   return {
     estrategia: txt(strategy?.estrutura) ?? txt(c.estrategia),
     score: num(processo?.score),
@@ -76,5 +151,7 @@ export function lerSnapshotCognitivo(contexto: Json | null): SnapshotCognitivoVi
     representacao: marketReading ? txt(marketReading.representation) : null,
     brickSize: marketReading ? num(marketReading.brickSize) : null,
     cadeiaEvidencia: lerCadeiaEvidencia(processo?.cadeiaEvidencia),
+    mercado: mercadoView,
+    portfolio: portfolioTemFato ? portfolioView : null,
   };
 }

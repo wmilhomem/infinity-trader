@@ -1,14 +1,28 @@
 import type { SnapshotCognitivoView } from "@/engines/decision-memory-reader";
 import { BrainCircuit, ShieldAlert } from "lucide-react";
+import { FONTE_MERCADO_LABEL } from "@/lib/mercado-snapshot";
 
 /**
  * Snapshot cognitivo — o "estado do trader" no instante da decisão,
  * reconstruído do decision_memory gravado pelo Eixo 4. Vale ouro
- * meses depois: confiança, theta, regras quebradas, capital em risco.
+ * meses depois: confiança, theta, regras quebradas, capital em risco,
+ * e agora o que o usuário via (mercado) e qual era sua exposição (carteira).
  */
 
 function brl(v: number) {
   return `R$ ${v.toFixed(2)}`;
+}
+
+function horario(iso: string | null) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
+
+function fonteRotulo(fonte: string | null) {
+  if (!fonte) return null;
+  return FONTE_MERCADO_LABEL[fonte as keyof typeof FONTE_MERCADO_LABEL] ?? fonte;
 }
 
 export function SnapshotCognitivo({ snap }: { snap: SnapshotCognitivoView }) {
@@ -88,6 +102,90 @@ export function SnapshotCognitivo({ snap }: { snap: SnapshotCognitivoView }) {
           Viés no momento: {snap.padroes.join(" · ")}
         </p>
       )}
+
+      {snap.mercado && (
+        <div className="mt-2 border-t border-border pt-2">
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+            O que você via
+          </div>
+          <dl className="mt-1 grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+            {snap.mercado.fonte && (
+              <div className="col-span-2">
+                <dt className="text-muted-foreground">Fonte</dt>
+                <dd className="font-medium">{fonteRotulo(snap.mercado.fonte)}</dd>
+              </div>
+            )}
+            {snap.mercado.spot !== null && (
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">Spot</dt>
+                <dd className="font-mono font-semibold">{brl(snap.mercado.spot)}</dd>
+              </div>
+            )}
+            {snap.mercado.ivAtm !== null && (
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">IV ATM</dt>
+                <dd className="font-mono font-semibold">{snap.mercado.ivAtm.toFixed(1)}%</dd>
+              </div>
+            )}
+            {snap.mercado.ivRank !== null && (
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">IV rank</dt>
+                <dd className="font-mono font-semibold">{snap.mercado.ivRank}%</dd>
+              </div>
+            )}
+            {snap.mercado.liquidityScore && (
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">Liquidez</dt>
+                <dd className="font-medium capitalize">{snap.mercado.liquidityScore}</dd>
+              </div>
+            )}
+            {horario(snap.mercado.observadoEm) && (
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">Observado às</dt>
+                <dd className="font-mono">{horario(snap.mercado.observadoEm)}</dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      )}
+
+      {snap.portfolio && (
+        <div className="mt-2 border-t border-border pt-2">
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Sua exposição no momento (estimada)
+          </div>
+          <dl className="mt-1 grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+            {snap.portfolio.netDelta !== null && (
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">Delta líquido</dt>
+                <dd className="font-mono font-semibold">{snap.portfolio.netDelta.toFixed(2)}</dd>
+              </div>
+            )}
+            {snap.portfolio.netTheta !== null && (
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">Theta/dia</dt>
+                <dd className="font-mono font-semibold">{brl(snap.portfolio.netTheta)}</dd>
+              </div>
+            )}
+            {snap.portfolio.netVega !== null && (
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">Vega</dt>
+                <dd className="font-mono font-semibold">{brl(snap.portfolio.netVega)}</dd>
+              </div>
+            )}
+            {snap.portfolio.marginUtilized !== null && (
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">Margem estimada</dt>
+                <dd className="font-mono font-semibold">{brl(snap.portfolio.marginUtilized)}</dd>
+              </div>
+            )}
+          </dl>
+          <p className="mt-1 text-[10px] text-muted-foreground">
+            Estimado pelo modelo no momento da decisão — não é valor oficial de corretora.
+          </p>
+        </div>
+      )}
+
       <p className="mt-2 border-t border-border pt-2 text-[11px] text-muted-foreground">
         {snap.cadeiaEvidencia
           ? "Esta decisão possui cadeia de evidência."

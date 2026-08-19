@@ -1,16 +1,21 @@
 import type { Interpretacao } from "./simulation-interpreter";
 import type { DiaryEntry } from "./types";
 import { disciplina } from "./decision-engine";
+import type { FonteMercado } from "@/lib/mercado-snapshot";
 
 // ==========================================
 // THE 5 DIMENSIONS OF CONTEXT
 // ==========================================
 
 export type MarketDimension = {
-  ivRank: number;
-  diCurveState: "normal" | "inclinada" | "invertida" | "flat";
-  liquidityScore: "alta" | "media" | "baixa";
-  eventsImminent: boolean;
+  /** Proveniência do dado: mock | live | modelo | replay — nunca escondida. */
+  fonte: FonteMercado | null;
+  /** Instante da observação que participou da decisão. */
+  observadoEm: string | null;
+  ivRank: number | null;
+  diCurveState: "normal" | "inclinada" | "invertida" | "flat" | null;
+  liquidityScore: "alta" | "media" | "baixa" | null;
+  eventsImminent: boolean | null;
 };
 
 export type StrategyDimension = {
@@ -33,12 +38,18 @@ export type TimeDimension = {
 };
 
 export type PortfolioDimension = {
-  netDelta: number;
-  netTheta: number;
-  netVega: number;
-  netRho: number;
-  marginUtilized: number;
-  topAssets: string[]; // Ex: ["PETR4", "VALE3"]
+  /** Origem das posições — sempre "manual" nesta fase (nunca automático). */
+  source: "manual" | null;
+  /** Qualidade da valoração — "modelo" (Black-Scholes estimado). */
+  valuationSource: "modelo" | null;
+  /** Instante em que a valoração foi estimada. */
+  valuatedAt: string | null;
+  netDelta: number | null;
+  netTheta: number | null;
+  netVega: number | null;
+  netRho: number | null;
+  marginUtilized: number | null;
+  topAssets: string[] | null;
 };
 
 export type OmniscientContext = {
@@ -59,11 +70,11 @@ export function buildStrategyDimension(inter: Interpretacao): StrategyDimension 
   if (inter.objetivo === "renda") nature = "renda";
   if (inter.objetivo === "protecao") nature = "protecao";
   if (inter.objetivo === "lateralizacao") nature = "volatilidade";
-  
+
   return {
     nature,
     complexity: inter.complexidade,
-    capitalAtRisk: inter.capitalEmRisco
+    capitalAtRisk: inter.capitalEmRisco,
   };
 }
 
@@ -76,7 +87,7 @@ export function buildTimeDimension(daysToMaturity: number, now = new Date()): Ti
   const hour = now.getHours();
   const min = now.getMinutes();
   const t = hour + min / 60;
-  
+
   // Horário B3 aprox
   let phase: TimeDimension["sessionPhase"] = "fechado";
   if (t >= 10 && t < 11.5) phase = "abertura";
@@ -88,7 +99,7 @@ export function buildTimeDimension(daysToMaturity: number, now = new Date()): Ti
 
 export function buildUserDimension(entries: DiaryEntry[], currentLevel = 1): UserDimension {
   const closed = entries.filter((e) => e.status === "encerrada" && e.resultado !== null);
-  
+
   let wr = 0;
   if (closed.length > 0) {
     const wins = closed.filter((e) => Number(e.resultado) > 0).length;
@@ -99,9 +110,10 @@ export function buildUserDimension(entries: DiaryEntry[], currentLevel = 1): Use
   let bias: UserDimension["bias"] = "neutro";
   if (entries.length >= 3) {
     // Basic heuristics: are checking if the user almost always plays the same side
-    const dirTexts = entries.map(e => e.motivo?.toLowerCase() || "");
-    let bull = 0, bear = 0;
-    dirTexts.forEach(t => {
+    const dirTexts = entries.map((e) => e.motivo?.toLowerCase() || "");
+    let bull = 0,
+      bear = 0;
+    dirTexts.forEach((t) => {
       if (t.includes("alta") || t.includes("compra") || t.includes("subir")) bull++;
       if (t.includes("venda") || t.includes("baixa") || t.includes("cair")) bear++;
     });
@@ -113,15 +125,15 @@ export function buildUserDimension(entries: DiaryEntry[], currentLevel = 1): Use
     experienceLevel: currentLevel,
     disciplineScore: Math.round(disciplina(entries)),
     bias,
-    historicalWinrate: wr
+    historicalWinrate: wr,
   };
 }
 
 export function buildMarketDimension(
-  ivRank: number, 
-  diShortDays: number, 
-  diLongDays: number, 
-  eventsImminent: boolean
+  ivRank: number,
+  diShortDays: number,
+  diLongDays: number,
+  eventsImminent: boolean,
 ): MarketDimension {
   let curva: MarketDimension["diCurveState"] = "normal"; // Default short < long
   if (diShortDays > diLongDays + 0.5) curva = "invertida";
@@ -132,10 +144,12 @@ export function buildMarketDimension(
   const liquidity = ivRank > 90 || ivRank < 10 ? "media" : "alta";
 
   return {
+    fonte: null, // proveniência não observada por este caminho
+    observadoEm: null,
     ivRank,
     diCurveState: curva,
     liquidityScore: liquidity,
-    eventsImminent
+    eventsImminent,
   };
 }
 
@@ -144,7 +158,7 @@ export function buildOmniscientContext(
   strategy: StrategyDimension,
   user: UserDimension,
   time: TimeDimension,
-  portfolio: PortfolioDimension
+  portfolio: PortfolioDimension,
 ): OmniscientContext {
   return { market, strategy, user, time, portfolio };
 }

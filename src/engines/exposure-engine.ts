@@ -2,10 +2,10 @@ import type { PortfolioDimension } from "./context-engine";
 
 export type ExposureProfile = {
   volatilityExposure: string; // Ex: "comprado em volatilidade"
-  timeExposure: string;       // Ex: "vendido em tempo" (short theta) ou "protegido pelo tempo"
-  directionExposure: string;  // Ex: "dependente de alta"
-  interestExposure: string;   // Ex: "exposto ao DI"
-  concentration: string;      // Ex: "concentrado em PETR4"
+  timeExposure: string; // Ex: "vendido em tempo" (short theta) ou "protegido pelo tempo"
+  directionExposure: string; // Ex: "dependente de alta"
+  interestExposure: string; // Ex: "exposto ao DI"
+  concentration: string; // Ex: "concentrado em PETR4"
 };
 
 /**
@@ -15,26 +15,30 @@ export type ExposureProfile = {
  */
 export function buildExposureProfile(port: PortfolioDimension): ExposureProfile {
   // Limites nominais para fins didáticos. Podem ser calibrados pelo % do AUM do cliente.
-  const VEGA_THRESHOLD = 5; 
+  const VEGA_THRESHOLD = 5;
   const THETA_THRESHOLD = 2;
   const DELTA_THRESHOLD = 5;
   const RHO_THRESHOLD = 15;
 
   let vol = "neutro em volatilidade";
-  if (port.netVega > VEGA_THRESHOLD) vol = "comprado em volatilidade";
-  else if (port.netVega < -VEGA_THRESHOLD) vol = "vendido em volatilidade";
+  const vega = port.netVega ?? 0;
+  if (vega > VEGA_THRESHOLD) vol = "comprado em volatilidade";
+  else if (vega < -VEGA_THRESHOLD) vol = "vendido em volatilidade";
 
   let tempo = "neutro estruturalmente no tempo";
   // Theta negativo = A posição perde com o passar do tempo (opções compradas). Logo, você está "vendido contra o relógio".
-  if (port.netTheta < -THETA_THRESHOLD) tempo = "vendido em tempo (decaimento te prejudica)";
-  else if (port.netTheta > THETA_THRESHOLD) tempo = "comprado em tempo (decaimento te favorece)";
+  const theta = port.netTheta ?? 0;
+  if (theta < -THETA_THRESHOLD) tempo = "vendido em tempo (decaimento te prejudica)";
+  else if (theta > THETA_THRESHOLD) tempo = "comprado em tempo (decaimento te favorece)";
 
   let dir = "neutro direcionalmente";
-  if (port.netDelta > DELTA_THRESHOLD) dir = "fortemente dependente de alta";
-  else if (port.netDelta < -DELTA_THRESHOLD) dir = "fortemente dependente de baixa";
+  const delta = port.netDelta ?? 0;
+  if (delta > DELTA_THRESHOLD) dir = "fortemente dependente de alta";
+  else if (delta < -DELTA_THRESHOLD) dir = "fortemente dependente de baixa";
 
   let juros = "imune à curva de juros";
-  if (Math.abs(port.netRho) > RHO_THRESHOLD) juros = "exposto ao DI (risco de taxa)";
+  const rho = port.netRho ?? 0;
+  if (Math.abs(rho) > RHO_THRESHOLD) juros = "exposto ao DI (risco de taxa)";
 
   let conc = "portfólio diversificado";
   if (port.topAssets && port.topAssets.length > 0) {
@@ -47,6 +51,6 @@ export function buildExposureProfile(port: PortfolioDimension): ExposureProfile 
     timeExposure: tempo,
     directionExposure: dir,
     interestExposure: juros,
-    concentration: conc
+    concentration: conc,
   };
 }

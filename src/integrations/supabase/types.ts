@@ -687,6 +687,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      portfolio_positions: {
+        Row: {
+          ativo: string;
+          created_at: string;
+          id: string;
+          lado: string;
+          opcao_tipo: string | null;
+          preco_entrada: number | null;
+          quantidade: number;
+          strike: number | null;
+          tipo: string;
+          user_id: string;
+          vencimento: string | null;
+        };
+        Insert: {
+          ativo: string;
+          created_at?: string;
+          id?: string;
+          lado: string;
+          opcao_tipo?: string | null;
+          preco_entrada?: number | null;
+          quantidade: number;
+          strike?: number | null;
+          tipo: string;
+          user_id: string;
+          vencimento?: string | null;
+        };
+        Update: {
+          ativo?: string;
+          created_at?: string;
+          id?: string;
+          lado?: string;
+          opcao_tipo?: string | null;
+          preco_entrada?: number | null;
+          quantidade?: number;
+          strike?: number | null;
+          tipo?: string;
+          user_id?: string;
+          vencimento?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;

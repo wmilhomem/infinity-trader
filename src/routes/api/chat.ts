@@ -50,6 +50,13 @@ REPRESENTAÇÕES DE PREÇO (ex: Renko)
   7. nunca apresente o Renko como preditivo;
   8. nunca descreva a sequência com conclusão ("quatro blocos Renko indicam entrada" → reformule: "foram observados quatro blocos na mesma direção — o que sustenta essa leitura, e o que a contradiz?").
 - Use a linguagem: "O gráfico mostra...", "A sua regra estabelece...", "O que podemos observar é...", "Isso, sozinho, não determina uma decisão."
+
+CONTEXTO OBSERVADO DA DECISÃO (honestidade epistemológica — nunca quebre):
+- Todo dado de mercado ou de carteira que chegar até você carrega uma FONTE e um INSTANTE. Nomeie a fonte ao citá-lo: "Book ao vivo", "Ambiente didático (sandbox)", "Dado calculado/modelado — não é o book real" ou "Recuperado de uma decisão histórica".
+- Carteira e exposição são sempre ESTIMADAS pelo modelo no momento da decisão — nunca são valor oficial de corretora. Formule como "pelo modelo utilizado no momento, a exposição estimada era X" — jamais "sua carteira tem exatamente X", "sua posição vale R$ X" ou qualquer afirmação de precisão.
+- Valor que não tem fonte nem instante (null) é "não observado" — diga "não observado" ou "não registrado", nunca "zero", "inexistente" ou "sem exposição" quando a informação simplesmente não foi registrada.
+- Informação de uma decisão histórica é um SNAPSHOT CONGELADO: nunca recalcule, refetch ou "atualize" o passado. Se o usuário perguntar "e hoje, qual seria o valor?", responda que o snapshot guarda o instante da decisão e separe claramente o que é histórico do que é atual.
+- Você informa e contextualiza; o sistema apresenta; o usuário decide. Nunca ordene, nunca julgue a decisão, nunca apresente o contexto observado como ordem de compra ou venda.
 `;
 
 export const Route = createFileRoute("/api/chat")({
@@ -141,7 +148,8 @@ export const Route = createFileRoute("/api/chat")({
           contextBlock +
           guiaPlataforma +
           (omniscient
-            ? `\n\nQUANDO O USUÁRIO PERGUNTAR SOBRE ESTA SIMULAÇÃO:\n- Use os valores do CONTEXTO abaixo (breakevens, lucro máximo, perda máxima, gregas, PoP) para explicar a mecânica — eles são hipótese didática, não dado real de mercado.\n- Explique POR QUE cada número tem aquele valor usando as analogias do guia (vale-ingresso, seguro de carro, iogurte, plano de celular, carro de corrida).\n- Se a estrutura violar uma regra pessoal do usuário ou gerar alerta, aponte de forma direta e educativa.\n\n${omniscient}\n`
+            ? `\n\nQUANDO O USUÁRIO PERGUNTAR SOBRE ESTA SIMULAÇÃO:\n- Use os valores do CONTEXTO abaixo (breakevens, lucro máximo, perda máxima, gregas, PoP) para explicar a mecânica — eles são hipótese didática, não dado real de mercado.\n- Explique POR QUE cada número tem aquele valor usando as analogias do guia (vale-ingresso, seguro de carro, iogurte, plano de celular, carro de corrida).\n- Se a estrutura violar uma regra pessoal do usuário ou gerar alerta, aponte de forma direta e educativa.
+- Mercado observado e carteira aparecem no CONTEXTO com fonte e instante: cite-os como "estimados no momento da decisão" e sempre nomeando a fonte (Book ao vivo / didático / modelado / histórico). A exposição é estimada pelo modelo — nunca valor oficial de corretora.\n\n${omniscient}\n`
             : "");
 
         const gateway = createLovableAiGatewayProvider(key);

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedCarteiraRouteImport } from './routes/_authenticated/carteira'
 import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated/diario'
 import { Route as AuthenticatedEspelhoRouteImport } from './routes/_authenticated/espelho'
 import { Route as AuthenticatedHistoriaRouteImport } from './routes/_authenticated/historia'
@@ -44,6 +45,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCarteiraRoute = AuthenticatedCarteiraRouteImport.update({
+  id: '/carteira',
+  path: '/carteira',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDiarioRoute = AuthenticatedDiarioRouteImport.update({
   id: '/diario',
@@ -143,6 +149,7 @@ const AuthenticatedReplayIdRoute = AuthenticatedReplayIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/carteira': typeof AuthenticatedCarteiraRoute
   '/diario': typeof AuthenticatedDiarioRoute
   '/espelho': typeof AuthenticatedEspelhoRoute
   '/historia': typeof AuthenticatedHistoriaRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/carteira': typeof AuthenticatedCarteiraRoute
   '/diario': typeof AuthenticatedDiarioRoute
   '/espelho': typeof AuthenticatedEspelhoRoute
   '/historia': typeof AuthenticatedHistoriaRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/_authenticated/carteira': typeof AuthenticatedCarteiraRoute
   '/_authenticated/diario': typeof AuthenticatedDiarioRoute
   '/_authenticated/espelho': typeof AuthenticatedEspelhoRoute
   '/_authenticated/historia': typeof AuthenticatedHistoriaRoute
@@ -213,6 +222,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/carteira'
     | '/diario'
     | '/espelho'
     | '/historia'
@@ -235,6 +245,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/carteira'
     | '/diario'
     | '/espelho'
     | '/historia'
@@ -258,6 +269,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/carteira'
     | '/_authenticated/diario'
     | '/_authenticated/espelho'
     | '/_authenticated/historia'
@@ -308,6 +320,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/carteira': {
+      id: '/_authenticated/carteira'
+      path: '/carteira'
+      fullPath: '/carteira'
+      preLoaderRoute: typeof AuthenticatedCarteiraRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/diario': {
       id: '/_authenticated/diario'
@@ -439,6 +458,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCarteiraRoute: typeof AuthenticatedCarteiraRoute
   AuthenticatedDiarioRoute: typeof AuthenticatedDiarioRoute
   AuthenticatedEspelhoRoute: typeof AuthenticatedEspelhoRoute
   AuthenticatedHistoriaRoute: typeof AuthenticatedHistoriaRoute
@@ -457,6 +477,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCarteiraRoute: AuthenticatedCarteiraRoute,
   AuthenticatedDiarioRoute: AuthenticatedDiarioRoute,
   AuthenticatedEspelhoRoute: AuthenticatedEspelhoRoute,
   AuthenticatedHistoriaRoute: AuthenticatedHistoriaRoute,

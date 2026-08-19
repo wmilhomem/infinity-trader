@@ -104,6 +104,7 @@ export type DecisionContextInput = {
   alertas: Alerta[];
   userScoreInput: Omit<ScoreInput, "interpretacao">;
   quote?: ProviderQuote | null; // Observação de mercado do provedor (Confidence Engine)
+  portfolio?: PortfolioDimension | null; // Exposição estimada da carteira manual (Rodada W)
 };
 
 /**
@@ -115,6 +116,18 @@ export type DecisionContextInput = {
 export function buildDecisionContext(input: DecisionContextInput): DecisionContext {
   const intel = computePositionIntelligence(input);
   const inter = interpretar(input.pernas, input.centro, input.ativo);
+
+  const quote = input.quote ?? null;
+  const market: MarketDimension | null = quote
+    ? {
+        fonte: quote.provider,
+        observadoEm: quote.quoteTime || null,
+        ivRank: quote.ivRank ?? null,
+        diCurveState: null, // curva DI não observada no simulador — nunca chute
+        liquidityScore: quote.liquidityScore ?? null,
+        eventsImminent: quote.eventsImminent ?? null,
+      }
+    : null;
 
   const alerts: string[] = [];
   if (intel.tempo.status.includes("Crítico"))
@@ -145,8 +158,8 @@ export function buildDecisionContext(input: DecisionContextInput): DecisionConte
     technical: {
       ativo: input.ativo,
       riskRegime: intel.regime,
-      market: null, // Eixo 3 (Gateway B3)
-      portfolio: null, // Eixo 3 (Gateway B3)
+      market, // observado do quote do provedor (Eixo 3) — null se não observado
+      portfolio: input.portfolio ?? null, // Rodada W (carteira manual estimada)
       strategy: {
         ...buildStrategyDimension(inter),
         interpretacao: inter,

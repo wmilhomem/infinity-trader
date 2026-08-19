@@ -1,4 +1,5 @@
 import type { DecisionContext } from "./decision-context";
+import { FONTE_MERCADO_LABEL } from "@/lib/mercado-snapshot";
 
 // ==========================================
 // OMNISCIENT CONTEXT — CONTEXTO ESTRUTURADO DO COPILOT
@@ -48,8 +49,30 @@ export type OmniscientContext = {
     alertas: { regra: string; motivo: string; severidade: string }[];
     disciplinaHistorica: number;
   } | null;
-  mercado: null;
-  portfolio: null;
+  /**
+   * Mercado observado no instante da decisão (Rodada W). Proveniência
+   * (fonte + instante) é parte do dado — nunca chute, nunca refetch.
+   */
+  mercado: {
+    fonte: string | null;
+    observadoEm: string | null;
+    spot: number | null;
+    ivAtm: number | null;
+    ivRank: number | null;
+    liquidez: string | null;
+  } | null;
+  /** Exposições líquidas da carteira (estimadas pelo modelo). Null sem posições. */
+  portfolio: {
+    source: string | null;
+    valuationSource: string | null;
+    valuatedAt: string | null;
+    netDelta: number | null;
+    netTheta: number | null;
+    netVega: number | null;
+    netRho: number | null;
+    marginUtilized: number | null;
+    topAssets: string[] | null;
+  } | null;
 };
 
 function brl(v: number) {
@@ -109,8 +132,29 @@ export function buildOmniscientContext(ctx: DecisionContext): OmniscientContext 
       })),
       disciplinaHistorica: c.disciplinaHistorica,
     },
-    mercado: null,
-    portfolio: null,
+    mercado: t.market
+      ? {
+          fonte: t.market.fonte,
+          observadoEm: t.market.observadoEm,
+          spot: t.pricing.spot,
+          ivAtm: t.volatility.iv,
+          ivRank: t.market.ivRank,
+          liquidez: t.market.liquidityScore,
+        }
+      : null,
+    portfolio: t.portfolio
+      ? {
+          source: t.portfolio.source,
+          valuationSource: t.portfolio.valuationSource,
+          valuatedAt: t.portfolio.valuatedAt,
+          netDelta: t.portfolio.netDelta,
+          netTheta: t.portfolio.netTheta,
+          netVega: t.portfolio.netVega,
+          netRho: t.portfolio.netRho,
+          marginUtilized: t.portfolio.marginUtilized,
+          topAssets: t.portfolio.topAssets,
+        }
+      : null,
   };
 }
 
@@ -163,6 +207,32 @@ export function formatOmniscientContextForPrompt(ctx: OmniscientContext | null):
         lines.push(`- ALERTA [${a.severidade.toUpperCase()}]: ${a.regra} (${a.motivo})`);
       }
     }
+  }
+
+  if (ctx.mercado) {
+    const m = ctx.mercado;
+    const rotulo = m.fonte
+      ? FONTE_MERCADO_LABEL[m.fonte as keyof typeof FONTE_MERCADO_LABEL]
+      : m.fonte;
+    lines.push(
+      `MERCADO (${rotulo ?? "fonte não observada"}): spot ${m.spot != null ? brl(m.spot) : "não observado"} às ${m.observadoEm ?? "instante não registrado"}`,
+    );
+    if (m.ivAtm != null) lines.push(`- IV ATM: ${m.ivAtm.toFixed(1)}% a.a. (usado na valoração)`);
+    if (m.ivRank != null) lines.push(`- Percentil de IV no histórico do ativo: ${m.ivRank}%`);
+    if (m.liquidez) lines.push(`- Liquidez: ${m.liquidez}`);
+  }
+
+  if (ctx.portfolio) {
+    const p = ctx.portfolio;
+    lines.push(
+      `CARTEIRA (posições ${p.source ?? "não registradas"} · valoração ${p.valuationSource ?? "sem modelo"}): exposição ESTIMADA pelo modelo no momento — não é valor oficial de corretora.`,
+    );
+    if (p.netDelta != null)
+      lines.push(`- Delta líquido estimado: ${p.netDelta.toFixed(2)} contratos-equivalentes`);
+    if (p.netTheta != null) lines.push(`- Theta estimado: ${brl(p.netTheta)} por dia`);
+    if (p.netVega != null) lines.push(`- Vega estimado: ${brl(p.netVega)} por 1 ponto de IV`);
+    if (p.netRho != null) lines.push(`- Rho estimado: ${brl(p.netRho)} por 1 ponto de taxa`);
+    if (p.topAssets?.length) lines.push(`- Concentração: ${p.topAssets.join(", ")}`);
   }
 
   lines.push("==");

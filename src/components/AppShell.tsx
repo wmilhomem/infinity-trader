@@ -8,6 +8,7 @@ import { CAMINHO_INFO, CAMINHOS } from "@/lib/caminho";
 import { cn } from "@/lib/utils";
 import {
   BookOpen,
+  Briefcase,
   Calculator,
   ChevronDown,
   ClipboardList,
@@ -24,6 +25,7 @@ const NAV = [
   { to: "/trilha", label: "Trilha", icon: BookOpen },
   { to: "/laboratorio", label: "Laboratório", icon: FlaskConical },
   { to: "/simulador", label: "Simulador", icon: Calculator },
+  { to: "/carteira", label: "Carteira", icon: Briefcase },
   { to: "/regras", label: "Regras", icon: ScrollText },
   { to: "/diario", label: "Diário", icon: ClipboardList },
   { to: "/revisao", label: "Revisão", icon: LineChart },

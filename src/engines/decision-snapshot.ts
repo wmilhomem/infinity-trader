@@ -1,6 +1,7 @@
 import type { Perna } from "@/lib/payoff";
 import type { CadeiaEvidencia } from "@/lib/cadeia-evidencia";
 import { validarCadeiaEvidencia } from "@/lib/cadeia-evidencia";
+import type { MercadoObservado } from "@/lib/mercado-snapshot";
 import type { Interpretacao } from "./simulation-interpreter";
 import type { Alerta } from "./rule-engine";
 import type { DecisionScore } from "./decision-engine";
@@ -64,26 +65,33 @@ export type DecisionSnapshot = {
     status: string;
     resultado: number | null;
   };
-  /** Preenchido pelo Eixo 3 (B3 / Cumbuca Livre / BCB). Nulo enquanto mock. */
-  mercado: {
-    ivAtm: number | null;
-    ivRank: number | null;
-    diCurveState: string | null;
-    liquidityScore: string | null;
-    eventsImminent: boolean | null;
-  };
+  /**
+   * O mercado observado no instante da decisão (Rodada W). Provém do quote
+   * que efetivamente participou da decisão — fonte + instante fazem parte do
+   * dado. Nulo enquanto mock/não observado; nunca refetch do passado.
+   */
+  mercado: MercadoObservado;
   /** Janela temporal do registro (aprox. horário da B3). */
   tempo: {
     capturedWeekday: number;
     sessionPhase: "abertura" | "miolo" | "fechamento" | "fechado";
     weekSegment: "inicio" | "meio" | "fim";
   };
-  /** Exposições líquidas da carteira. Nulo enquanto não há somatório de gregas. */
+  /**
+   * Exposições líquidas da carteira no instante (Rodada W). A origem das
+   * posições e a qualidade da valoração são parte do dado — "estimada pelo
+   * modelo", nunca "exatamente X". Nulo enquanto não há posições registradas.
+   */
   portfolio: {
+    source: "manual" | null;
+    valuationSource: "modelo" | null;
+    valuatedAt: string | null;
     netDelta: number | null;
     netTheta: number | null;
     netVega: number | null;
     netRho: number | null;
+    marginUtilized: number | null;
+    topAssets: string[] | null;
   };
 };
 
@@ -179,6 +187,9 @@ export function buildDecisionSnapshot(input: DecisionSnapshotInput): DecisionSna
     },
     mercado: m
       ? {
+          observadoEm: m.observadoEm ?? null,
+          fonte: m.fonte ?? null,
+          spot: m.spot ?? null,
           ivAtm: m.ivAtm ?? null,
           ivRank: m.ivRank ?? null,
           diCurveState: m.diCurveState ?? null,
@@ -186,6 +197,9 @@ export function buildDecisionSnapshot(input: DecisionSnapshotInput): DecisionSna
           eventsImminent: m.eventsImminent ?? null,
         }
       : {
+          observadoEm: null,
+          fonte: null,
+          spot: null,
           ivAtm: null,
           ivRank: null,
           diCurveState: null,
@@ -199,11 +213,26 @@ export function buildDecisionSnapshot(input: DecisionSnapshotInput): DecisionSna
     },
     portfolio: p
       ? {
+          source: p.source ?? null,
+          valuationSource: p.valuationSource ?? null,
+          valuatedAt: p.valuatedAt ?? null,
           netDelta: p.netDelta ?? null,
           netTheta: p.netTheta ?? null,
           netVega: p.netVega ?? null,
           netRho: p.netRho ?? null,
+          marginUtilized: p.marginUtilized ?? null,
+          topAssets: p.topAssets ?? null,
         }
-      : { netDelta: null, netTheta: null, netVega: null, netRho: null },
+      : {
+          source: null,
+          valuationSource: null,
+          valuatedAt: null,
+          netDelta: null,
+          netTheta: null,
+          netVega: null,
+          netRho: null,
+          marginUtilized: null,
+          topAssets: null,
+        },
   };
 }
