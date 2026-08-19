@@ -13,6 +13,11 @@ import { calcularDecisionScore, disciplina } from "@/engines/decision-engine";
 import { detectarPadroes, detectarPadroesTemporais } from "@/engines/behavior-engine";
 import { buildDecisionSnapshot } from "@/engines/decision-snapshot";
 import { lerSnapshotCognitivo } from "@/engines/decision-memory-reader";
+import {
+  lerCadeiaEvidencia,
+  validarCadeiaEvidencia,
+  type CadeiaEvidencia,
+} from "@/lib/cadeia-evidencia";
 import { recomendarMissao } from "@/engines/missoes";
 import { preverTamanhoPosicao } from "@/engines/behavior-forecast";
 import { lerOrigem } from "@/lib/fichas-estrategias";
@@ -122,6 +127,7 @@ function Diario() {
   const [check, setCheck] = useState<Record<string, boolean>>({});
   const [representacao, setRepresentacao] = useState<"candle" | "renko">("candle");
   const [brickSize, setBrickSize] = useState<string>("");
+  const [cadeiaEvidencia, setCadeiaEvidencia] = useState<CadeiaEvidencia | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [celebraPrimeira, setCelebraPrimeira] = useState(false);
 
@@ -135,6 +141,11 @@ function Diario() {
         const parsed = JSON.parse(raw) as { tese?: string; checklist?: Record<string, boolean> };
         if (parsed.tese) setMotivo(parsed.tese);
         if (parsed.checklist) setCheck(parsed.checklist);
+      }
+      const rawCadeia = sessionStorage.getItem(`sim-cadeia:${preSim.data.id}`);
+      if (rawCadeia) {
+        const lida = lerCadeiaEvidencia(JSON.parse(rawCadeia) as unknown);
+        if (lida && validarCadeiaEvidencia(lida).ok) setCadeiaEvidencia(lida);
       }
     } catch {
       /* sem tese pré-carregada */
@@ -260,6 +271,7 @@ function Diario() {
                 representation: representacao,
                 brickSize: representacao === "renko" && brickSize ? Number(brickSize) : undefined,
               },
+              cadeiaEvidencia,
             },
             comportamento: {
               disciplinaHistorica,
@@ -318,6 +330,7 @@ function Diario() {
       setCheck({});
       setRepresentacao("candle");
       setBrickSize("");
+      setCadeiaEvidencia(null);
       qc.invalidateQueries();
     } finally {
       setSalvando(false);

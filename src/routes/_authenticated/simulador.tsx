@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -85,6 +85,8 @@ import { DecisionCards } from "@/components/simulador/DecisionCards";
 import { CenarioTempo } from "@/components/simulador/CenarioTempo";
 import { NarrativaEstrutura } from "@/components/simulador/NarrativaEstrutura";
 import { OsStatusBar } from "@/components/simulador/OsStatusBar";
+import { CadeiaEvidenciaForm } from "@/components/simulador/CadeiaEvidencia";
+import type { CadeiaEvidencia } from "@/lib/cadeia-evidencia";
 
 export const Route = createFileRoute("/_authenticated/simulador")({
   head: () => ({
@@ -295,6 +297,8 @@ function Simulador() {
     erro: "",
     risco: "",
   });
+  const [cadeia, setCadeia] = useState<CadeiaEvidencia | null>(null);
+  const [cadeiaIniciada, setCadeiaIniciada] = useState(false);
   const { caminho } = useCaminho();
   const [instrumento, setInstrumento] = useState<Instrumento>(() =>
     caminho === "futuros" ? "futuro" : "opcoes",
@@ -397,11 +401,18 @@ function Simulador() {
     setTecnicoFuturo(false);
   }
 
+  const onCadeiaEvidencia = useCallback((c: CadeiaEvidencia | null, iniciada: boolean) => {
+    setCadeia(c);
+    setCadeiaIniciada(iniciada);
+  }, []);
+
   function montarFuturo() {
     setContratosManual(null);
     setCheck({});
     setConfirmacoes({});
     setTesePartes({ motivo: "", expectativa: "", erro: "", risco: "" });
+    setCadeia(null);
+    setCadeiaIniciada(false);
     setEtapa("decisao");
   }
 
@@ -418,6 +429,8 @@ function Simulador() {
     setCheck({});
     setConfirmacoes({});
     setTesePartes({ motivo: "", expectativa: "", erro: "", risco: "" });
+    setCadeia(null);
+    setCadeiaIniciada(false);
     setEtapa("decisao");
   }
 
@@ -441,6 +454,8 @@ function Simulador() {
     setCheck({});
     setConfirmacoes({});
     setTesePartes({ motivo: "", expectativa: "", erro: "", risco: "" });
+    setCadeia(null);
+    setCadeiaIniciada(false);
     setTecnico(false);
     setDirecaoFuturo(null);
     setStopPontos(null);
@@ -742,6 +757,9 @@ function Simulador() {
 
     try {
       sessionStorage.setItem(`sim-tese:${data.id}`, JSON.stringify({ tese, checklist: respostas }));
+      if (cadeia && cadeiaIniciada) {
+        sessionStorage.setItem(`sim-cadeia:${data.id}`, JSON.stringify(cadeia));
+      }
       sessionStorage.removeItem(FLOW_OPERAR_KEY);
       if (instrumento === "opcoes" && quote) {
         sessionStorage.setItem(
@@ -1154,6 +1172,11 @@ function Simulador() {
                   </div>
                 </div>
 
+                <CadeiaEvidenciaForm
+                  hipoteseInicial={labBridge?.hipotese}
+                  onChange={onCadeiaEvidencia}
+                />
+
                 {instrumento === "opcoes" && (
                   <DetalhesTecnicos
                     aberto={tecnico}
@@ -1206,16 +1229,20 @@ function Simulador() {
 
                 <button
                   onClick={salvar}
-                  disabled={!checkOk && !aprendizado}
+                  disabled={cadeiaIniciada && !cadeia ? true : !checkOk && !aprendizado}
                   className="w-full rounded-xl bg-primary py-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
                 >
                   {aprendizado ? "Registrar como exercício" : "Levar esta decisão para o Diário"}
                 </button>
-                {!checkOk && !aprendizado && (
+                {cadeiaIniciada && !cadeia ? (
+                  <p className="text-center text-xs text-muted-foreground">
+                    Complete a cadeia de evidência — ou limpe-a — para registrar a decisão.
+                  </p>
+                ) : !checkOk && !aprendizado ? (
                   <p className="text-center text-xs text-muted-foreground">
                     Responda o checklist inteiro para registrar a decisão.
                   </p>
-                )}
+                ) : null}
               </div>
 
               {instrumento === "opcoes" && (

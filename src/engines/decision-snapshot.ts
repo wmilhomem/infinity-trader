@@ -1,4 +1,6 @@
 import type { Perna } from "@/lib/payoff";
+import type { CadeiaEvidencia } from "@/lib/cadeia-evidencia";
+import { validarCadeiaEvidencia } from "@/lib/cadeia-evidencia";
 import type { Interpretacao } from "./simulation-interpreter";
 import type { Alerta } from "./rule-engine";
 import type { DecisionScore } from "./decision-engine";
@@ -43,6 +45,13 @@ export type DecisionSnapshot = {
       representation: "candle" | "renko";
       brickSize?: number;
     } | null;
+    /**
+     * O processo cognitivo que produziu a decisão (Rodada V). Opcional e
+     * null-safe: decisões antigas seguem com null — a cadeia nunca é
+     * reconstruída artificialmente. A versão do snapshot permanece 1 porque
+     * o contrato existente só foi enriquecido, não alterado.
+     */
+    cadeiaEvidencia?: CadeiaEvidencia | null;
   };
   /** Quem estava decidindo: disciplina histórica, padrões presentes, emoção. */
   comportamento: {
@@ -99,6 +108,7 @@ export type DecisionSnapshotInput = {
       representation: "candle" | "renko";
       brickSize?: number;
     } | null;
+    cadeiaEvidencia?: CadeiaEvidencia | null;
   };
   comportamento: {
     disciplinaHistorica: number;
@@ -123,6 +133,16 @@ export function buildDecisionSnapshot(input: DecisionSnapshotInput): DecisionSna
   const m = input.mercado;
   const p = input.portfolio;
 
+  const cadeia = input.processo.cadeiaEvidencia ?? null;
+  if (cadeia) {
+    const validacao = validarCadeiaEvidencia(cadeia);
+    if (!validacao.ok) {
+      throw new Error(
+        `Cadeia de evidência inválida — ${validacao.problemas.map((pr) => pr.motivo).join(" | ")}`,
+      );
+    }
+  }
+
   return {
     version: 1,
     captured_at: capturedAt.toISOString(),
@@ -146,6 +166,7 @@ export function buildDecisionSnapshot(input: DecisionSnapshotInput): DecisionSna
       regraAplicada: input.processo.regraAplicada,
       seguiuRegra: input.processo.seguiuRegra,
       marketReading: input.processo.marketReading ?? null,
+      cadeiaEvidencia: cadeia,
     },
     comportamento: {
       disciplinaHistorica: input.comportamento.disciplinaHistorica,

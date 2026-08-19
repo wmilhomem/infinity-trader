@@ -1,4 +1,6 @@
 import type { Json } from "@/integrations/supabase/types";
+import type { CadeiaEvidencia } from "@/lib/cadeia-evidencia";
+import { lerCadeiaEvidencia } from "@/lib/cadeia-evidencia";
 
 /**
  * DECISION MEMORY READER — lê o snapshot cognitivo gravado em
@@ -20,7 +22,13 @@ export type SnapshotCognitivoView = {
   status: string | null;
   representacao: string | null;
   brickSize: number | null;
+  /** A cadeia de evidência registrada nesta decisão — ou null em decisões antigas. */
+  cadeiaEvidencia: CadeiaEvidencia | null;
 };
+
+export function temCadeiaEvidencia(snap: Pick<SnapshotCognitivoView, "cadeiaEvidencia">): boolean {
+  return snap.cadeiaEvidencia !== null;
+}
 
 export function num(v: unknown): number | null {
   return typeof v === "number" && Number.isFinite(v) ? v : null;
@@ -67,5 +75,6 @@ export function lerSnapshotCognitivo(contexto: Json | null): SnapshotCognitivoVi
     status: txt(resultado?.status),
     representacao: marketReading ? txt(marketReading.representation) : null,
     brickSize: marketReading ? num(marketReading.brickSize) : null,
+    cadeiaEvidencia: lerCadeiaEvidencia(processo?.cadeiaEvidencia),
   };
 }

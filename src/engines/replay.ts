@@ -1,6 +1,8 @@
 import type { Json } from "@/integrations/supabase/types";
 import type { Perna } from "@/lib/payoff";
 import { payoffCurve } from "@/lib/payoff";
+import type { CadeiaEvidencia } from "@/lib/cadeia-evidencia";
+import { lerCadeiaEvidencia } from "@/lib/cadeia-evidencia";
 import { interpretar, type Interpretacao } from "./simulation-interpreter";
 import { narrarMudanca, type PassoNarrativa } from "./narrator";
 import { obj, txt, num } from "./decision-memory-reader";
@@ -55,6 +57,8 @@ export type ReplayView = {
   status: string | null;
   capturedWeekday: number | null;
   sessionPhase: string | null;
+  /** Como a pessoa chegou à decisão — ou null quando não registrado na época. */
+  cadeiaEvidencia: CadeiaEvidencia | null;
 };
 
 const ROTULOS_ITENS: Record<string, string> = {
@@ -198,5 +202,6 @@ export function lerReplay(
     status: txt(resultado?.status) ?? entry.status,
     capturedWeekday: num(tempo?.capturedWeekday),
     sessionPhase: txt(tempo?.sessionPhase),
+    cadeiaEvidencia: lerCadeiaEvidencia(processo?.cadeiaEvidencia),
   };
 }

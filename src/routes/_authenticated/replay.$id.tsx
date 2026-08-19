@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { lerReplay, type ReplayView } from "@/engines/replay";
 import { NarrativaEstrutura } from "@/components/simulador/NarrativaEstrutura";
+import { CadeiaEvidenciaVisao } from "@/components/simulador/CadeiaEvidencia";
 import { cn } from "@/lib/utils";
 import type { Json } from "@/integrations/supabase/types";
 import {
@@ -370,6 +371,17 @@ function ReplayPage() {
               </ul>
             </Cartao>
           )}
+
+          <Cartao titulo="Como você chegou a essa decisão">
+            {replay.cadeiaEvidencia ? (
+              <CadeiaEvidenciaVisao cadeia={replay.cadeiaEvidencia} />
+            ) : (
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                A cadeia de evidência não foi registrada nesta decisão — o replay devolve o que
+                existia naquele instante, sem reconstruir o que não foi gravado.
+              </p>
+            )}
+          </Cartao>
 
           <Cartao titulo="O que o mercado dizia">
             <div className="grid grid-cols-2 gap-3 text-sm">

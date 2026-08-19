@@ -88,6 +88,11 @@ export function SnapshotCognitivo({ snap }: { snap: SnapshotCognitivoView }) {
           Viés no momento: {snap.padroes.join(" · ")}
         </p>
       )}
+      <p className="mt-2 border-t border-border pt-2 text-[11px] text-muted-foreground">
+        {snap.cadeiaEvidencia
+          ? "Esta decisão possui cadeia de evidência."
+          : "A cadeia de evidência não foi registrada nesta decisão."}
+      </p>
     </div>
   );
 }
