@@ -8,6 +8,8 @@ import type { DecisionScore } from "./decision-engine";
 import type { Padrao } from "./behavior-engine";
 import { buildTimeDimension } from "./context-engine";
 
+import type { MarketContext } from "@/lib/market-context";
+
 // ==========================================
 // DECISION MEMORY — SNAPSHOT DE ESTADO
 // ==========================================
@@ -23,6 +25,8 @@ import { buildTimeDimension } from "./context-engine";
 export type DecisionSnapshot = {
   version: 1;
   captured_at: string;
+  /** O contexto canônico de mercado observado no instante da decisão (Rodada X). */
+  marketContext?: MarketContext | null;
   /** O que foi montado: estrutura, pernas e leitura estratégica. */
   strategy: {
     ativo: string | null;
@@ -97,6 +101,7 @@ export type DecisionSnapshot = {
 
 export type DecisionSnapshotInput = {
   capturedAt?: Date;
+  marketContext?: MarketContext | null;
   strategy?: {
     ativo: string | null;
     estrutura: string | null;
@@ -154,6 +159,7 @@ export function buildDecisionSnapshot(input: DecisionSnapshotInput): DecisionSna
   return {
     version: 1,
     captured_at: capturedAt.toISOString(),
+    marketContext: input.marketContext ?? null,
     strategy: input.strategy
       ? {
           ativo: input.strategy.ativo,

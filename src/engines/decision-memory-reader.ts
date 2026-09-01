@@ -3,6 +3,7 @@ import type { CadeiaEvidencia } from "@/lib/cadeia-evidencia";
 import { lerCadeiaEvidencia } from "@/lib/cadeia-evidencia";
 import type { FonteMercado } from "@/lib/mercado-snapshot";
 import { mercadoObservadoTemFato } from "@/lib/mercado-snapshot";
+import type { MarketContext } from "@/lib/market-context";
 
 /**
  * DECISION MEMORY READER — lê o snapshot cognitivo gravado em
@@ -30,6 +31,8 @@ export type SnapshotCognitivoView = {
   mercado: MercadoObservadoView | null;
   /** Exposições líquidas da carteira no instante (Rodada W) — null sem posições. */
   portfolio: PortfolioObservadoView | null;
+  /** O Contexto de Mercado canônico (Rodada X) — null em decisões antigas. */
+  marketContext: MarketContext | null;
 };
 
 export type MercadoObservadoView = {
@@ -81,6 +84,7 @@ export function lerSnapshotCognitivo(contexto: Json | null): SnapshotCognitivoVi
   const comportamento = obj(c.comportamento);
   const mercado = obj(c.mercado);
   const resultado = obj(c.resultado);
+  const marketContextObj = obj(c.marketContext) as unknown as MarketContext | null;
 
   const alertas = Array.isArray(processo?.alertas) ? (processo.alertas as unknown[]) : [];
   const padroes = Array.isArray(comportamento?.padroesPresentes)
@@ -153,5 +157,7 @@ export function lerSnapshotCognitivo(contexto: Json | null): SnapshotCognitivoVi
     cadeiaEvidencia: lerCadeiaEvidencia(processo?.cadeiaEvidencia),
     mercado: mercadoView,
     portfolio: portfolioTemFato ? portfolioView : null,
+    marketContext: marketContextObj && marketContextObj.version === 1 ? marketContextObj : null,
   };
 }
+

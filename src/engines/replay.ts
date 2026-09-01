@@ -27,6 +27,8 @@ export type ReplayChecklist = {
   marcados: number;
 };
 
+import type { MarketContext } from "@/lib/market-context";
+
 export type ReplayView = {
   entryId: string;
   ativo: string;
@@ -59,6 +61,8 @@ export type ReplayView = {
   sessionPhase: string | null;
   /** Como a pessoa chegou à decisão — ou null quando não registrado na época. */
   cadeiaEvidencia: CadeiaEvidencia | null;
+  /** O contexto canônico de mercado observado no instante da decisão (Rodada X). */
+  marketContext: MarketContext | null;
 };
 
 const ROTULOS_ITENS: Record<string, string> = {
@@ -172,6 +176,8 @@ export function lerReplay(
     narrativa = narrarMudanca([], pernas, entry.ativo, precoReferencia);
   }
 
+  const marketContextObj = obj(c.marketContext) as unknown as MarketContext | null;
+
   return {
     entryId: entry.id,
     ativo: entry.ativo,
@@ -203,5 +209,6 @@ export function lerReplay(
     capturedWeekday: num(tempo?.capturedWeekday),
     sessionPhase: txt(tempo?.sessionPhase),
     cadeiaEvidencia: lerCadeiaEvidencia(processo?.cadeiaEvidencia),
+    marketContext: marketContextObj && marketContextObj.version === 1 ? marketContextObj : null,
   };
 }

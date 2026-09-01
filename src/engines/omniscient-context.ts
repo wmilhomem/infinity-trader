@@ -235,6 +235,14 @@ export function formatOmniscientContextForPrompt(ctx: OmniscientContext | null):
     if (p.topAssets?.length) lines.push(`- Concentração: ${p.topAssets.join(", ")}`);
   }
 
+  lines.push(
+    "==POLÍTICA DE CONTEXTO DE MERCADO (RODADA X)==",
+    "- Você NUNCA deve produzir sinais de compra/venda, metas de preço ou recomendações de trade.",
+    "- O contexto de mercado é estritamente observacional e factual.",
+    "- Ausência de dados (null) deve ser tratada como ausência de observação, nunca como zero.",
+    "==",
+  );
+
   lines.push("==");
   return lines.join("\n");
 }

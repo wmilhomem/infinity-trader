@@ -8,6 +8,7 @@ import { NarrativaEstrutura } from "@/components/simulador/NarrativaEstrutura";
 import { CadeiaEvidenciaVisao } from "@/components/simulador/CadeiaEvidencia";
 import { cn } from "@/lib/utils";
 import type { Json } from "@/integrations/supabase/types";
+import { ReplayMarketContext } from "@/components/replay/ReplayMarketContext";
 import {
   ArrowLeft,
   Brain,
@@ -383,42 +384,46 @@ function ReplayPage() {
             )}
           </Cartao>
 
-          <Cartao titulo="O que o mercado dizia">
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <div className="text-[11px] uppercase text-muted-foreground">IV ATM</div>
-                <div className="font-mono">
-                  {replay.ivAtm !== null ? `${replay.ivAtm.toFixed(1)}%` : "não registrado"}
-                </div>
-              </div>
-              <div>
-                <div className="text-[11px] uppercase text-muted-foreground">IV rank</div>
-                <div className="font-mono">
-                  {replay.ivRank !== null ? `percentil ${replay.ivRank}%` : "não registrado"}
-                </div>
-              </div>
-              <div>
-                <div className="text-[11px] uppercase text-muted-foreground">Liquidez</div>
-                <div>{replay.liquidityScore ?? "não registrado"}</div>
-              </div>
-              <div>
-                <div className="text-[11px] uppercase text-muted-foreground">Eventos</div>
+          {replay.marketContext ? (
+            <ReplayMarketContext context={replay.marketContext} />
+          ) : (
+            <Cartao titulo="O que o mercado dizia">
+              <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  {replay.eventsImminent === null
-                    ? "não registrado"
-                    : replay.eventsImminent
-                      ? "próximos"
-                      : "sem eventos"}
+                  <div className="text-[11px] uppercase text-muted-foreground">IV ATM</div>
+                  <div className="font-mono">
+                    {replay.ivAtm !== null ? `${replay.ivAtm.toFixed(1)}%` : "não registrado"}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[11px] uppercase text-muted-foreground">IV rank</div>
+                  <div className="font-mono">
+                    {replay.ivRank !== null ? `percentil ${replay.ivRank}%` : "não registrado"}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[11px] uppercase text-muted-foreground">Liquidez</div>
+                  <div>{replay.liquidityScore ?? "não registrado"}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] uppercase text-muted-foreground">Eventos</div>
+                  <div>
+                    {replay.eventsImminent === null
+                      ? "não registrado"
+                      : replay.eventsImminent
+                        ? "próximos"
+                        : "sem eventos"}
+                  </div>
                 </div>
               </div>
-            </div>
-            {replay.ivAtm === null && (
-              <p className="mt-3 text-[11px] text-muted-foreground">
-                Decisões antigas foram gravadas antes da captura de IV existir. Replays futuros
-                trazem o mercado completo do dia.
-              </p>
-            )}
-          </Cartao>
+              {replay.ivAtm === null && (
+                <p className="mt-3 text-[11px] text-muted-foreground">
+                  Decisões antigas foram gravadas antes da captura de IV existir. Replays futuros
+                  trazem o mercado completo do dia.
+                </p>
+              )}
+            </Cartao>
+          )}
         </div>
       </div>
 

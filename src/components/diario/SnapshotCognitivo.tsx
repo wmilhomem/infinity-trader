@@ -103,6 +103,18 @@ export function SnapshotCognitivo({ snap }: { snap: SnapshotCognitivoView }) {
         </p>
       )}
 
+      {snap.marketContext && (
+        <div className="mt-2 border-t border-border pt-2 space-y-1">
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-primary">
+            Contexto de Mercado Canônico (Rodada X)
+          </div>
+          <div className="flex flex-wrap gap-2 text-[11px] font-mono text-muted-foreground">
+            <span>Fonte: {snap.marketContext.provenance.source}</span>
+            <span>Qualidade: {snap.marketContext.quality.freshness} ({snap.marketContext.quality.completeness})</span>
+          </div>
+        </div>
+      )}
+
       {snap.mercado && (
         <div className="mt-2 border-t border-border pt-2">
           <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">

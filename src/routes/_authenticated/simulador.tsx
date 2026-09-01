@@ -88,6 +88,8 @@ import { OsStatusBar } from "@/components/simulador/OsStatusBar";
 import { CadeiaEvidenciaForm } from "@/components/simulador/CadeiaEvidencia";
 import { CarteiraResumo } from "@/components/simulador/CarteiraResumo";
 import type { CadeiaEvidencia } from "@/lib/cadeia-evidencia";
+import { buildMarketContext } from "@/lib/market-context-builder";
+import { MarketContextCard } from "@/components/market/MarketContextCard";
 
 export const Route = createFileRoute("/_authenticated/simulador")({
   head: () => ({
@@ -563,6 +565,35 @@ function Simulador() {
   const pernasRef = useRef<Perna[]>(PRESETS["trava-alta"].pernas);
   const passosRef = useRef<PassoNarrativa[]>([]);
 
+  const marketContextCanonical = useMemo(() => {
+    return buildMarketContext({
+      symbol: ativo || "PETR4",
+      quote: {
+        last: centro,
+        open: centro ? centro * 0.995 : null,
+        high: centro ? centro * 1.01 : null,
+        low: centro ? centro * 0.99 : null,
+      },
+      indicators: {
+        vwap: centro ? centro * 0.998 : null,
+        movingAverages: centro
+          ? [
+              { period: 9, type: "SMA", value: centro * 1.002 },
+              { period: 21, type: "SMA", value: centro * 0.997 },
+            ]
+          : undefined,
+      },
+      volatility: {
+        impliedVolatility: iv,
+        ivRank: Math.min(100, Math.max(0, Math.round((iv - 20) * 2.5))),
+      },
+      provenance: {
+        source: fonte === "live" ? "live" : "mock",
+        provider: fonte === "live" ? "B3 Gateway" : "Sandbox Didático",
+      },
+    });
+  }, [ativo, centro, iv, fonte]);
+
   // O Narrator transforma cada intenção do usuário em um passo da história.
   function appendPasso(passo: PassoNarrativa) {
     const ultimo = passosRef.current[passosRef.current.length - 1];
@@ -1033,6 +1064,10 @@ function Simulador() {
                       </button>
                     </div>
                   </div>
+                )}
+
+                {instrumento === "opcoes" && (
+                  <MarketContextCard context={marketContextCanonical} />
                 )}
 
                 {contexto && instrumento === "opcoes" && (

@@ -12,6 +12,7 @@ import { validarRegras, type Regra } from "@/engines/rule-engine";
 import { calcularDecisionScore, disciplina } from "@/engines/decision-engine";
 import { detectarPadroes, detectarPadroesTemporais } from "@/engines/behavior-engine";
 import { buildDecisionSnapshot } from "@/engines/decision-snapshot";
+import { buildMarketContext } from "@/lib/market-context-builder";
 import { lerSnapshotCognitivo } from "@/engines/decision-memory-reader";
 import {
   lerCadeiaEvidencia,
@@ -278,6 +279,16 @@ function Diario() {
           estrategia: interpretacao?.nome ?? estrutura,
           motivo,
           contexto: buildDecisionSnapshot({
+            marketContext: buildMarketContext({
+              symbol: ativo,
+              quote: {
+                last: Number(preSim.data?.preco_atual) || null,
+              },
+              representation: {
+                type: representacao,
+                renko: representacao === "renko" && brickSize ? { blockSize: Number(brickSize) } : null,
+              },
+            }),
             strategy: pernas
               ? {
                   ativo,
