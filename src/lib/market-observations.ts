@@ -148,34 +148,55 @@ export function deriveMarketObservations(ctx: MarketContext): MarketObservation[
     }
   }
 
-  // 6. Inteligência de Opções (Rodada Y)
+  // 6. Inteligência de Opções (Rodada Y.1 — com proveniência por campo)
   if (ctx.optionsChain) {
     const opt = ctx.optionsChain;
+    const atmMethod = opt.atm?.method ?? null;
 
-    if (opt.impliedVolatilityAtm !== null && opt.impliedVolatilityAtm !== undefined) {
+    // IV ATM: agora é um objeto { value, provenance } — extrair .value
+    const ivAtmValue = opt.impliedVolatilityAtm?.value;
+    if (ivAtmValue !== null && ivAtmValue !== undefined) {
+      const ivOrigin = opt.impliedVolatilityAtm?.provenance?.origin ?? "unknown";
       obs.push({
         id: "options-iv-atm",
-        fact: `Volatilidade Implícita ATM da cadeia observada em ${opt.impliedVolatilityAtm.toFixed(1)}% a.a. para o vencimento de ${opt.daysToExpiration ?? "N/A"} dias`,
+        fact: `Volatilidade Implícita ATM da cadeia ${ivOrigin === "calculated" ? "calculada" : "observada"} em ${ivAtmValue.toFixed(1)}% a.a. para o vencimento de ${opt.daysToExpiration ?? "N/A"} dias${atmMethod ? ` (ATM: ${atmMethod})` : ""}`,
         sourceFields: ["optionsChain.impliedVolatilityAtm", "optionsChain.daysToExpiration"],
         observedAt: time,
       });
     }
 
-    if (opt.skew?.putIvOtm !== null && opt.skew?.callIvOtm !== null && opt.skew?.putIvOtm !== undefined && opt.skew?.callIvOtm !== undefined) {
+    // Skew: ainda { putIvOtm, callIvOtm, slope, provenance, strikes }
+    if (opt.skew?.putIvOtm !== null && opt.skew?.callIvOtm !== null
+        && opt.skew?.putIvOtm !== undefined && opt.skew?.callIvOtm !== undefined) {
       const diff = opt.skew.putIvOtm - opt.skew.callIvOtm;
-      const incl = diff > 0 ? "inclinado para Puts (Put IV maior que Call IV)" : diff < 0 ? "inclinado para Calls (Call IV maior que Put IV)" : "simétrico";
+      const incl = diff > 0
+        ? "inclinado para Puts (Put IV maior que Call IV)"
+        : diff < 0
+        ? "inclinado para Calls (Call IV maior que Put IV)"
+        : "simétrico";
+      const putStrike = opt.skew.putStrikeUsed != null ? ` (strike ${opt.skew.putStrikeUsed})` : "";
+      const callStrike = opt.skew.callStrikeUsed != null ? ` (strike ${opt.skew.callStrikeUsed})` : "";
       obs.push({
         id: "options-skew",
-        fact: `Skew de volatilidade observado ${incl}: Put OTM com ${opt.skew.putIvOtm.toFixed(1)}% vs. Call OTM com ${opt.skew.callIvOtm.toFixed(1)}%`,
+        fact: `Skew de volatilidade observado ${incl}: Put OTM${putStrike} com ${opt.skew.putIvOtm.toFixed(1)}% vs. Call OTM${callStrike} com ${opt.skew.callIvOtm.toFixed(1)}%`,
         sourceFields: ["optionsChain.skew"],
         observedAt: time,
       });
     }
 
-    if (opt.expectedMove?.lowerBound1Sigma !== null && opt.expectedMove?.upperBound1Sigma !== null && opt.expectedMove?.lowerBound1Sigma !== undefined && opt.expectedMove?.upperBound1Sigma !== undefined) {
+    // Expected Move: agora é objeto com .value fields + .formula + .ivUsed
+    if (opt.expectedMove?.lowerBound1Sigma !== null && opt.expectedMove?.upperBound1Sigma !== null
+        && opt.expectedMove?.lowerBound1Sigma !== undefined && opt.expectedMove?.upperBound1Sigma !== undefined) {
+      const formula = opt.expectedMove.formula ? ` [fórmula: ${opt.expectedMove.formula}]` : "";
+      const ivUsed = opt.expectedMove.ivUsed != null
+        ? `, IV usada: ${(opt.expectedMove.ivUsed * 100).toFixed(1)}%`
+        : "";
+      const dteUsed = opt.expectedMove.dteUsed != null
+        ? `, DTE: ${opt.expectedMove.dteUsed} dias ${opt.expectedMove.dteBase ?? ""}`
+        : "";
       obs.push({
         id: "options-expected-move",
-        fact: `Faixa de variação esperada em 1 sigma (68% prob. implícita): entre R$ ${opt.expectedMove.lowerBound1Sigma.toFixed(2)} e R$ ${opt.expectedMove.upperBound1Sigma.toFixed(2)} (amplitude de ±R$ ${opt.expectedMove.sigma1Brl?.toFixed(2) ?? "N/A"})`,
+        fact: `Faixa de variação esperada em 1 sigma (68% prob. implícita): entre R$ ${opt.expectedMove.lowerBound1Sigma.toFixed(2)} e R$ ${opt.expectedMove.upperBound1Sigma.toFixed(2)} (amplitude de ±R$ ${opt.expectedMove.sigma1Brl?.toFixed(2) ?? "N/A"})${formula}${ivUsed}${dteUsed}`,
         sourceFields: ["optionsChain.expectedMove"],
         observedAt: time,
       });
