@@ -28,6 +28,7 @@ export type ReplayChecklist = {
 };
 
 import type { MarketContext } from "@/lib/market-context";
+import type { MercadoObservadoComProvenance } from "@/lib/market-data/mercado-observado-provenance";
 
 export type ReplayView = {
   entryId: string;
@@ -63,6 +64,8 @@ export type ReplayView = {
   cadeiaEvidencia: CadeiaEvidencia | null;
   /** O contexto canônico de mercado observado no instante da decisão (Rodada X). */
   marketContext: MarketContext | null;
+  /** Y.2 — Mercado observado com provenance granular por campo. */
+  mercadoY2: MercadoObservadoComProvenance | null;
 };
 
 const ROTULOS_ITENS: Record<string, string> = {
@@ -177,6 +180,7 @@ export function lerReplay(
   }
 
   const marketContextObj = obj(c.marketContext) as unknown as MarketContext | null;
+  const mercadoY2Obj = obj(c.mercadoY2) as unknown as MercadoObservadoComProvenance | null;
 
   return {
     entryId: entry.id,
@@ -210,5 +214,6 @@ export function lerReplay(
     sessionPhase: txt(tempo?.sessionPhase),
     cadeiaEvidencia: lerCadeiaEvidencia(processo?.cadeiaEvidencia),
     marketContext: marketContextObj && marketContextObj.version === 1 ? marketContextObj : null,
+    mercadoY2: mercadoY2Obj,
   };
 }

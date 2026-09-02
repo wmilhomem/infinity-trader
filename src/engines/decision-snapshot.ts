@@ -9,6 +9,7 @@ import type { Padrao } from "./behavior-engine";
 import { buildTimeDimension } from "./context-engine";
 
 import type { MarketContext } from "@/lib/market-context";
+import type { MercadoObservadoComProvenance } from "@/lib/market-data/mercado-observado-provenance";
 
 // ==========================================
 // DECISION MEMORY — SNAPSHOT DE ESTADO
@@ -75,6 +76,16 @@ export type DecisionSnapshot = {
    * dado. Nulo enquanto mock/não observado; nunca refetch do passado.
    */
   mercado: MercadoObservado;
+  /**
+   * Y.2 — Mercado observado com provenance granular por campo.
+   * Cada campo carrega: origin (observed/calculated/estimated), method, inputs,
+   * source, observedAt/calculatedAt, quality, absenceReason.
+   *
+   * Este campo é gravado quando a decisão usa LiveMarketDataProvider (Y.2).
+   * Decisões antigas gravadas com o formato legado têm este campo null —
+   * o Replay verifica primero este campo antes de usar `mercado`.
+   */
+  mercadoY2?: MercadoObservadoComProvenance | null;
   /** Janela temporal do registro (aprox. horário da B3). */
   tempo: {
     capturedWeekday: number;
@@ -133,6 +144,7 @@ export type DecisionSnapshotInput = {
     resultado: number | null;
   };
   mercado?: DecisionSnapshot["mercado"];
+  mercadoY2?: MercadoObservadoComProvenance | null;
   portfolio?: DecisionSnapshot["portfolio"];
 };
 
@@ -240,5 +252,6 @@ export function buildDecisionSnapshot(input: DecisionSnapshotInput): DecisionSna
           marginUtilized: null,
           topAssets: null,
         },
+    mercadoY2: input.mercadoY2 ?? null,
   };
 }

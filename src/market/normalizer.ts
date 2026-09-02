@@ -3,97 +3,181 @@ import type {
   OptionContract,
   OptionChain,
   CorporateEvent,
-  MarketCalendar,
   YieldCurve,
 } from "./types";
+import { parseAsset, parseOptionContract, parseOptionChain, parseDICurve, parseCorporateEvents } from "@/lib/market-data/schemas";
+import {
+  normalizeAssetPackage,
+  normalizeOptionChainPackage,
+  normalizeDICurvePackage,
+  normalizeCorporateEventsPackage,
+  makeObservedProvenance,
+} from "@/lib/market-data/normalizer";
 
 type Raw = Record<string, unknown>;
 
 /**
  * Normalizer
- * Nenhuma tela consome JSON bruto da B3. Esta camada converte pacotes sujos
- * de dados externos para nossos objetos internos imutáveis.
+ * Y.2 — delega para src/lib/market-data/ (camada Y.2) e converte
+ * o FieldEnvelope<Snapshot> para o tipo legado.
+ *
+ * Mantém a interface pública (LiveProvider legado continua funcionando),
+ * mas usa o pipeline Y.2 (schema + validators + normalizer) internamente.
  */
 export class MarketNormalizer {
   static normalizeAsset(raw: unknown): Asset {
-    const r = (raw ?? {}) as Raw;
-    const ivRank = Number(r.ivRank ?? null);
+    const parsed = parseAsset(raw);
+    if (!parsed.ok) {
+      // Falha de schema: fallback com valores vazios, mas mantém interface
+      return {
+        ticker: "",
+        name: "",
+        price: 0,
+        lastUpdate: new Date(),
+        ivRank: undefined,
+      };
+    }
+    const observedAt = new Date(parsed.data.lastUpdate).toISOString();
+    const provenance = makeObservedProvenance("yahoo-finance", observedAt);
+    const env = normalizeAssetPackage(
+      parsed.data,
+      { quality: "valid", reasons: [] },
+      provenance,
+    );
+    const snap = env?.value;
+    if (!snap) {
+      return {
+        ticker: parsed.data.ticker,
+        name: parsed.data.name,
+        price: 0,
+        lastUpdate: new Date(parsed.data.lastUpdate),
+        ivRank: undefined,
+      };
+    }
+    // Converte Snapshot → Asset legado. Mantém price (mesmo 0).
     return {
-      ticker: String(r.ticker || r.symbol || ""),
-      name: String(r.name || r.companyName || ""),
-      price: Number(r.price || r.last || 0),
-      lastUpdate: new Date(Number(r.timestamp || r.lastUpdate) || Date.now()),
-      ivRank: Number.isFinite(ivRank) && ivRank >= 0 ? ivRank : undefined,
+      ticker: snap.ticker,
+      name: snap.name,
+      price: snap.price ?? 0,
+      lastUpdate: new Date(parsed.data.lastUpdate),
+      // ivRank null preservado como undefined para o tipo legado
+      ivRank: snap.ivRank === null ? undefined : snap.ivRank,
     };
   }
 
   static normalizeOptionContract(raw: unknown, underlying: string): OptionContract {
+    const parsed = parseOptionContract(raw);
     const r = (raw ?? {}) as Raw;
-    const rawType = String(r.type || r.right || "").toLowerCase();
-    const isCall = rawType === "call" || rawType === "c";
-    const g = (r.greeks ?? undefined) as Raw | undefined;
+    if (!parsed.ok) {
+      const rawType = String(r.type || r.right || "").toLowerCase();
+      const isCall = rawType === "call" || rawType === "c";
+      return {
+        ticker: String(r.ticker || r.symbol || ""),
+        underlying,
+        type: isCall ? "call" : "put",
+        strike: Number(r.strike || r.strikePrice || 0),
+        expiration: new Date(Number(r.expiration || r.maturity) || Date.now()),
+        bid: 0,
+        ask: 0,
+        last: 0,
+        greeks: undefined,
+      };
+    }
+    const c = parsed.data;
+    const rawType = String(c.right);
+    const isCall = rawType === "C";
     return {
-      ticker: String(r.ticker || r.symbol || ""),
+      ticker: c.symbol,
       underlying,
       type: isCall ? "call" : "put",
-      strike: Number(r.strike || r.strikePrice || 0),
-      expiration: new Date(Number(r.expiration || r.maturity) || Date.now()),
-      bid: Number(r.bid || 0),
-      ask: Number(r.ask || 0),
-      last: Number(r.last || r.price || 0),
-      greeks: g
+      strike: c.strikePrice,
+      expiration: new Date(c.expiration),
+      // Converte null → 0 para compatibilidade com tipo legado (não-nullable)
+      // IMPORTANTE: Y.2 preservou o null. A conversão aqui é apenas para o
+      // tipo legado; o tipo Y.2 (OptionContractSnapshot) preserva null.
+      bid: c.bid ?? 0,
+      ask: c.ask ?? 0,
+      last: c.last ?? 0,
+      greeks: c.greeks
         ? {
-            delta: Number(g.delta || 0),
-            gamma: Number(g.gamma || 0),
-            theta: Number(g.theta || 0),
-            vega: Number(g.vega || 0),
-            rho: Number(g.rho || 0),
-            impliedVolatility: Number(g.impliedVolatility || g.iv || 0),
+            delta: c.greeks.delta,
+            gamma: c.greeks.gamma,
+            theta: c.greeks.theta,
+            vega: c.greeks.vega,
+            rho: c.greeks.rho,
+            impliedVolatility: c.greeks.impliedVolatility,
           }
         : undefined,
     };
   }
 
   static normalizeOptionChain(raw: unknown): OptionChain {
-    const r = (raw ?? {}) as Raw;
-    const underlying = String(r.underlying || r.symbol || "");
-    const listaRaw = r.contracts || r.options;
-    const rawContracts: unknown[] = Array.isArray(listaRaw) ? listaRaw : [];
-
+    const parsed = parseOptionChain(raw);
+    if (!parsed.ok) {
+      return { underlying: "", contracts: [], lastUpdate: new Date() };
+    }
+    const r = parsed.data;
+    const env = normalizeOptionChainPackage(
+      r,
+      { quality: "valid", reasons: [] },
+      null,
+    );
+    const snap = env?.value;
     return {
-      underlying,
-      contracts: rawContracts.map((c: unknown) => this.normalizeOptionContract(c, underlying)),
-      lastUpdate: new Date(Number(r.timestamp) || Date.now()),
+      underlying: r.underlying,
+      contracts: snap
+        ? snap.contracts.map((c) =>
+            this.normalizeOptionContract(
+              {
+                symbol: c.symbol,
+                strikePrice: c.strike,
+                right: c.right,
+                expiration: c.expiration,
+                bid: c.bid,
+                ask: c.ask,
+                last: c.last,
+              },
+              r.underlying,
+            ),
+          )
+        : [],
+      lastUpdate: new Date(r.timestamp),
     };
   }
 
   static normalizeDICurve(rawArray: unknown[]): YieldCurve {
-    if (!Array.isArray(rawArray)) return { points: [], baseDate: new Date() };
+    const parsed = parseDICurve(rawArray);
+    if (!parsed.ok) {
+      return { points: [], baseDate: new Date() };
+    }
+    const env = normalizeDICurvePackage(
+      parsed.data,
+      { quality: "valid", reasons: [] },
+    );
     return {
       baseDate: new Date(),
-      points: rawArray
-        .map((p) => {
-          const r = (p ?? {}) as Raw;
-          return {
-            days: Number(r.days || r.du || 0),
-            rate: Number(r.rate || r.taxa || 0),
-          };
-        })
-        .sort((a, b) => a.days - b.days),
+      points: env?.value
+        ? env.value.points.map((p) => ({ days: p.days, rate: p.rate }))
+        : [],
     };
   }
 
   static normalizeCorporateEvents(rawArray: unknown[]): CorporateEvent[] {
-    if (!Array.isArray(rawArray)) return [];
-    return rawArray.map((raw) => {
-      const r = (raw ?? {}) as Raw;
-      return {
-        ticker: String(r.ticker || ""),
-        type: r.type === "DIVIDEND" ? "dividendo" : "outro",
-        valueOrRatio: Number(r.value || r.ratio || 0),
-        exDate: new Date(Number(r.exDate) || Date.now()),
-        paymentDate: r.paymentDate ? new Date(Number(r.paymentDate)) : undefined,
-      };
-    });
+    const parsed = parseCorporateEvents(rawArray);
+    if (!parsed.ok) {
+      return [];
+    }
+    const env = normalizeCorporateEventsPackage(
+      parsed.data,
+      { quality: "valid", reasons: [] },
+    );
+    if (!env?.value) return [];
+    return env.value.map((e) => ({
+      ticker: e.ticker,
+      type: e.type === "DIVIDEND" ? "dividendo" : "outro",
+      valueOrRatio: e.valueOrRatio,
+      exDate: new Date(e.exDate),
+      paymentDate: e.paymentDate ? new Date(e.paymentDate) : undefined,
+    }));
   }
 }

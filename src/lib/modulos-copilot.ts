@@ -3,6 +3,7 @@ export type ModuloCopilot = {
   rotulo: string;
   padrao: RegExp;
   sugestoes: string[];
+  sugestoesProvenance?: string[];
   ocultarBubble?: boolean;
 };
 
@@ -57,6 +58,12 @@ export const MODULOS_COPILOT: ModuloCopilot[] = [
       "Qual o breakeven da estrutura que montei?",
       "Qual o risco máximo e onde colocar meu stop?",
     ],
+    sugestoesProvenance: [
+      "Como sei se o IV que estou vendo foi observado ou calculado?",
+      "Esse Expected Move foi calculado com qual IV?",
+      "Por que este dado está marcado como 'suspeito'?",
+      "Qual era a qualidade dos dados quando registrei esta decisão?",
+    ],
   },
   {
     id: "regras",
@@ -76,6 +83,11 @@ export const MODULOS_COPILOT: ModuloCopilot[] = [
       "O que devo registrar no diário?",
       "O que o snapshot cognitivo captura?",
       "Por que registrar a emoção junto com a decisão?",
+    ],
+    sugestoesProvenance: [
+      "O que significa 'dado observado' vs 'dado calculado'?",
+      "Como a provenance dos dados afeta minha decisão?",
+      "Por que alguns dados estão ausentes e outros não?",
     ],
   },
   {
@@ -104,6 +116,12 @@ export const MODULOS_COPILOT: ModuloCopilot[] = [
     rotulo: "Replay",
     padrao: /^\/replay/,
     sugestoes: ["O que o replay mostra sobre uma decisão?", "Para que serve reviver uma decisão?"],
+    sugestoesProvenance: [
+      "O que a provenance dos dados no replay significa?",
+      "Por que alguns dados antigos não têm provenance?",
+      "Qual a diferença entre dado observado e calculado no replay?",
+      "Este replay foi feito com dados reais ou reconstruídos?",
+    ],
   },
   {
     id: "copilot",
@@ -125,6 +143,18 @@ export const SUGESTOES_GLOBAIS = [
   "Como funciona a conversa por voz?",
   "O copilot dá recomendação de investimento?",
 ];
+
+export const SUGESTOES_PROVENANCE_GLOBAIS = [
+  "O que significa quando um dado é 'observado'?",
+  "Qual a diferença entre dado 'calculado' e 'estimado'?",
+  "Por que vejo 'dado suspeito' às vezes?",
+  "O que é a proveniência de um dado de mercado?",
+  "Como sei se posso confiar neste dado?",
+];
+
+export function sugestoesProvenance(modulo: ModuloCopilot | undefined): string[] {
+  return modulo?.sugestoesProvenance ?? SUGESTOES_PROVENANCE_GLOBAIS;
+}
 
 export function moduloAtual(pathname: string): ModuloCopilot | undefined {
   return MODULOS_COPILOT.find((m) => m.padrao.test(pathname));

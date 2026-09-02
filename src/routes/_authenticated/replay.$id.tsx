@@ -9,6 +9,7 @@ import { CadeiaEvidenciaVisao } from "@/components/simulador/CadeiaEvidencia";
 import { cn } from "@/lib/utils";
 import type { Json } from "@/integrations/supabase/types";
 import { ReplayMarketContext } from "@/components/replay/ReplayMarketContext";
+import { ReplayMarketContextY2 } from "@/components/replay/ReplayMarketContextY2";
 import {
   ArrowLeft,
   Brain,
@@ -384,7 +385,9 @@ function ReplayPage() {
             )}
           </Cartao>
 
-          {replay.marketContext ? (
+          {replay.mercadoY2 ? (
+            <ReplayMarketContextY2 mercado={replay.mercadoY2} />
+          ) : replay.marketContext ? (
             <ReplayMarketContext context={replay.marketContext} />
           ) : (
             <Cartao titulo="O que o mercado dizia">
