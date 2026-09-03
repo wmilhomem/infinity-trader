@@ -226,8 +226,8 @@ export function normalizeOptionChainPackage(
       bid: c.bid,
       ask: c.ask,
       last: c.last,
-      volume: c.volume,
-      openInterest: c.openInterest,
+      volume: c.volume ?? null,
+      openInterest: c.openInterest ?? null,
       impliedVolatility: c.impliedVolatility ?? null,
     });
   }
