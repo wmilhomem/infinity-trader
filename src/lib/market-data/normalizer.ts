@@ -208,12 +208,12 @@ export function normalizeOptionChainPackage(
       suspiciousReasons.push("extreme-moneyness");
     }
     // volume
-    const vA = assessVolume(c.volume);
+    const vA = assessVolume(c.volume ?? null);
     if (vA.quality === "invalid") {
       continue;
     }
     // oi
-    const oA = assessOpenInterest(c.openInterest);
+    const oA = assessOpenInterest(c.openInterest ?? null);
     if (oA.quality === "invalid") {
       continue;
     }
