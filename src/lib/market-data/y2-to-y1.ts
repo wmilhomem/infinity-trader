@@ -109,6 +109,17 @@ export function packageToBuildInput(
   let optionsChain: BuildInput["optionsChain"] = null;
   if (chain && chain.contracts.length > 0 && asset) {
     const spot = asset.price;
+    if (spot === null) {
+      return {
+        symbol: asset?.ticker ?? asset?.symbol ?? "",
+        observedAt,
+        provenance,
+        quality,
+        quote,
+        volatility,
+        optionsChain: null,
+      };
+    }
     const r = 0.1065; // taxa default BCB; pode ser refinada via pkg.diCurve
 
     // ATM: strike mais próximo do spot
