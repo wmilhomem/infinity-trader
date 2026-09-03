@@ -89,8 +89,10 @@ export function packageToMercadoObservado(
     : makeAbsentFact("not-provided-by-source", "yahoo-finance", capturedAt);
 
   return {
-    observadoEm: makeObservedFact(pkg.observedAt ?? capturedAt, pkg.source, capturedAt, "valid"),
-    fonte: makeObservedFact(
+    observadoEm: makeObservedFact<string | null>(pkg.observedAt ?? capturedAt, pkg.source, capturedAt, "valid"),
+    fonte: makeObservedFact<
+      "mock" | "live" | "modelo" | "replay" | "bcb" | "yahoo-finance"
+    >(
       pkg.source === "yahoo-finance" ? "yahoo-finance" : pkg.source === "bcb" ? "bcb" : "modelo",
       pkg.source,
       capturedAt,
@@ -101,13 +103,13 @@ export function packageToMercadoObservado(
     ivRank: ivRankEnvelope,
     expectedMove: expectedMoveEnvelope,
     skew: skewEnvelope,
-    liquidityScore: makeObservedFact(
+    liquidityScore: makeObservedFact<"alta" | "media" | "baixa" | null>(
       chain?.value && chain.value.contracts.length >= 8 ? "alta" : chain?.value ? "media" : null,
       "yahoo-finance",
       capturedAt,
       chain?.quality ?? "valid",
     ),
-    eventsImminent: makeObservedFact(
+    eventsImminent: makeObservedFact<boolean | null>(
       pkg.corporateEvents?.value && pkg.corporateEvents.value.length > 0 ? true : false,
       "yahoo-finance",
       capturedAt,
