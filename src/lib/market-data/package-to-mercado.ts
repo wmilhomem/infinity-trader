@@ -26,10 +26,10 @@ export function packageToMercadoObservado(
 
   const spot = asset?.value?.price ?? null;
   const spotEnvelope = asset?.quality === "absent"
-    ? makeAbsentFact("source-unavailable", "yahoo-finance", capturedAt)
+    ? makeAbsentFact<number | null>("source-unavailable", "yahoo-finance", capturedAt)
     : asset?.quality === "invalid"
-      ? makeAbsentFact("schema-error", "yahoo-finance", capturedAt)
-      : makeObservedFact(spot, "yahoo-finance", capturedAt, asset?.quality ?? "valid", asset?.reasons ?? []);
+      ? makeAbsentFact<number | null>("schema-error", "yahoo-finance", capturedAt)
+      : makeObservedFact<number | null>(spot, "yahoo-finance", capturedAt, asset?.quality ?? "valid", asset?.reasons ?? []);
 
   const ivAtmValue = chain?.value?.contracts[0]?.impliedVolatility ?? null;
   const ivAtmEnvelope = (() => {
