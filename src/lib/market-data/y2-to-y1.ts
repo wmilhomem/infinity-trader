@@ -22,7 +22,7 @@ interface BuildInput {
   symbol: string;
   observedAt?: string | null;
   provenance: {
-    source: "yahoo-finance" | "model" | "mock" | "live" | "delayed" | "provider" | "replay" | "manual" | "unknown";
+    source: "yahoo-finance" | "model" | "mock" | "live" | "delayed" | "provider" | "replay" | "manual" | "unknown" | "bcb";
     provider?: string | null;
   };
   quality: {
