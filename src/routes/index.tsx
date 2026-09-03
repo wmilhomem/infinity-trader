@@ -112,7 +112,10 @@ const PILARES = [
   },
   { titulo: "Educação antes da execução", desc: "Você aprende antes de arriscar dinheiro." },
   { titulo: "Reflexão antes da repetição", desc: "Toda decisão vira aprendizado." },
-  { titulo: "Consciência antes da confiança", desc: "A confiança nasce do processo. Não da sorte." },
+  {
+    titulo: "Consciência antes da confiança",
+    desc: "A confiança nasce do processo. Não da sorte.",
+  },
 ];
 
 const ENCONTRA = [
@@ -149,7 +152,6 @@ function Landing() {
         className="zat-aurora pointer-events-none absolute top-[70vh] -left-40 h-[520px] w-[720px] rounded-full opacity-[0.10] blur-[120px]"
         style={{ background: "radial-gradient(closest-side, oklch(0.72 0.18 155), transparent)" }}
       />
-
 
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
@@ -198,9 +200,7 @@ function Landing() {
                 <span className="glass-panel rounded-full px-3 py-1.5 text-foreground">
                   {etapa}
                 </span>
-                {i < CICLO_HERO.length - 1 ? (
-                  <span className="text-primary/60">→</span>
-                ) : null}
+                {i < CICLO_HERO.length - 1 ? <span className="text-primary/60">→</span> : null}
               </span>
             ))}
           </div>
@@ -247,7 +247,6 @@ function Landing() {
           </div>
         </Reveal>
       </section>
-
 
       {/* 02 — MÉTODO x INFORMAÇÃO */}
       <section className="relative z-10 mx-auto max-w-5xl px-6 py-28">
@@ -353,7 +352,6 @@ function Landing() {
                 </div>
               </Tilt3D>
             </Reveal>
-
           ))}
         </div>
 
@@ -415,7 +413,6 @@ function Landing() {
                 </div>
               </Tilt3D>
             </Reveal>
-
           ))}
         </div>
       </section>
@@ -440,7 +437,6 @@ function Landing() {
                 </div>
               </Tilt3D>
             </Reveal>
-
           ))}
         </div>
       </section>

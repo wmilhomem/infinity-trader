@@ -13,7 +13,10 @@ export class MarketCache {
   private diCurve: { data: YieldCurve; expiresAt: number } | null = null;
   private corporateEvents = new Map<string, { data: CorporateEvent[]; expiresAt: number }>();
 
-  constructor(private gateway: IMarketGateway, private ttlMs = 15000) {} // default 15s cache
+  constructor(
+    private gateway: IMarketGateway,
+    private ttlMs = 15000,
+  ) {} // default 15s cache
 
   async getAsset(ticker: string): Promise<Asset> {
     const cached = this.assets.get(ticker);

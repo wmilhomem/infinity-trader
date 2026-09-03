@@ -66,7 +66,8 @@ export function detectarEstrategia(pernas: Perna[]): Base {
         perfil: "Defensiva — proteção / compra de volatilidade",
         objetivo: "protecao",
         complexidade: "iniciante",
-        analogia: "É contratar um seguro: você paga um prêmio e fica protegido se o preço despencar.",
+        analogia:
+          "É contratar um seguro: você paga um prêmio e fica protegido se o preço despencar.",
         licaoSlug: "compra-a-seco",
       };
     if (p.tipo === "call")
@@ -119,7 +120,8 @@ export function detectarEstrategia(pernas: Perna[]): Base {
           perfil: "Direcional defensiva com risco limitado",
           objetivo: "baixa",
           complexidade: "intermediario",
-          analogia: "É um seguro parcial: você compra proteção e vende um pedaço dela para baratear o custo.",
+          analogia:
+            "É um seguro parcial: você compra proteção e vende um pedaço dela para baratear o custo.",
           licaoSlug: "trava-de-baixa",
         }
       : {
@@ -139,7 +141,8 @@ export function detectarEstrategia(pernas: Perna[]): Base {
         perfil: "Compra de volatilidade",
         objetivo: "indefinido",
         complexidade: "avancado",
-        analogia: "Você aposta em movimento forte, para qualquer lado. Se nada acontecer, o tempo te consome.",
+        analogia:
+          "Você aposta em movimento forte, para qualquer lado. Se nada acontecer, o tempo te consome.",
       };
     if (vendas.length === 2)
       return {
@@ -147,7 +150,8 @@ export function detectarEstrategia(pernas: Perna[]): Base {
         perfil: "Venda de volatilidade (risco não limitado)",
         objetivo: "lateralizacao",
         complexidade: "avancado",
-        analogia: "Você ganha se o preço ficar parado — e perde muito se ele explodir para qualquer lado.",
+        analogia:
+          "Você ganha se o preço ficar parado — e perde muito se ele explodir para qualquer lado.",
       };
     return {
       nome: "Collar (proteção financiada)",
@@ -174,7 +178,8 @@ export function detectarEstrategia(pernas: Perna[]): Base {
       perfil: "Venda de volatilidade concentrada em um preço-alvo",
       objetivo: "lateralizacao",
       complexidade: "avancado",
-      analogia: "Você aposta que o preço vai parar quase exatamente em um ponto. Acertar o alvo paga bem.",
+      analogia:
+        "Você aposta que o preço vai parar quase exatamente em um ponto. Acertar o alvo paga bem.",
     };
 
   return {
@@ -182,7 +187,8 @@ export function detectarEstrategia(pernas: Perna[]): Base {
     perfil: "Depende da combinação das pernas",
     objetivo: "indefinido",
     complexidade: "avancado",
-    analogia: "Combinação livre de pernas: leia o gráfico de payoff para entender onde ganha e onde perde.",
+    analogia:
+      "Combinação livre de pernas: leia o gráfico de payoff para entender onde ganha e onde perde.",
   };
 }
 
@@ -216,7 +222,8 @@ export function interpretar(pernas: Perna[], centro: number, ativo: string): Int
 
   const lucroLimitado = Number.isFinite(s.lucroMax) && s.lucroMax < 1e6;
   const vendasDescobertas =
-    pernas.filter((p) => p.acao === "venda").length > pernas.filter((p) => p.acao === "compra").length;
+    pernas.filter((p) => p.acao === "venda").length >
+    pernas.filter((p) => p.acao === "compra").length;
   const perdaLimitada = !vendasDescobertas;
   const capitalEmRisco = Math.abs(Math.min(0, s.perdaMax));
   const comprometido = capitalComprometido(pernas);
@@ -229,7 +236,8 @@ export function interpretar(pernas: Perna[], centro: number, ativo: string): Int
   const contexto: Record<Objetivo, string> = {
     alta: "Ela é indicada quando você acredita em uma alta do ativo.",
     baixa: "Ela é indicada quando você acredita em uma queda do ativo.",
-    renda: "Ela é indicada quando você quer receber um prêmio hoje e acredita que o preço não vai contra você.",
+    renda:
+      "Ela é indicada quando você quer receber um prêmio hoje e acredita que o preço não vai contra você.",
     protecao: "Ela é indicada quando você quer proteger uma posição contra quedas.",
     lateralizacao: "Ela é indicada quando você acredita que o preço vai ficar parado.",
     indefinido: "Leia o gráfico para entender em quais preços você ganha e em quais você perde.",
@@ -240,7 +248,9 @@ export function interpretar(pernas: Perna[], centro: number, ativo: string): Int
     perdaLimitada
       ? `Seu risco máximo é ${brl(capitalEmRisco)}.`
       : `Esta estrutura tem venda descoberta: a perda pode ir muito além do prêmio recebido.`,
-    lucroLimitado ? `Seu lucro máximo é ${brl(Math.max(0, s.lucroMax))}.` : `Seu lucro é teoricamente ilimitado.`,
+    lucroLimitado
+      ? `Seu lucro máximo é ${brl(Math.max(0, s.lucroMax))}.`
+      : `Seu lucro é teoricamente ilimitado.`,
     contexto[base.objetivo],
     lucroLimitado && perdaLimitada ? "Ela limita perdas e também limita ganhos." : "",
   ]

@@ -2,7 +2,7 @@ import type { MarketDataQuality, MarketDataSource } from "./market-context";
 
 /**
  * POLÍTICA DE FONTES DE DADOS (MARKET SOURCE POLICY)
- * 
+ *
  * Define a hierarquia de fontes de dados e mapeia a confiabilidade da fonte.
  * A prioridade nunca deve ser confundida com precisão absoluta; guarda-se
  * sempre a fonte efetivamente utilizada.

@@ -20,13 +20,22 @@ const MarketContext = createContext<MarketContextType | null>(null);
  * Provê à aplicação frontend a porta de entrada imaculada aos dados de mercado.
  * Nenhuma UI entra em contato com Gateway ou API bruta. Tudo trafega pelo Context.
  */
-export function MarketProvider({ children, cache = defaultCache }: { children: ReactNode; cache?: MarketCache }) {
-  const value = useMemo<MarketContextType>(() => ({
-    getAsset: (t: string) => cache.getAsset(t),
-    getOptionChain: (u: string) => cache.getOptionChain(u),
-    getDICurve: () => cache.getDICurve(),
-    getCorporateEvents: (t: string) => cache.getCorporateEvents(t),
-  }), [cache]);
+export function MarketProvider({
+  children,
+  cache = defaultCache,
+}: {
+  children: ReactNode;
+  cache?: MarketCache;
+}) {
+  const value = useMemo<MarketContextType>(
+    () => ({
+      getAsset: (t: string) => cache.getAsset(t),
+      getOptionChain: (u: string) => cache.getOptionChain(u),
+      getDICurve: () => cache.getDICurve(),
+      getCorporateEvents: (t: string) => cache.getCorporateEvents(t),
+    }),
+    [cache],
+  );
 
   return <MarketContext.Provider value={value}>{children}</MarketContext.Provider>;
 }

@@ -79,9 +79,7 @@ function Regras() {
       categoria,
       tipo: "texto",
     };
-    const { error } = await supabase
-      .from("personal_rules")
-      .insert(payload as never);
+    const { error } = await supabase.from("personal_rules").insert(payload as never);
     if (error) return toast.error(error.message);
     setTexto("");
     invalidate();
@@ -107,9 +105,7 @@ function Regras() {
       texto: describeIndicador(nome, parametros_json),
       parametros_json,
     };
-    const { error } = await supabase
-      .from("personal_rules")
-      .insert(payload as never);
+    const { error } = await supabase.from("personal_rules").insert(payload as never);
     if (error) return toast.error(error.message);
     setIndNome("");
     invalidate();
@@ -137,9 +133,7 @@ function Regras() {
       texto: padDescricao.trim() || padCondicao.trim(),
       parametros_json,
     };
-    const { error } = await supabase
-      .from("personal_rules")
-      .insert(payload as never);
+    const { error } = await supabase.from("personal_rules").insert(payload as never);
     if (error) return toast.error(error.message);
     setPadNome("");
     setPadCondicao("");
@@ -162,9 +156,7 @@ function Regras() {
           : (t.parametros.descricao ?? t.parametros.condicao),
       parametros_json: t.parametros as unknown as Record<string, unknown>,
     }));
-    const { error } = await supabase
-      .from("personal_rules")
-      .insert(rows as never);
+    const { error } = await supabase.from("personal_rules").insert(rows as never);
     if (error) return toast.error(error.message);
     invalidate();
     toast.success("Exemplos adicionados!");
@@ -189,8 +181,8 @@ function Regras() {
   return (
     <AppShell title="Minhas regras">
       <p className="mb-6 text-sm text-muted-foreground">
-        Suas regras são <span className="text-primary">suas</span>. O copilot vai lembrar
-        delas quando você registrar uma decisão — nunca decidir por você.
+        Suas regras são <span className="text-primary">suas</span>. O copilot vai lembrar delas
+        quando você registrar uma decisão — nunca decidir por você.
       </p>
 
       <div className="rounded-lg border border-border bg-card p-4 mb-6">
@@ -414,10 +406,7 @@ function Regras() {
                 </div>
               )}
             </div>
-            <button
-              onClick={() => remove(r.id)}
-              className="text-muted-foreground hover:text-loss"
-            >
+            <button onClick={() => remove(r.id)} className="text-muted-foreground hover:text-loss">
               <Trash2 size={16} />
             </button>
           </div>

@@ -46,10 +46,7 @@ function mk(
  *  - spread > 50%    → suspicious
  *  - normal          → valid
  */
-export function assessBidAsk(
-  bid: number | null,
-  ask: number | null,
-): QualityAssessment {
+export function assessBidAsk(bid: number | null, ask: number | null): QualityAssessment {
   if (bid === null || ask === null) {
     return mk("absent", ["bid-or-ask-missing"], "not-provided-by-source");
   }
@@ -78,10 +75,7 @@ export function assessBidAsk(
  *  - > 40% → suspicious (extreme-moneyness)
  *  - ≤ 40% → valid
  */
-export function assessMoneyness(
-  strike: number | null,
-  spot: number | null,
-): QualityAssessment {
+export function assessMoneyness(strike: number | null, spot: number | null): QualityAssessment {
   if (strike === null || spot === null || spot <= 0) {
     return mk("absent", ["strike-or-spot-missing"], "not-provided-by-source");
   }
@@ -184,9 +178,7 @@ export function schemaErrorAssessment(errors: string[]): QualityAssessment {
  *
  * Os reasons são concatenados.
  */
-export function combineAssessments(
-  list: QualityAssessment[],
-): QualityAssessment {
+export function combineAssessments(list: QualityAssessment[]): QualityAssessment {
   const reasons: string[] = [];
   let worstAbsent: DataAbsenceReason | undefined;
   let hasInvalid = false;

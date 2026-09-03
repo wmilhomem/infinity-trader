@@ -67,33 +67,48 @@ export function HeroScene() {
         {/* anel orbital */}
         <div
           className="absolute left-1/2 top-1/2 size-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/35 md:size-[440px]"
-          style={{ transform: "rotateX(74deg) translateZ(30px)", animation: "zat-spin 26s linear infinite" }}
+          style={{
+            transform: "rotateX(74deg) translateZ(30px)",
+            animation: "zat-spin 26s linear infinite",
+          }}
         >
           <span className="absolute -top-1 left-1/2 size-2 -translate-x-1/2 rounded-full bg-primary shadow-[0_0_18px_2px_color-mix(in_oklab,var(--primary)_70%,transparent)]" />
         </div>
         <div
           className="absolute left-1/2 top-1/2 size-[250px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-success/20 md:size-[300px]"
-          style={{ transform: "rotateX(74deg) translateZ(70px)", animation: "zat-spin 18s linear infinite reverse" }}
+          style={{
+            transform: "rotateX(74deg) translateZ(70px)",
+            animation: "zat-spin 18s linear infinite reverse",
+          }}
         >
           <span className="absolute -top-1 left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-success shadow-[0_0_16px_2px_color-mix(in_oklab,var(--success)_70%,transparent)]" />
         </div>
 
         {/* cartões de vidro */}
         <GlassCard
-          style={{ transform: "translate3d(-46%, -78%, 120px) rotateY(16deg) rotateX(6deg)", animationDelay: "0s" }}
+          style={{
+            transform: "translate3d(-46%, -78%, 120px) rotateY(16deg) rotateX(6deg)",
+            animationDelay: "0s",
+          }}
           label="CHECK COGNITIVO"
           title="Como você chega hoje?"
           tone="primary"
         />
         <GlassCard
-          style={{ transform: "translate3d(6%, -10%, 220px) rotateY(-6deg) rotateX(3deg)", animationDelay: "-2.4s" }}
+          style={{
+            transform: "translate3d(6%, -10%, 220px) rotateY(-6deg) rotateX(3deg)",
+            animationDelay: "-2.4s",
+          }}
           label="SIMULAÇÃO"
           title="Perda máxima — R$ 320"
           tone="loss"
           chart
         />
         <GlassCard
-          style={{ transform: "translate3d(-58%, 44%, 60px) rotateY(18deg) rotateX(-4deg)", animationDelay: "-1.2s" }}
+          style={{
+            transform: "translate3d(-58%, 44%, 60px) rotateY(18deg) rotateX(-4deg)",
+            animationDelay: "-1.2s",
+          }}
           label="DECISION SCORE"
           title="82 / 100 · processo"
           tone="success"
@@ -116,12 +131,15 @@ function GlassCard({
   tone: "primary" | "success" | "loss";
   chart?: boolean;
 }) {
-  const dot =
-    tone === "primary" ? "bg-primary" : tone === "success" ? "bg-success" : "bg-loss";
+  const dot = tone === "primary" ? "bg-primary" : tone === "success" ? "bg-success" : "bg-loss";
   return (
     <div
       className="absolute left-1/2 top-1/2 w-56 rounded-2xl border border-white/10 bg-card/60 p-4 shadow-[0_30px_60px_-25px_rgba(0,0,0,0.9)] backdrop-blur-xl md:w-64"
-      style={{ ...style, animation: "zat-float 7s ease-in-out infinite", animationDelay: style.animationDelay }}
+      style={{
+        ...style,
+        animation: "zat-float 7s ease-in-out infinite",
+        animationDelay: style.animationDelay,
+      }}
     >
       <div className="flex items-center gap-2">
         <span className={`size-1.5 rounded-full ${dot}`} />
@@ -139,7 +157,10 @@ function GlassCard({
             strokeWidth="2.5"
             strokeLinejoin="round"
           />
-          <path d="M4 44 L70 44 L104 14 L196 14 L196 50 L4 50 Z" fill="oklch(0.72 0.18 155 / 0.12)" />
+          <path
+            d="M4 44 L70 44 L104 14 L196 14 L196 50 L4 50 Z"
+            fill="oklch(0.72 0.18 155 / 0.12)"
+          />
         </svg>
       ) : (
         <div className="mt-3 space-y-1.5">

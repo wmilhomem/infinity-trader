@@ -22,10 +22,13 @@ let _instance: MarketDataPackageProvider | null = null;
 export class MarketDataPackageProvider implements MarketDataProvider {
   private adapter: MarketDataProvider;
 
-  constructor(gateway?: { fetchAsset: (t: string) => Promise<unknown>; fetchOptionChain: (u: string) => Promise<unknown>; fetchDICurve: () => Promise<unknown>; fetchCorporateEvents: (t?: string) => Promise<unknown> }) {
-    this.adapter = new YahooSourceAdapter(
-      gateway ?? new HttpGateway(),
-    );
+  constructor(gateway?: {
+    fetchAsset: (t: string) => Promise<unknown>;
+    fetchOptionChain: (u: string) => Promise<unknown>;
+    fetchDICurve: () => Promise<unknown>;
+    fetchCorporateEvents: (t?: string) => Promise<unknown>;
+  }) {
+    this.adapter = new YahooSourceAdapter(gateway ?? new HttpGateway());
   }
 
   static getInstance(): MarketDataPackageProvider {

@@ -52,10 +52,7 @@ export interface BuildMarketContextInput {
  * Proveniência padrão para campos observados externamente.
  * Usar como base ao passar dados diretos de provider B3.
  */
-export function observedProvenance(
-  source: string,
-  observedAt: string,
-): FieldProvenance {
+export function observedProvenance(source: string, observedAt: string): FieldProvenance {
   return { origin: "observed", source, calculatedAt: observedAt };
 }
 
@@ -93,7 +90,7 @@ export function buildMarketContext(input: BuildMarketContextInput): MarketContex
     provider: input.provenance?.provider ?? null,
     observedAt,
     receivedAt: input.provenance?.receivedAt ?? timestamp,
-    isDelayed: input.provenance?.isDelayed ?? (source === "delayed"),
+    isDelayed: input.provenance?.isDelayed ?? source === "delayed",
     delaySeconds: input.provenance?.delaySeconds ?? (source === "delayed" ? 900 : null),
   };
 
@@ -131,9 +128,7 @@ export function buildMarketContext(input: BuildMarketContextInput): MarketContex
   };
 
   // Mapeamento null-safe dos contratos de opções com proveniência por campo
-  const mapContracts = (
-    contracts: OptionContract[] | undefined,
-  ): OptionContract[] => {
+  const mapContracts = (contracts: OptionContract[] | undefined): OptionContract[] => {
     if (!contracts) return [];
     return contracts.map((c) => ({
       symbol: c.symbol,

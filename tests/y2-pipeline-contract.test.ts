@@ -64,7 +64,7 @@ function makeGateway(overrides: Partial<IMarketGateway> = {}): IMarketGateway {
     })),
     fetchDICurve: vi.fn(async () => [
       { days: 21, rate: 0.1065 },
-      { days: 252, rate: 0.1080 },
+      { days: 252, rate: 0.108 },
     ]),
     fetchCorporateEvents: vi.fn(async () => []),
     ...overrides,
@@ -98,9 +98,28 @@ function buildReplayContext(overrides: Record<string, unknown> = {}): Json {
     },
     comportamento: { disciplinaHistorica: 80, padroesPresentes: [], emocao: "tranquilo" },
     resultado: { status: "aberta", resultado: null },
-    mercado: { observadoEm: NOW, fonte: "live", spot: 38.5, ivAtm: 28.7, ivRank: 62, diCurveState: null, liquidityScore: "alta", eventsImminent: false },
+    mercado: {
+      observadoEm: NOW,
+      fonte: "live",
+      spot: 38.5,
+      ivAtm: 28.7,
+      ivRank: 62,
+      diCurveState: null,
+      liquidityScore: "alta",
+      eventsImminent: false,
+    },
     tempo: { capturedWeekday: 3, sessionPhase: "miolo", weekSegment: "meio" },
-    portfolio: { source: "manual", valuationSource: "modelo", valuatedAt: NOW, netDelta: 0.45, netTheta: -0.02, netVega: 0.1, netRho: 0.01, marginUtilized: 0.3, topAssets: ["PETR4"] },
+    portfolio: {
+      source: "manual",
+      valuationSource: "modelo",
+      valuatedAt: NOW,
+      netDelta: 0.45,
+      netTheta: -0.02,
+      netVega: 0.1,
+      netRho: 0.01,
+      marginUtilized: 0.3,
+      topAssets: ["PETR4"],
+    },
     mercadoY2: null,
     ...overrides,
   } as unknown as Json;
@@ -151,18 +170,72 @@ describe("[1] null da fonte → null até Replay", () => {
   test("bid=null do Yahoo permanece null no Replay", () => {
     const contexto = buildReplayContext({
       mercadoY2: {
-        observadoEm: { value: NOW, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        fonte: { value: "yahoo-finance", provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        spot: { value: null, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "absent", absenceReason: "not-provided-by-source" },
-        ivAtm: { value: null, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "absent", absenceReason: "not-provided-by-source" },
-        ivRank: { value: null, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "absent", absenceReason: "not-provided-by-source" },
-        expectedMove: { value: null, provenance: { origin: "calculated", method: "expected-move-1sigma", inputs: {}, calculatedAt: NOW }, quality: "absent", absenceReason: "not-provided-by-source" },
-        skew: { value: null, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "absent" },
-        liquidityScore: { value: null, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "absent" },
-        eventsImminent: { value: null, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "absent" },
+        observadoEm: {
+          value: NOW,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        fonte: {
+          value: "yahoo-finance",
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        spot: {
+          value: null,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "absent",
+          absenceReason: "not-provided-by-source",
+        },
+        ivAtm: {
+          value: null,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "absent",
+          absenceReason: "not-provided-by-source",
+        },
+        ivRank: {
+          value: null,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "absent",
+          absenceReason: "not-provided-by-source",
+        },
+        expectedMove: {
+          value: null,
+          provenance: {
+            origin: "calculated",
+            method: "expected-move-1sigma",
+            inputs: {},
+            calculatedAt: NOW,
+          },
+          quality: "absent",
+          absenceReason: "not-provided-by-source",
+        },
+        skew: {
+          value: null,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "absent",
+        },
+        liquidityScore: {
+          value: null,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "absent",
+        },
+        eventsImminent: {
+          value: null,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "absent",
+        },
       } as unknown as MercadoObservadoComProvenance,
       // Also set mercado (Y.1 legacy) to null to avoid fallback
-      mercado: { observadoEm: null, fonte: null, spot: null, ivAtm: null, ivRank: null, diCurveState: null, liquidityScore: null, eventsImminent: null },
+      mercado: {
+        observadoEm: null,
+        fonte: null,
+        spot: null,
+        ivAtm: null,
+        ivRank: null,
+        diCurveState: null,
+        liquidityScore: null,
+        eventsImminent: null,
+      },
     });
 
     const replay = lerReplay(makeMinimalEntry(), contexto);
@@ -294,7 +367,7 @@ describe("[4] IV calculada → origin=calculated + method + inputs", () => {
             bid: 1.0,
             ask: 1.2,
             last: 1.1,
-            impliedVolatility: 0.30,
+            impliedVolatility: 0.3,
           },
         ],
       })),
@@ -474,15 +547,56 @@ describe("[8] Snapshot antigo → Replay NÃO faz fetch", () => {
   test("lerReplay é pure function — não chama nenhum provider", () => {
     const contexto = buildReplayContext({
       mercadoY2: {
-        observadoEm: { value: NOW, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        fonte: { value: "yahoo-finance", provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        spot: { value: 38.5, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        ivAtm: { value: 28.7, provenance: { origin: "calculated", method: "black-scholes-bsm", inputs: { spot: 38.5, strike: 38, dte: 17, r: 0.1065 }, calculatedAt: NOW }, quality: "valid" },
-        ivRank: { value: 62, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        expectedMove: { value: null, provenance: { origin: "calculated", calculatedAt: NOW }, quality: "absent" },
-        skew: { value: null, provenance: { origin: "observed", calculatedAt: NOW }, quality: "absent" },
-        liquidityScore: { value: "alta", provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        eventsImminent: { value: false, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
+        observadoEm: {
+          value: NOW,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        fonte: {
+          value: "yahoo-finance",
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        spot: {
+          value: 38.5,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        ivAtm: {
+          value: 28.7,
+          provenance: {
+            origin: "calculated",
+            method: "black-scholes-bsm",
+            inputs: { spot: 38.5, strike: 38, dte: 17, r: 0.1065 },
+            calculatedAt: NOW,
+          },
+          quality: "valid",
+        },
+        ivRank: {
+          value: 62,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        expectedMove: {
+          value: null,
+          provenance: { origin: "calculated", calculatedAt: NOW },
+          quality: "absent",
+        },
+        skew: {
+          value: null,
+          provenance: { origin: "observed", calculatedAt: NOW },
+          quality: "absent",
+        },
+        liquidityScore: {
+          value: "alta",
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        eventsImminent: {
+          value: false,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
       } as unknown as MercadoObservadoComProvenance,
     });
 
@@ -504,15 +618,56 @@ describe("[8] Snapshot antigo → Replay NÃO faz fetch", () => {
     // A evidência: lerReplay() é uma pure function que só lê o JSON
     const contexto = buildReplayContext({
       mercadoY2: {
-        observadoEm: { value: NOW, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        fonte: { value: "yahoo-finance", provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        spot: { value: 38.5, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        ivAtm: { value: 28.7, provenance: { origin: "calculated", method: "black-scholes-bsm", inputs: { spot: 38.5, strike: 38, dte: 17, r: 0.1065 }, calculatedAt: NOW }, quality: "valid" },
-        ivRank: { value: 62, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        expectedMove: { value: null, provenance: { origin: "calculated", calculatedAt: NOW }, quality: "absent" },
-        skew: { value: null, provenance: { origin: "observed", calculatedAt: NOW }, quality: "absent" },
-        liquidityScore: { value: "alta", provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        eventsImminent: { value: false, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
+        observadoEm: {
+          value: NOW,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        fonte: {
+          value: "yahoo-finance",
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        spot: {
+          value: 38.5,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        ivAtm: {
+          value: 28.7,
+          provenance: {
+            origin: "calculated",
+            method: "black-scholes-bsm",
+            inputs: { spot: 38.5, strike: 38, dte: 17, r: 0.1065 },
+            calculatedAt: NOW,
+          },
+          quality: "valid",
+        },
+        ivRank: {
+          value: 62,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        expectedMove: {
+          value: null,
+          provenance: { origin: "calculated", calculatedAt: NOW },
+          quality: "absent",
+        },
+        skew: {
+          value: null,
+          provenance: { origin: "observed", calculatedAt: NOW },
+          quality: "absent",
+        },
+        liquidityScore: {
+          value: "alta",
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        eventsImminent: {
+          value: false,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
       } as unknown as MercadoObservadoComProvenance,
     });
 
@@ -534,15 +689,56 @@ describe("[8] Snapshot antigo → Replay NÃO faz fetch", () => {
 describe("[9] Replay → reproduz snapshot original sem alteração", () => {
   test("dados do snapshot são reproduzidos byte-identicos no ReplayView", () => {
     const mercadoY2 = {
-      observadoEm: { value: NOW, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" as const },
-      fonte: { value: "yahoo-finance" as const, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" as const },
-      spot: { value: 38.5, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" as const },
-      ivAtm: { value: 28.7, provenance: { origin: "calculated", method: "black-scholes-bsm", inputs: { spot: 38.5, strike: 38, dte: 17, r: 0.1065 }, calculatedAt: NOW }, quality: "valid" as const },
-      ivRank: { value: 62, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" as const },
-      expectedMove: { value: null, provenance: { origin: "calculated", method: "expected-move-1sigma", calculatedAt: NOW }, quality: "absent" as const },
-      skew: { value: null, provenance: { origin: "observed", calculatedAt: NOW }, quality: "absent" as const },
-      liquidityScore: { value: "alta", provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" as const },
-      eventsImminent: { value: false, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" as const },
+      observadoEm: {
+        value: NOW,
+        provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+        quality: "valid" as const,
+      },
+      fonte: {
+        value: "yahoo-finance" as const,
+        provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+        quality: "valid" as const,
+      },
+      spot: {
+        value: 38.5,
+        provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+        quality: "valid" as const,
+      },
+      ivAtm: {
+        value: 28.7,
+        provenance: {
+          origin: "calculated",
+          method: "black-scholes-bsm",
+          inputs: { spot: 38.5, strike: 38, dte: 17, r: 0.1065 },
+          calculatedAt: NOW,
+        },
+        quality: "valid" as const,
+      },
+      ivRank: {
+        value: 62,
+        provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+        quality: "valid" as const,
+      },
+      expectedMove: {
+        value: null,
+        provenance: { origin: "calculated", method: "expected-move-1sigma", calculatedAt: NOW },
+        quality: "absent" as const,
+      },
+      skew: {
+        value: null,
+        provenance: { origin: "observed", calculatedAt: NOW },
+        quality: "absent" as const,
+      },
+      liquidityScore: {
+        value: "alta",
+        provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+        quality: "valid" as const,
+      },
+      eventsImminent: {
+        value: false,
+        provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+        quality: "valid" as const,
+      },
     } as unknown as MercadoObservadoComProvenance;
 
     const contexto = buildReplayContext({ mercadoY2 });
@@ -565,15 +761,51 @@ describe("[10] Provenance → não pode ser alterada no Replay", () => {
   test("origin=observed no snapshot permanece observed no Replay", () => {
     const contexto = buildReplayContext({
       mercadoY2: {
-        observadoEm: { value: NOW, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        fonte: { value: "yahoo-finance", provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        spot: { value: 38.5, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        ivAtm: { value: 28.7, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" }, // observed no snapshot
-        ivRank: { value: 62, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        expectedMove: { value: null, provenance: { origin: "calculated", calculatedAt: NOW }, quality: "absent" },
-        skew: { value: null, provenance: { origin: "observed", calculatedAt: NOW }, quality: "absent" },
-        liquidityScore: { value: "alta", provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        eventsImminent: { value: false, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
+        observadoEm: {
+          value: NOW,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        fonte: {
+          value: "yahoo-finance",
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        spot: {
+          value: 38.5,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        ivAtm: {
+          value: 28.7,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        }, // observed no snapshot
+        ivRank: {
+          value: 62,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        expectedMove: {
+          value: null,
+          provenance: { origin: "calculated", calculatedAt: NOW },
+          quality: "absent",
+        },
+        skew: {
+          value: null,
+          provenance: { origin: "observed", calculatedAt: NOW },
+          quality: "absent",
+        },
+        liquidityScore: {
+          value: "alta",
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        eventsImminent: {
+          value: false,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
       } as unknown as MercadoObservadoComProvenance,
     });
 
@@ -587,15 +819,61 @@ describe("[10] Provenance → não pode ser alterada no Replay", () => {
   test("origin=calculated no snapshot permanece calculated no Replay", () => {
     const contexto = buildReplayContext({
       mercadoY2: {
-        observadoEm: { value: NOW, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        fonte: { value: "yahoo-finance", provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        spot: { value: 38.5, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        ivAtm: { value: 28.7, provenance: { origin: "calculated", method: "black-scholes-bsm", inputs: { spot: 38.5, strike: 38, dte: 17, r: 0.1065 }, calculatedAt: NOW }, quality: "valid" },
-        ivRank: { value: 62, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        expectedMove: { value: { value: 1.83, lowerBound: 36.67, upperBound: 40.33 }, provenance: { origin: "calculated", method: "expected-move-1sigma", inputs: { spot: 38.5, iv: 28.7, dte: "2026-09-20" }, calculatedAt: NOW }, quality: "valid" },
-        skew: { value: null, provenance: { origin: "observed", calculatedAt: NOW }, quality: "absent" },
-        liquidityScore: { value: "alta", provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        eventsImminent: { value: false, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
+        observadoEm: {
+          value: NOW,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        fonte: {
+          value: "yahoo-finance",
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        spot: {
+          value: 38.5,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        ivAtm: {
+          value: 28.7,
+          provenance: {
+            origin: "calculated",
+            method: "black-scholes-bsm",
+            inputs: { spot: 38.5, strike: 38, dte: 17, r: 0.1065 },
+            calculatedAt: NOW,
+          },
+          quality: "valid",
+        },
+        ivRank: {
+          value: 62,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        expectedMove: {
+          value: { value: 1.83, lowerBound: 36.67, upperBound: 40.33 },
+          provenance: {
+            origin: "calculated",
+            method: "expected-move-1sigma",
+            inputs: { spot: 38.5, iv: 28.7, dte: "2026-09-20" },
+            calculatedAt: NOW,
+          },
+          quality: "valid",
+        },
+        skew: {
+          value: null,
+          provenance: { origin: "observed", calculatedAt: NOW },
+          quality: "absent",
+        },
+        liquidityScore: {
+          value: "alta",
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        eventsImminent: {
+          value: false,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
       } as unknown as MercadoObservadoComProvenance,
     });
 
@@ -612,15 +890,52 @@ describe("[10] Provenance → não pode ser alterada no Replay", () => {
   test("quality=suspicious no snapshot permanece suspicious no Replay", () => {
     const contexto = buildReplayContext({
       mercadoY2: {
-        observadoEm: { value: NOW, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        fonte: { value: "yahoo-finance", provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        spot: { value: 38.5, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        ivAtm: { value: 28.7, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "suspicious", reasons: ["zero-price"] },
-        ivRank: { value: 62, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        expectedMove: { value: null, provenance: { origin: "calculated", calculatedAt: NOW }, quality: "absent" },
-        skew: { value: null, provenance: { origin: "observed", calculatedAt: NOW }, quality: "absent" },
-        liquidityScore: { value: "alta", provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
-        eventsImminent: { value: false, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW }, quality: "valid" },
+        observadoEm: {
+          value: NOW,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        fonte: {
+          value: "yahoo-finance",
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        spot: {
+          value: 38.5,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        ivAtm: {
+          value: 28.7,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "suspicious",
+          reasons: ["zero-price"],
+        },
+        ivRank: {
+          value: 62,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        expectedMove: {
+          value: null,
+          provenance: { origin: "calculated", calculatedAt: NOW },
+          quality: "absent",
+        },
+        skew: {
+          value: null,
+          provenance: { origin: "observed", calculatedAt: NOW },
+          quality: "absent",
+        },
+        liquidityScore: {
+          value: "alta",
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
+        eventsImminent: {
+          value: false,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          quality: "valid",
+        },
       } as unknown as MercadoObservadoComProvenance,
     });
 

@@ -29,7 +29,8 @@ export function MarketProvenanceInfo({ provenance }: Props) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/50 pt-2 text-[11px] text-muted-foreground">
       <span className="flex items-center gap-1">
-        <Database size={11} className="text-primary" /> Fonte: <strong className="font-normal text-foreground">{label}</strong>
+        <Database size={11} className="text-primary" /> Fonte:{" "}
+        <strong className="font-normal text-foreground">{label}</strong>
         {provenance.provider ? ` (${provenance.provider})` : ""}
       </span>
       <span className="flex items-center gap-1 font-mono">

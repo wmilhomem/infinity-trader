@@ -14,8 +14,18 @@
  */
 
 import type { FieldEnvelope, FieldProvenance, MarketDataPackage } from "./types";
-import type { AssetSnapshot, OptionChainSnapshot, DICurveSnapshot, CorporateEventSnapshot } from "./types";
-import type { RawAsset, RawOptionChain, RawDICurvePoint, RawCorporateEvent } from "@/market/raw-types";
+import type {
+  AssetSnapshot,
+  OptionChainSnapshot,
+  DICurveSnapshot,
+  CorporateEventSnapshot,
+} from "./types";
+import type {
+  RawAsset,
+  RawOptionChain,
+  RawDICurvePoint,
+  RawCorporateEvent,
+} from "@/market/raw-types";
 import {
   assessBidAsk,
   assessExpiration,
@@ -35,10 +45,7 @@ import {
  * `source` é a string de origem (ex: "yahoo-finance").
  * `observedAt` é o ISO timestamp.
  */
-export function makeObservedProvenance(
-  source: string,
-  observedAt: string,
-): FieldProvenance {
+export function makeObservedProvenance(source: string, observedAt: string): FieldProvenance {
   return { origin: "observed", source, calculatedAt: observedAt };
 }
 
@@ -241,9 +248,10 @@ export function normalizeOptionChainPackage(
           reasons: ["no-valid-contracts"],
         }
       : {
-          quality: assessment.quality === "valid" && suspiciousReasons.length > 0
-            ? "suspicious"
-            : assessment.quality,
+          quality:
+            assessment.quality === "valid" && suspiciousReasons.length > 0
+              ? "suspicious"
+              : assessment.quality,
           reasons: [...assessment.reasons, ...suspiciousReasons, ...crossReasons],
         };
 

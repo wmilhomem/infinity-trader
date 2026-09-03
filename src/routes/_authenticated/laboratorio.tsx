@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { FlaskConical, Scale } from "lucide-react";
+import { FlaskConical, Scale, BookOpen } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useCaminho } from "@/lib/use-caminho";
 import { HipoteseMap, type FiltroHipotese } from "@/components/laboratorio/HipoteseMap";
@@ -19,6 +19,8 @@ import {
 import { fichasPorHipotese } from "@/lib/fichas-estrategias";
 import { PRESETS_ESTRATEGIA } from "@/lib/presets-estrategias";
 import { summary } from "@/lib/payoff";
+import { OptionsChainReader } from "@/components/options/OptionsChainReader";
+import { buildMarketContext } from "@/lib/market-context-builder";
 
 export const Route = createFileRoute("/_authenticated/laboratorio")({
   head: () => ({
@@ -50,6 +52,7 @@ function Laboratorio() {
   const [fichaAberta, setFichaAberta] = useState<string | null>(fichaParam ?? null);
   const [selecionadas, setSelecionadas] = useState<string[]>([]);
   const [comparando, setComparando] = useState(false);
+  const [labSection, setLabSection] = useState<"estrategias" | "ler-cadeia">("estrategias");
 
   const contagens = useMemo(() => {
     const c: Record<string, number> = { todas: FICHAS_ESTRATEGIAS.length };
@@ -70,6 +73,105 @@ function Laboratorio() {
 
   const ficha = fichaAberta ? (getFicha(fichaAberta) ?? null) : null;
   const fichasComparadas = useMemo(() => selecionarFichas(selecionadas), [selecionadas]);
+
+  const lerCadeiaContext = useMemo(() => {
+    const NOW = new Date().toISOString();
+    return buildMarketContext({
+      symbol: "PETR4",
+      quote: { last: 38.47 },
+      timestamp: NOW,
+      provenance: { source: "live", provider: "yahoo-finance", observedAt: NOW },
+      optionsChain: {
+        expirationDate: "2026-09-18",
+        daysToExpiration: 17,
+        atm: {
+          strike: 38.50,
+          spotUsed: 38.47,
+          determinedAt: NOW,
+          method: "nearest-strike",
+        },
+        impliedVolatilityAtm: {
+          value: 0.287,
+          provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW },
+          atmStrikeUsed: 38.50,
+        },
+        skew: {
+          putIvOtm: 0.342,
+          callIvOtm: 0.278,
+          slope: 0.064,
+          provenance: { origin: "calculated", method: "put-call-iv-spread", calculatedAt: NOW },
+          putStrikeUsed: 36.0,
+          callStrikeUsed: 41.0,
+          otmDistanceUsed: 0.065,
+        },
+        expectedMove: {
+          sigma1Brl: 1.83,
+          lowerBound1Sigma: 36.64,
+          upperBound1Sigma: 40.30,
+          provenance: { origin: "calculated", method: "spot-iv-sqrt-t", calculatedAt: NOW },
+          ivUsed: 0.287,
+          spotUsed: 38.47,
+          dteUsed: 17,
+          dteBase: "calendar",
+          formula: "Spot × IV × √(T/252)",
+        },
+        contracts: [
+          {
+            symbol: "PETR4",
+            strike: 36.0,
+            type: "put",
+            expiration: "2026-09-18",
+            daysToExpiration: 17,
+            bid: 0.42,
+            ask: 0.45,
+            volume: 1240,
+            openInterest: 8920,
+            impliedVolatility: { value: 0.342, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW } },
+            delta: { value: -0.234, provenance: { origin: "calculated", method: "black-scholes-bsm", calculatedAt: NOW } },
+          },
+          {
+            symbol: "PETR4",
+            strike: 37.0,
+            type: "put",
+            expiration: "2026-09-18",
+            daysToExpiration: 17,
+            bid: 0.72,
+            ask: 0.75,
+            volume: 2100,
+            openInterest: 12400,
+            impliedVolatility: { value: 0.321, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW } },
+            delta: { value: -0.318, provenance: { origin: "calculated", method: "black-scholes-bsm", calculatedAt: NOW } },
+          },
+          {
+            symbol: "PETR4",
+            strike: 38.5,
+            type: "call",
+            expiration: "2026-09-18",
+            daysToExpiration: 17,
+            bid: 1.15,
+            ask: 1.20,
+            volume: 3420,
+            openInterest: 12400,
+            impliedVolatility: { value: 0.287, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW } },
+            delta: { value: 0.512, provenance: { origin: "calculated", method: "black-scholes-bsm", calculatedAt: NOW } },
+          },
+          {
+            symbol: "PETR4",
+            strike: 40.0,
+            type: "call",
+            expiration: "2026-09-18",
+            daysToExpiration: 17,
+            bid: 0.38,
+            ask: 0.40,
+            volume: 980,
+            openInterest: 7800,
+            impliedVolatility: { value: 0.294, provenance: { origin: "observed", source: "yahoo-finance", calculatedAt: NOW } },
+            delta: { value: 0.201, provenance: { origin: "calculated", method: "black-scholes-bsm", calculatedAt: NOW } },
+          },
+        ],
+      },
+    });
+  }, []);
 
   function abrirFicha(id: string) {
     setFichaAberta(id);
@@ -130,7 +232,38 @@ function Laboratorio() {
           </Link>
         </div>
       )}
-      <div className="space-y-8">
+
+      {caminho !== "futuros" && (
+        <div className="mb-4 flex gap-1 rounded-lg border border-border bg-card p-1 w-fit">
+          <button
+            onClick={() => setLabSection("estrategias")}
+            className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              labSection === "estrategias"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground"
+            }`}
+          >
+            <Scale size={14} />
+            Estratégias
+          </button>
+          <button
+            onClick={() => setLabSection("ler-cadeia")}
+            className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              labSection === "ler-cadeia"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground"
+            }`}
+          >
+            <BookOpen size={14} />
+            Ler Cadeia
+          </button>
+        </div>
+      )}
+
+      {labSection === "ler-cadeia" ? (
+        <OptionsChainReader context={lerCadeiaContext} />
+      ) : (
+        <div className="space-y-8">
         <section>
           <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-primary">
             <FlaskConical size={13} /> Mapas de hipóteses → fichas de estruturas
@@ -225,7 +358,8 @@ function Laboratorio() {
             simular(id);
           }}
         />
-      </div>
+        </div>
+      )}
     </AppShell>
   );
 }

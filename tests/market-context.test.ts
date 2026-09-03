@@ -1,6 +1,9 @@
 import { describe, test, expect } from "vitest";
 import { buildMarketContext } from "../src/lib/market-context-builder";
-import { deriveMarketObservations, containsPrescriptiveLanguage } from "../src/lib/market-observations";
+import {
+  deriveMarketObservations,
+  containsPrescriptiveLanguage,
+} from "../src/lib/market-observations";
 import { calculateMarketFreshness } from "../src/lib/market-freshness";
 import { getSourceReliability } from "../src/lib/market-source-policy";
 import { buildDecisionSnapshot } from "../src/engines/decision-snapshot";

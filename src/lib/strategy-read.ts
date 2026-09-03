@@ -23,7 +23,12 @@ function fmt(v: number) {
   return `R$ ${v.toFixed(2)}`;
 }
 
-function detect(pernas: Perna[]): { nome: string; perfil: string; analogia: string; licaoSlug?: string } {
+function detect(pernas: Perna[]): {
+  nome: string;
+  perfil: string;
+  analogia: string;
+  licaoSlug?: string;
+} {
   const calls = pernas.filter((p) => p.tipo === "call");
   const puts = pernas.filter((p) => p.tipo === "put");
   const compras = pernas.filter((p) => p.acao === "compra");
@@ -182,12 +187,19 @@ export function checarRegras(pernas: Perna[], regras: RegraSimples[], leitura: L
 
   for (const r of regras.filter((x) => x.ativa)) {
     const t = `${r.nome ?? ""} ${r.texto}`.toLowerCase();
-    if (soCall && t.includes("call") && (t.includes("trava") || t.includes("sozinha") || t.includes("seco")))
+    if (
+      soCall &&
+      t.includes("call") &&
+      (t.includes("trava") || t.includes("sozinha") || t.includes("seco"))
+    )
       alertas.push({
         regra: r.texto,
         motivo: "Você está simulando uma call sozinha, sem trava.",
       });
-    if (!leitura.perdaLimitada && (t.includes("risco limitado") || t.includes("100% limitado") || t.includes("descoberta")))
+    if (
+      !leitura.perdaLimitada &&
+      (t.includes("risco limitado") || t.includes("100% limitado") || t.includes("descoberta"))
+    )
       alertas.push({
         regra: r.texto,
         motivo: "Esta estrutura tem perna vendida descoberta — risco não limitado.",
@@ -195,7 +207,8 @@ export function checarRegras(pernas: Perna[], regras: RegraSimples[], leitura: L
     if (t.includes("rsi") && soCall)
       alertas.push({
         regra: r.texto,
-        motivo: "Confirme o RSI antes de comprar call: sua regra condiciona a entrada a esse indicador.",
+        motivo:
+          "Confirme o RSI antes de comprar call: sua regra condiciona a entrada a esse indicador.",
       });
   }
   return alertas.filter(

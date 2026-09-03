@@ -22,7 +22,17 @@ interface BuildInput {
   symbol: string;
   observedAt?: string | null;
   provenance: {
-    source: "yahoo-finance" | "model" | "mock" | "live" | "delayed" | "provider" | "replay" | "manual" | "unknown" | "bcb";
+    source:
+      | "yahoo-finance"
+      | "model"
+      | "mock"
+      | "live"
+      | "delayed"
+      | "provider"
+      | "replay"
+      | "manual"
+      | "unknown"
+      | "bcb";
     provider?: string | null;
   };
   quality: {
@@ -54,9 +64,7 @@ interface BuildInput {
  * Converte um MarketDataPackage Y.2 para a estrutura Y.1.
  * Não chama Yahoo, não chama gateway — pura transformação.
  */
-export function packageToBuildInput(
-  pkg: MarketDataPackage,
-): BuildInput {
+export function packageToBuildInput(pkg: MarketDataPackage): BuildInput {
   const asset = pkg.asset?.value;
   const chain = pkg.optionChain?.value;
   const observedAt = pkg.observedAt ?? pkg.capturedAt;
@@ -80,11 +88,7 @@ export function packageToBuildInput(
   const sourceReliability: BuildInput["quality"]["sourceReliability"] =
     pkg.source === "yahoo-finance" ? "provider" : "secondary";
   const confidence: BuildInput["quality"]["confidence"] =
-    pkg.availability === "available"
-      ? "high"
-      : pkg.availability === "partial"
-        ? "medium"
-        : "low";
+    pkg.availability === "available" ? "high" : pkg.availability === "partial" ? "medium" : "low";
   const quality = { freshness, completeness, sourceReliability, confidence };
 
   // QUOTE
@@ -193,9 +197,10 @@ export function packageToBuildInput(
       const tContract = Math.max(dteContract, 1) / 252;
       // Greeks derivados via BSM se temos IV
       const iv = c.impliedVolatility ?? null;
-      const dS = iv !== null
-        ? bsmGreeks(c.right === "C" ? "call" : "put", spot, c.strike, tContract, r, iv)
-        : null;
+      const dS =
+        iv !== null
+          ? bsmGreeks(c.right === "C" ? "call" : "put", spot, c.strike, tContract, r, iv)
+          : null;
       return {
         symbol: c.symbol,
         strike: c.strike,
@@ -220,16 +225,28 @@ export function packageToBuildInput(
               }
             : null,
         delta: dS
-          ? { value: dS.delta, provenance: bsmProvenance("delta", spot, c.strike, dteContract, r, chain.observedAt) }
+          ? {
+              value: dS.delta,
+              provenance: bsmProvenance("delta", spot, c.strike, dteContract, r, chain.observedAt),
+            }
           : null,
         gamma: dS
-          ? { value: dS.gamma, provenance: bsmProvenance("gamma", spot, c.strike, dteContract, r, chain.observedAt) }
+          ? {
+              value: dS.gamma,
+              provenance: bsmProvenance("gamma", spot, c.strike, dteContract, r, chain.observedAt),
+            }
           : null,
         theta: dS
-          ? { value: dS.theta, provenance: bsmProvenance("theta", spot, c.strike, dteContract, r, chain.observedAt) }
+          ? {
+              value: dS.theta,
+              provenance: bsmProvenance("theta", spot, c.strike, dteContract, r, chain.observedAt),
+            }
           : null,
         vega: dS
-          ? { value: dS.vega, provenance: bsmProvenance("vega", spot, c.strike, dteContract, r, chain.observedAt) }
+          ? {
+              value: dS.vega,
+              provenance: bsmProvenance("vega", spot, c.strike, dteContract, r, chain.observedAt),
+            }
           : null,
       };
     });
@@ -286,8 +303,7 @@ function bsmGreeks(
 ) {
   if (t <= 0 || sigma <= 0) return null;
   try {
-    const d1 =
-      (Math.log(S / K) + (r + (sigma * sigma) / 2) * t) / (sigma * Math.sqrt(t));
+    const d1 = (Math.log(S / K) + (r + (sigma * sigma) / 2) * t) / (sigma * Math.sqrt(t));
     const d2 = d1 - sigma * Math.sqrt(t);
     const cdf = standardNormalCDF(d1);
     const pdf = standardNormalPDF(d1);
@@ -298,14 +314,10 @@ function bsmGreeks(
     let theta: number;
     if (type === "call") {
       delta = cdf;
-      theta =
-        (-S * pdf * sigma) / (2 * sqrtT) -
-        r * K * discount * standardNormalCDF(d2);
+      theta = (-S * pdf * sigma) / (2 * sqrtT) - r * K * discount * standardNormalCDF(d2);
     } else {
       delta = cdf - 1;
-      theta =
-        (-S * pdf * sigma) / (2 * sqrtT) +
-        r * K * discount * standardNormalCDF(-d2);
+      theta = (-S * pdf * sigma) / (2 * sqrtT) + r * K * discount * standardNormalCDF(-d2);
     }
     const gamma = pdf / (S * sigma * sqrtT);
     const vega = S * pdf * sqrtT * 0.01; // para 1% de IV
@@ -343,9 +355,7 @@ function standardNormalCDF(x: number): number {
   const sign = x < 0 ? -1 : 1;
   const absX = Math.abs(x) / Math.sqrt(2);
   const t = 1.0 / (1.0 + p * absX);
-  const y =
-    1.0 -
-    ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-absX * absX);
+  const y = 1.0 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-absX * absX);
   return 0.5 * (1.0 + sign * y);
 }
 

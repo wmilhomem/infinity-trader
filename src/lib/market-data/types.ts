@@ -35,11 +35,7 @@ export type DataQuality = "valid" | "suspicious" | "invalid" | "absent";
  * (não deve acontecer em produção — sempre classificar).
  */
 export type DataAbsenceReason =
-  | "not-provided-by-source"
-  | "insufficient-history"
-  | "source-unavailable"
-  | "schema-error"
-  | null;
+  "not-provided-by-source" | "insufficient-history" | "source-unavailable" | "schema-error" | null;
 
 // ─── PROVENIÊNCIA DE CAMPO (Y.1) ───────────────────────────────────
 

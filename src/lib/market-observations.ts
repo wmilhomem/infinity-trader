@@ -2,9 +2,9 @@ import type { MarketContext } from "./market-context";
 
 /**
  * DERIVED OBSERVATIONS & INTERPRETATION TYPES — RODADA X
- * 
+ *
  * Transforma dados numéricos brutos em observações verificáveis (fatos).
- * 
+ *
  * REGRA CRÍTICA:
  * Observações são matematicamente verificáveis ("Preço acima da VWAP").
  * NUNCA contêm linguagem prescritiva (sinais de compra/venda, metas, oportunidades).
@@ -60,7 +60,12 @@ export function deriveMarketObservations(ctx: MarketContext): MarketObservation[
   const vol = ctx.volatility;
 
   // 1. Preço vs VWAP
-  if (quote?.last !== undefined && quote?.last !== null && ind?.vwap !== undefined && ind?.vwap !== null) {
+  if (
+    quote?.last !== undefined &&
+    quote?.last !== null &&
+    ind?.vwap !== undefined &&
+    ind?.vwap !== null
+  ) {
     if (quote.last > ind.vwap) {
       obs.push({
         id: "price-above-vwap",
@@ -112,7 +117,8 @@ export function deriveMarketObservations(ctx: MarketContext): MarketObservation[
   if (rep?.type === "renko" && rep.renko) {
     const r = rep.renko;
     if (r.sequence !== undefined && r.sequence !== null && r.direction) {
-      const dirText = r.direction === "up" ? "alta" : r.direction === "down" ? "baixa" : "neutralidade";
+      const dirText =
+        r.direction === "up" ? "alta" : r.direction === "down" ? "baixa" : "neutralidade";
       obs.push({
         id: "renko-sequence",
         fact: `Foram observados ${r.sequence} blocos Renko consecutivos na direção de ${dirText} (tamanho do bloco: ${r.blockSize ?? "não informado"})`,
@@ -137,7 +143,8 @@ export function deriveMarketObservations(ctx: MarketContext): MarketObservation[
     for (const lvl of ind.fibonacci.levels) {
       const pctRatio = (lvl.ratio * 100).toFixed(1);
       const diffPct = Math.abs(quote.last - lvl.price) / quote.last;
-      if (diffPct <= 0.005) { // dentro de 0.5%
+      if (diffPct <= 0.005) {
+        // dentro de 0.5%
         obs.push({
           id: `fib-${lvl.ratio}`,
           fact: `Preço em R$ ${quote.last.toFixed(2)} está próximo do nível de ${pctRatio}% de Fibonacci (R$ ${lvl.price.toFixed(2)})`,
@@ -166,16 +173,22 @@ export function deriveMarketObservations(ctx: MarketContext): MarketObservation[
     }
 
     // Skew: ainda { putIvOtm, callIvOtm, slope, provenance, strikes }
-    if (opt.skew?.putIvOtm !== null && opt.skew?.callIvOtm !== null
-        && opt.skew?.putIvOtm !== undefined && opt.skew?.callIvOtm !== undefined) {
+    if (
+      opt.skew?.putIvOtm !== null &&
+      opt.skew?.callIvOtm !== null &&
+      opt.skew?.putIvOtm !== undefined &&
+      opt.skew?.callIvOtm !== undefined
+    ) {
       const diff = opt.skew.putIvOtm - opt.skew.callIvOtm;
-      const incl = diff > 0
-        ? "inclinado para Puts (Put IV maior que Call IV)"
-        : diff < 0
-        ? "inclinado para Calls (Call IV maior que Put IV)"
-        : "simétrico";
+      const incl =
+        diff > 0
+          ? "inclinado para Puts (Put IV maior que Call IV)"
+          : diff < 0
+            ? "inclinado para Calls (Call IV maior que Put IV)"
+            : "simétrico";
       const putStrike = opt.skew.putStrikeUsed != null ? ` (strike ${opt.skew.putStrikeUsed})` : "";
-      const callStrike = opt.skew.callStrikeUsed != null ? ` (strike ${opt.skew.callStrikeUsed})` : "";
+      const callStrike =
+        opt.skew.callStrikeUsed != null ? ` (strike ${opt.skew.callStrikeUsed})` : "";
       obs.push({
         id: "options-skew",
         fact: `Skew de volatilidade observado ${incl}: Put OTM${putStrike} com ${opt.skew.putIvOtm.toFixed(1)}% vs. Call OTM${callStrike} com ${opt.skew.callIvOtm.toFixed(1)}%`,
@@ -185,15 +198,21 @@ export function deriveMarketObservations(ctx: MarketContext): MarketObservation[
     }
 
     // Expected Move: agora é objeto com .value fields + .formula + .ivUsed
-    if (opt.expectedMove?.lowerBound1Sigma !== null && opt.expectedMove?.upperBound1Sigma !== null
-        && opt.expectedMove?.lowerBound1Sigma !== undefined && opt.expectedMove?.upperBound1Sigma !== undefined) {
+    if (
+      opt.expectedMove?.lowerBound1Sigma !== null &&
+      opt.expectedMove?.upperBound1Sigma !== null &&
+      opt.expectedMove?.lowerBound1Sigma !== undefined &&
+      opt.expectedMove?.upperBound1Sigma !== undefined
+    ) {
       const formula = opt.expectedMove.formula ? ` [fórmula: ${opt.expectedMove.formula}]` : "";
-      const ivUsed = opt.expectedMove.ivUsed != null
-        ? `, IV usada: ${(opt.expectedMove.ivUsed * 100).toFixed(1)}%`
-        : "";
-      const dteUsed = opt.expectedMove.dteUsed != null
-        ? `, DTE: ${opt.expectedMove.dteUsed} dias ${opt.expectedMove.dteBase ?? ""}`
-        : "";
+      const ivUsed =
+        opt.expectedMove.ivUsed != null
+          ? `, IV usada: ${(opt.expectedMove.ivUsed * 100).toFixed(1)}%`
+          : "";
+      const dteUsed =
+        opt.expectedMove.dteUsed != null
+          ? `, DTE: ${opt.expectedMove.dteUsed} dias ${opt.expectedMove.dteBase ?? ""}`
+          : "";
       obs.push({
         id: "options-expected-move",
         fact: `Faixa de variação esperada em 1 sigma (68% prob. implícita): entre R$ ${opt.expectedMove.lowerBound1Sigma.toFixed(2)} e R$ ${opt.expectedMove.upperBound1Sigma.toFixed(2)} (amplitude de ±R$ ${opt.expectedMove.sigma1Brl?.toFixed(2) ?? "N/A"})${formula}${ivUsed}${dteUsed}`,
@@ -206,7 +225,9 @@ export function deriveMarketObservations(ctx: MarketContext): MarketObservation[
   // Sanity check: garantir ausência de linguagem prescritiva em todas as observações
   for (const o of obs) {
     if (containsPrescriptiveLanguage(o.fact)) {
-      throw new Error(`VIOLAÇÃO EPISTÊMICA DA RODADA X/Y: Observação automática contém termo prescritivo: "${o.fact}"`);
+      throw new Error(
+        `VIOLAÇÃO EPISTÊMICA DA RODADA X/Y: Observação automática contém termo prescritivo: "${o.fact}"`,
+      );
     }
   }
 

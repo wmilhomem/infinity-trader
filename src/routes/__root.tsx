@@ -21,9 +21,7 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-primary">404</h1>
         <h2 className="mt-4 text-xl font-semibold">Página não encontrada</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Esse link não existe ou foi movido.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">Esse link não existe ou foi movido.</p>
         <Link
           to="/"
           className="mt-6 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
@@ -99,8 +97,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "O mercado não falta informação — falta processo. O Zero ao Trade transforma impulsos em decisões conscientes: o copilot informa, você decide.",
       },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e32adef6-cd20-4e9f-a3ab-464c15009564/id-preview-6c70d9e7--21570d6c-9578-40a2-b3b4-1b35149e2937.lovable.app-1784900714869.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e32adef6-cd20-4e9f-a3ab-464c15009564/id-preview-6c70d9e7--21570d6c-9578-40a2-b3b4-1b35149e2937.lovable.app-1784900714869.png" },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e32adef6-cd20-4e9f-a3ab-464c15009564/id-preview-6c70d9e7--21570d6c-9578-40a2-b3b4-1b35149e2937.lovable.app-1784900714869.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e32adef6-cd20-4e9f-a3ab-464c15009564/id-preview-6c70d9e7--21570d6c-9578-40a2-b3b4-1b35149e2937.lovable.app-1784900714869.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

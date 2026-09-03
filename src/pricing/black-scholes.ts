@@ -22,15 +22,22 @@ export function d2(S: number, K: number, t: number, r: number, sigma: number): n
  * @param r Taxa livre de risco anualizada contínua
  * @param sigma Volatilidade Implícita (anualizada, Ex: 0.3)
  */
-export function blackScholes(type: OptionType, S: number, K: number, t: number, r: number, sigma: number): number {
+export function blackScholes(
+  type: OptionType,
+  S: number,
+  K: number,
+  t: number,
+  r: number,
+  sigma: number,
+): number {
   if (t <= 0) return type === "call" ? Math.max(0, S - K) : Math.max(0, K - S);
 
   const d_1 = d1(S, K, t, r, sigma);
   const d_2 = d_1 - sigma * Math.sqrt(t);
-  
+
   const Nd1 = standardNormalCDF(d_1);
   const Nd2 = standardNormalCDF(d_2);
-  
+
   if (type === "call") {
     return S * Nd1 - K * Math.exp(-r * t) * Nd2;
   } else {

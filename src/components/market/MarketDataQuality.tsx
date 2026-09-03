@@ -33,7 +33,9 @@ export function MarketDataQualityBadge({ quality }: Props) {
 
   return (
     <div className="flex flex-wrap items-center gap-2 text-xs">
-      <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 font-medium ${fresh.class}`}>
+      <span
+        className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 font-medium ${fresh.class}`}
+      >
         <Clock size={12} /> {fresh.text}
       </span>
       <span className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-0.5 text-muted-foreground">

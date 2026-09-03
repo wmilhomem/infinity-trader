@@ -1,12 +1,7 @@
 import type { DecisionScore } from "@/engines/decision-engine";
 
 export function ScorePanel({ score }: { score: DecisionScore }) {
-  const cor =
-    score.score >= 85
-      ? "text-success"
-      : score.score >= 40
-        ? "text-primary"
-        : "text-loss";
+  const cor = score.score >= 85 ? "text-success" : score.score >= 40 ? "text-primary" : "text-loss";
   return (
     <div className="rounded-lg border border-border bg-card p-3">
       <div className="flex items-baseline justify-between">

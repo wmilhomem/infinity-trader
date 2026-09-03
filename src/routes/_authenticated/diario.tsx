@@ -286,7 +286,8 @@ function Diario() {
               },
               representation: {
                 type: representacao,
-                renko: representacao === "renko" && brickSize ? { blockSize: Number(brickSize) } : null,
+                renko:
+                  representacao === "renko" && brickSize ? { blockSize: Number(brickSize) } : null,
               },
             }),
             strategy: pernas

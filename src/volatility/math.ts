@@ -6,11 +6,11 @@ export function calculateIVRank(current: number, history: number[]): number {
   if (history.length === 0) return 50; // Neutral fallback if no data
   const min = Math.min(...history);
   const max = Math.max(...history);
-  
-  if (max === min) return 50; 
+
+  if (max === min) return 50;
   if (current <= min) return 0;
   if (current >= max) return 100;
-  
+
   return ((current - min) / (max - min)) * 100;
 }
 
@@ -21,7 +21,7 @@ export function calculateIVRank(current: number, history: number[]): number {
  */
 export function calculateIVPercentile(current: number, history: number[]): number {
   if (history.length === 0) return 50;
-  
-  const lowerDays = history.filter(v => v < current).length;
+
+  const lowerDays = history.filter((v) => v < current).length;
   return (lowerDays / history.length) * 100;
 }

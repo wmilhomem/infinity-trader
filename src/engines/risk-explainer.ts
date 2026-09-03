@@ -9,7 +9,12 @@ function brl(v: number) {
 }
 
 /** Traduz o payoff em cenários de linguagem simples: "o que pode dar errado?" */
-export function explicarRiscos(pernas: Perna[], centro: number, ativo: string, i: Interpretacao): RiscoItem[] {
+export function explicarRiscos(
+  pernas: Perna[],
+  centro: number,
+  ativo: string,
+  i: Interpretacao,
+): RiscoItem[] {
   const itens: RiscoItem[] = [];
   const queda = centro * 0.85;
   const alta = centro * 1.15;

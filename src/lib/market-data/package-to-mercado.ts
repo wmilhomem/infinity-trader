@@ -10,26 +10,34 @@
  */
 
 import type { MarketDataPackage } from "./types";
-import type { MercadoObservadoComProvenance, MarketFactEnvelope } from "./mercado-observado-provenance";
+import type {
+  MercadoObservadoComProvenance,
+  MarketFactEnvelope,
+} from "./mercado-observado-provenance";
 import {
   makeObservedFact,
   makeCalculatedFact,
   makeAbsentFact,
 } from "./mercado-observado-provenance";
 
-export function packageToMercadoObservado(
-  pkg: MarketDataPackage,
-): MercadoObservadoComProvenance {
+export function packageToMercadoObservado(pkg: MarketDataPackage): MercadoObservadoComProvenance {
   const asset = pkg.asset;
   const chain = pkg.optionChain;
   const capturedAt = pkg.capturedAt;
 
   const spot = asset?.value?.price ?? null;
-  const spotEnvelope = asset?.quality === "absent"
-    ? makeAbsentFact<number | null>("source-unavailable", "yahoo-finance", capturedAt)
-    : asset?.quality === "invalid"
-      ? makeAbsentFact<number | null>("schema-error", "yahoo-finance", capturedAt)
-      : makeObservedFact<number | null>(spot, "yahoo-finance", capturedAt, asset?.quality ?? "valid", asset?.reasons ?? []);
+  const spotEnvelope =
+    asset?.quality === "absent"
+      ? makeAbsentFact<number | null>("source-unavailable", "yahoo-finance", capturedAt)
+      : asset?.quality === "invalid"
+        ? makeAbsentFact<number | null>("schema-error", "yahoo-finance", capturedAt)
+        : makeObservedFact<number | null>(
+            spot,
+            "yahoo-finance",
+            capturedAt,
+            asset?.quality ?? "valid",
+            asset?.reasons ?? [],
+          );
 
   const ivAtmValue = chain?.value?.contracts[0]?.impliedVolatility ?? null;
   const ivAtmEnvelope: MarketFactEnvelope<number | null> = (() => {
@@ -40,7 +48,11 @@ export function packageToMercadoObservado(
       const prov = chain?.provenance;
       return {
         value: ivAtmValue,
-        provenance: prov ?? { origin: "observed", source: "yahoo-finance", calculatedAt: capturedAt },
+        provenance: prov ?? {
+          origin: "observed",
+          source: "yahoo-finance",
+          calculatedAt: capturedAt,
+        },
         quality: chain?.quality ?? "valid",
         reasons: chain?.reasons ?? [],
       };
@@ -56,7 +68,13 @@ export function packageToMercadoObservado(
     if (asset?.value?.ivRank === null && asset?.absenceReason === "insufficient-history") {
       return makeAbsentFact<number | null>("insufficient-history", "yahoo-finance", capturedAt);
     }
-    return makeObservedFact<number | null>(ivRankValue, "yahoo-finance", capturedAt, asset?.quality ?? "valid", asset?.reasons ?? []);
+    return makeObservedFact<number | null>(
+      ivRankValue,
+      "yahoo-finance",
+      capturedAt,
+      asset?.quality ?? "valid",
+      asset?.reasons ?? [],
+    );
   })();
 
   const expectedMoveValue = (() => {
@@ -73,9 +91,11 @@ export function packageToMercadoObservado(
     return null;
   })();
 
-  const expectedMoveEnvelope: MarketFactEnvelope<
-    { value: number | null; lowerBound: number | null; upperBound: number | null } | null
-  > = expectedMoveValue
+  const expectedMoveEnvelope: MarketFactEnvelope<{
+    value: number | null;
+    lowerBound: number | null;
+    upperBound: number | null;
+  } | null> = expectedMoveValue
     ? makeCalculatedFact(
         expectedMoveValue,
         "expected-move-1sigma",
@@ -86,21 +106,36 @@ export function packageToMercadoObservado(
     : makeAbsentFact("not-provided-by-source", "yahoo-finance", capturedAt);
 
   const skewValue = calculateSkew(chain);
-  const skewEnvelope: MarketFactEnvelope<
-    { putIv: number | null; callIv: number | null; slope: number | null } | null
-  > = skewValue
-    ? makeCalculatedFact(skewValue, "volatility-skew", { spot }, capturedAt, chain?.quality ?? "valid")
+  const skewEnvelope: MarketFactEnvelope<{
+    putIv: number | null;
+    callIv: number | null;
+    slope: number | null;
+  } | null> = skewValue
+    ? makeCalculatedFact(
+        skewValue,
+        "volatility-skew",
+        { spot },
+        capturedAt,
+        chain?.quality ?? "valid",
+      )
     : makeAbsentFact("not-provided-by-source", "yahoo-finance", capturedAt);
 
   return {
-    observadoEm: makeObservedFact<string | null>(pkg.observedAt ?? capturedAt, pkg.source, capturedAt, "valid"),
-    fonte: makeObservedFact<
-      "mock" | "live" | "modelo" | "replay" | "bcb" | "yahoo-finance"
-    >(
+    observadoEm: makeObservedFact<string | null>(
+      pkg.observedAt ?? capturedAt,
+      pkg.source,
+      capturedAt,
+      "valid",
+    ),
+    fonte: makeObservedFact<"mock" | "live" | "modelo" | "replay" | "bcb" | "yahoo-finance">(
       pkg.source === "yahoo-finance" ? "yahoo-finance" : pkg.source === "bcb" ? "bcb" : "modelo",
       pkg.source,
       capturedAt,
-      pkg.availability === "available" ? "valid" : pkg.availability === "partial" ? "suspicious" : "absent",
+      pkg.availability === "available"
+        ? "valid"
+        : pkg.availability === "partial"
+          ? "suspicious"
+          : "absent",
     ),
     spot: spotEnvelope,
     ivAtm: ivAtmEnvelope,

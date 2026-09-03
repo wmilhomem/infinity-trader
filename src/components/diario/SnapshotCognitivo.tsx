@@ -110,7 +110,10 @@ export function SnapshotCognitivo({ snap }: { snap: SnapshotCognitivoView }) {
           </div>
           <div className="flex flex-wrap gap-2 text-[11px] font-mono text-muted-foreground">
             <span>Fonte: {snap.marketContext.provenance.source}</span>
-            <span>Qualidade: {snap.marketContext.quality.freshness} ({snap.marketContext.quality.completeness})</span>
+            <span>
+              Qualidade: {snap.marketContext.quality.freshness} (
+              {snap.marketContext.quality.completeness})
+            </span>
           </div>
         </div>
       )}

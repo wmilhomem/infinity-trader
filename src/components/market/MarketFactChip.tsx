@@ -4,7 +4,10 @@ import { Plus, Check, HelpCircle } from "lucide-react";
 
 interface Props {
   observation: MarketObservation;
-  onUseFact?: (factText: string, usage: "evidencia" | "contraevidencia" | "contexto" | "irrelevante") => void;
+  onUseFact?: (
+    factText: string,
+    usage: "evidencia" | "contraevidencia" | "contexto" | "irrelevante",
+  ) => void;
 }
 
 export function MarketFactChip({ observation, onUseFact }: Props) {

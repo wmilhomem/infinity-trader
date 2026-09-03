@@ -8,7 +8,10 @@ import { Activity, BarChart2, Eye, HelpCircle } from "lucide-react";
 
 interface Props {
   context: MarketContext;
-  onUseFact?: (factText: string, usage: "evidencia" | "contraevidencia" | "contexto" | "irrelevante") => void;
+  onUseFact?: (
+    factText: string,
+    usage: "evidencia" | "contraevidencia" | "contexto" | "irrelevante",
+  ) => void;
 }
 
 function fmtCurrency(val?: number | null): string {
@@ -54,7 +57,9 @@ export function MarketContextCard({ context, onUseFact }: Props) {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
         {/* Preço */}
         <div className="rounded-lg border border-border/50 bg-background/50 p-3">
-          <div className="text-[11px] uppercase text-muted-foreground font-medium">Preço observado</div>
+          <div className="text-[11px] uppercase text-muted-foreground font-medium">
+            Preço observado
+          </div>
           <div className="font-mono text-base font-bold text-foreground mt-0.5">
             {fmtCurrency(q?.last)}
           </div>
@@ -71,14 +76,18 @@ export function MarketContextCard({ context, onUseFact }: Props) {
           </div>
           {ind?.movingAverages && ind.movingAverages.length > 0 && (
             <div className="text-[10px] text-muted-foreground mt-1 font-mono">
-              {ind.movingAverages.map((m) => `M${m.period}: ${m.value !== null ? m.value.toFixed(2) : "-"}`).join(" · ")}
+              {ind.movingAverages
+                .map((m) => `M${m.period}: ${m.value !== null ? m.value.toFixed(2) : "-"}`)
+                .join(" · ")}
             </div>
           )}
         </div>
 
         {/* Volatilidade */}
         <div className="rounded-lg border border-border/50 bg-background/50 p-3">
-          <div className="text-[11px] uppercase text-muted-foreground font-medium">Volatilidade (IV)</div>
+          <div className="text-[11px] uppercase text-muted-foreground font-medium">
+            Volatilidade (IV)
+          </div>
           <div className="font-mono text-base font-bold text-foreground mt-0.5">
             {fmtPct(vol?.impliedVolatility)}
           </div>
@@ -91,7 +100,9 @@ export function MarketContextCard({ context, onUseFact }: Props) {
 
         {/* Representação / Liquidez */}
         <div className="rounded-lg border border-border/50 bg-background/50 p-3">
-          <div className="text-[11px] uppercase text-muted-foreground font-medium">Representação</div>
+          <div className="text-[11px] uppercase text-muted-foreground font-medium">
+            Representação
+          </div>
           <div className="font-mono text-sm font-semibold text-foreground mt-0.5 capitalize">
             {rep?.type ?? "Candle"}
             {rep?.renko?.blockSize ? ` (${rep.renko.blockSize}pt)` : ""}

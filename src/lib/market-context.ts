@@ -18,14 +18,14 @@
 // ─── TIPOS DE PROVENIÊNCIA ─────────────────────────────────────────
 
 export type MarketDataSource =
-  | "mock"        // dado gerado para fins pedagógicos/sandbox
-  | "live"        // dado ao vivo de provider oficial B3
-  | "delayed"     // dado com atraso declarado
-  | "provider"    // dado de provedor terceirizado
-  | "model"       // gerado por modelo matemático interno
-  | "replay"      // dado congelado por snapshot histórico
-  | "manual"      // inserido manualmente pelo usuário
-  | "unknown";    // origem desconhecida — máxima cautela
+  | "mock" // dado gerado para fins pedagógicos/sandbox
+  | "live" // dado ao vivo de provider oficial B3
+  | "delayed" // dado com atraso declarado
+  | "provider" // dado de provedor terceirizado
+  | "model" // gerado por modelo matemático interno
+  | "replay" // dado congelado por snapshot histórico
+  | "manual" // inserido manualmente pelo usuário
+  | "unknown"; // origem desconhecida — máxima cautela
 
 /**
  * Origem de um campo derivado ou calculado.
@@ -133,7 +133,7 @@ export interface OptionContract {
   strike: number;
   type: "call" | "put";
   style?: "american" | "european" | null;
-  expiration: string;        // ISO date "YYYY-MM-DD"
+  expiration: string; // ISO date "YYYY-MM-DD"
   daysToExpiration: number;
 
   // ── Dados observados de mercado ────────────────────────────

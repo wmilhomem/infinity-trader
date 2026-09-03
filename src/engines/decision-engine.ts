@@ -23,13 +23,27 @@ export function calcularDecisionScore(input: ScoreInput): DecisionScore {
   const checkKeys = Object.keys(input.checklist);
   const checkOk = checkKeys.length > 0 && checkKeys.every((k) => input.checklist[k]);
   const riscoConhecido =
-    !!input.interpretacao && input.interpretacao.perdaLimitada && input.interpretacao.capitalEmRisco > 0;
+    !!input.interpretacao &&
+    input.interpretacao.perdaLimitada &&
+    input.interpretacao.capitalEmRisco > 0;
   const criticos = input.alertas.filter((a) => a.severidade === "critico").length;
   const regrasOk = input.alertas.length === 0;
 
   const itens: ScoreItem[] = [
-    { chave: "simulou", label: "Simulou antes de decidir", max: 20, pontos: input.simulou ? 20 : 0, ok: input.simulou },
-    { chave: "tese", label: "Escreveu a tese com clareza", max: 20, pontos: teseOk ? 20 : input.tese.trim() ? 8 : 0, ok: teseOk },
+    {
+      chave: "simulou",
+      label: "Simulou antes de decidir",
+      max: 20,
+      pontos: input.simulou ? 20 : 0,
+      ok: input.simulou,
+    },
+    {
+      chave: "tese",
+      label: "Escreveu a tese com clareza",
+      max: 20,
+      pontos: teseOk ? 20 : input.tese.trim() ? 8 : 0,
+      ok: teseOk,
+    },
     {
       chave: "regras",
       label: "A operação respeita suas regras",
@@ -37,7 +51,13 @@ export function calcularDecisionScore(input: ScoreInput): DecisionScore {
       pontos: regrasOk ? 20 : Math.max(0, 12 - criticos * 6),
       ok: regrasOk,
     },
-    { chave: "checklist", label: "Respondeu o checklist de decisão", max: 15, pontos: checkOk ? 15 : 0, ok: checkOk },
+    {
+      chave: "checklist",
+      label: "Respondeu o checklist de decisão",
+      max: 15,
+      pontos: checkOk ? 15 : 0,
+      ok: checkOk,
+    },
     {
       chave: "risco",
       label: "Risco máximo conhecido e limitado",
@@ -54,7 +74,10 @@ export function calcularDecisionScore(input: ScoreInput): DecisionScore {
     },
   ];
 
-  const score = Math.min(100, itens.reduce((s, i) => s + i.pontos, 0));
+  const score = Math.min(
+    100,
+    itens.reduce((s, i) => s + i.pontos, 0),
+  );
   const leitura =
     score >= 85
       ? "Decisão madura: você sabe o que está fazendo e por quê."

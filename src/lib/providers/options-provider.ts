@@ -2,7 +2,7 @@ import type { MarketContext } from "../market-context";
 
 /**
  * CONTRATO FUTURO DE MARKET DATA DE OPÇÕES & PROVEDORES DE MERCADO
- * 
+ *
  * Abstração para fontes de dados de mercado (Mock, Live, Delayed, B3 Provider).
  * Prepara o terreno para a Rodada Y sem acoplar o sistema a uma API específica.
  */

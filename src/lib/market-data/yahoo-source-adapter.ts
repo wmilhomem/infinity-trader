@@ -54,11 +54,7 @@ export class YahooSourceAdapter implements MarketDataProvider {
           "yahoo-finance",
           new Date(parsed.data.lastUpdate).toISOString(),
         );
-        assetEnvelope = normalizeAssetPackage(
-          parsed.data,
-          { quality: "valid", reasons: [] },
-          prov,
-        );
+        assetEnvelope = normalizeAssetPackage(parsed.data, { quality: "valid", reasons: [] }, prov);
       } else {
         const assessment = schemaErrorAssessment(
           parsed.errors.map((e) => `${e.path}: ${e.message}`),
@@ -116,10 +112,7 @@ export class YahooSourceAdapter implements MarketDataProvider {
       const raw = await this.gateway.fetchDICurve();
       const parsed = parseDICurve(raw);
       if (parsed.ok) {
-        diEnvelope = normalizeDICurvePackage(
-          parsed.data,
-          { quality: "valid", reasons: [] },
-        );
+        diEnvelope = normalizeDICurvePackage(parsed.data, { quality: "valid", reasons: [] });
       } else {
         diEnvelope = normalizeDICurvePackage(
           null,
@@ -127,14 +120,11 @@ export class YahooSourceAdapter implements MarketDataProvider {
         );
       }
     } catch {
-      diEnvelope = normalizeDICurvePackage(
-        null,
-        {
-          quality: "absent",
-          absenceReason: "source-unavailable",
-          reasons: ["network-error"],
-        },
-      );
+      diEnvelope = normalizeDICurvePackage(null, {
+        quality: "absent",
+        absenceReason: "source-unavailable",
+        reasons: ["network-error"],
+      });
     }
 
     // CORPORATE EVENTS
@@ -148,14 +138,11 @@ export class YahooSourceAdapter implements MarketDataProvider {
           : schemaErrorAssessment(parsed.errors.map((e) => `${e.path}: ${e.message}`)),
       );
     } catch {
-      eventsEnvelope = normalizeCorporateEventsPackage(
-        null,
-        {
-          quality: "absent",
-          absenceReason: "source-unavailable",
-          reasons: ["network-error"],
-        },
-      );
+      eventsEnvelope = normalizeCorporateEventsPackage(null, {
+        quality: "absent",
+        absenceReason: "source-unavailable",
+        reasons: ["network-error"],
+      });
     }
 
     const availability = aggregateAvailability([

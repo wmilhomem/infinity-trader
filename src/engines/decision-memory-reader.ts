@@ -160,4 +160,3 @@ export function lerSnapshotCognitivo(contexto: Json | null): SnapshotCognitivoVi
     marketContext: marketContextObj && marketContextObj.version === 1 ? marketContextObj : null,
   };
 }
-

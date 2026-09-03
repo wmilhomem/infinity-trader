@@ -1,17 +1,23 @@
 import { describe, test, expect } from "vitest";
 import { buildMarketContext } from "../src/lib/market-context-builder";
-import { deriveMarketObservations, containsPrescriptiveLanguage } from "../src/lib/market-observations";
+import {
+  deriveMarketObservations,
+  containsPrescriptiveLanguage,
+} from "../src/lib/market-observations";
 import { buildDecisionSnapshot } from "../src/engines/decision-snapshot";
 import { lerSnapshotCognitivo } from "../src/engines/decision-memory-reader";
 import { lerReplay } from "../src/engines/replay";
-import { formatOmniscientContextForPrompt, buildOmniscientContext } from "../src/engines/omniscient-context";
+import {
+  formatOmniscientContextForPrompt,
+  buildOmniscientContext,
+} from "../src/engines/omniscient-context";
 
 describe("RODADA X.1 — Audit & Hardening", () => {
   test("X.1.1 — Fluxo Completo: MarketContext atravessa todas as camadas sem perda de dados", () => {
     const marketCtx = buildMarketContext({
       symbol: "PETR4",
-      quote: { last: 38.50, open: 38.00, high: 39.00, low: 37.80 },
-      indicators: { vwap: 38.20 },
+      quote: { last: 38.5, open: 38.0, high: 39.0, low: 37.8 },
+      indicators: { vwap: 38.2 },
       representation: { type: "candle" },
       volatility: { impliedVolatility: 32.5, ivRank: 45 },
       provenance: { source: "live", provider: "B3 Gateway" },
@@ -44,7 +50,7 @@ describe("RODADA X.1 — Audit & Hardening", () => {
 
     // 2. Leitura Cognitiva (Diário)
     const cognitivoView = lerSnapshotCognitivo(snapshot as unknown as Record<string, unknown>);
-    expect(cognitivoView?.marketContext?.quote?.last).toBe(38.50);
+    expect(cognitivoView?.marketContext?.quote?.last).toBe(38.5);
 
     // 3. Replay Engine
     const replayView = lerReplay(
@@ -57,16 +63,16 @@ describe("RODADA X.1 — Audit & Hardening", () => {
         status: "aberta",
         resultado: null,
       },
-      snapshot as unknown as Record<string, unknown>
+      snapshot as unknown as Record<string, unknown>,
     );
 
-    expect(replayView?.marketContext?.indicators?.vwap).toBe(38.20);
+    expect(replayView?.marketContext?.indicators?.vwap).toBe(38.2);
   });
 
   test("X.1.2 — Imutabilidade: Alterações em instâncias posteriores de mercado não modificam snapshots antigos", () => {
     const originalMarket = buildMarketContext({
       symbol: "VALE3",
-      quote: { last: 60.00 },
+      quote: { last: 60.0 },
     });
 
     const snapshot = buildDecisionSnapshot({
@@ -87,12 +93,12 @@ describe("RODADA X.1 — Audit & Hardening", () => {
     // Instância posterior de mercado (preço mudou para 65.00)
     const laterMarket = buildMarketContext({
       symbol: "VALE3",
-      quote: { last: 65.00 },
+      quote: { last: 65.0 },
     });
 
     // Congelamento imutável preservado no snapshot
-    expect(snapshot.marketContext?.quote?.last).toBe(60.00);
-    expect(laterMarket.quote?.last).toBe(65.00);
+    expect(snapshot.marketContext?.quote?.last).toBe(60.0);
+    expect(laterMarket.quote?.last).toBe(65.0);
   });
 
   test("X.1.3 — Ausência de Dados: O sistema funciona perfeitamente com ausência total (null != 0)", () => {
@@ -131,8 +137,8 @@ describe("RODADA X.1 — Audit & Hardening", () => {
   test("X.1.4 — Copilot Red-Team: System Prompt proíbe recomendações e mantém conduta observacional", () => {
     const marketCtx = buildMarketContext({
       symbol: "PETR4",
-      quote: { last: 38.50 },
-      indicators: { vwap: 36.00 },
+      quote: { last: 38.5 },
+      indicators: { vwap: 36.0 },
     });
 
     const obs = deriveMarketObservations(marketCtx);
@@ -178,6 +184,8 @@ describe("RODADA X.1 — Audit & Hardening", () => {
 
     expect(promptText).toContain("POLÍTICA DE CONTEXTO DE MERCADO (RODADA X)");
     expect(promptText).toContain("Você NUNCA deve produzir sinais de compra/venda");
-    expect(promptText).toContain("Ausência de dados (null) deve ser tratada como ausência de observação");
+    expect(promptText).toContain(
+      "Ausência de dados (null) deve ser tratada como ausência de observação",
+    );
   });
 });

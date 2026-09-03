@@ -1,11 +1,11 @@
-import type {
-  Asset,
-  OptionContract,
-  OptionChain,
-  CorporateEvent,
-  YieldCurve,
-} from "./types";
-import { parseAsset, parseOptionContract, parseOptionChain, parseDICurve, parseCorporateEvents } from "@/lib/market-data/schemas";
+import type { Asset, OptionContract, OptionChain, CorporateEvent, YieldCurve } from "./types";
+import {
+  parseAsset,
+  parseOptionContract,
+  parseOptionChain,
+  parseDICurve,
+  parseCorporateEvents,
+} from "@/lib/market-data/schemas";
 import {
   normalizeAssetPackage,
   normalizeOptionChainPackage,
@@ -39,11 +39,7 @@ export class MarketNormalizer {
     }
     const observedAt = new Date(parsed.data.lastUpdate).toISOString();
     const provenance = makeObservedProvenance("yahoo-finance", observedAt);
-    const env = normalizeAssetPackage(
-      parsed.data,
-      { quality: "valid", reasons: [] },
-      provenance,
-    );
+    const env = normalizeAssetPackage(parsed.data, { quality: "valid", reasons: [] }, provenance);
     const snap = env?.value;
     if (!snap) {
       return {
@@ -117,11 +113,7 @@ export class MarketNormalizer {
       return { underlying: "", contracts: [], lastUpdate: new Date() };
     }
     const r = parsed.data;
-    const env = normalizeOptionChainPackage(
-      r,
-      { quality: "valid", reasons: [] },
-      null,
-    );
+    const env = normalizeOptionChainPackage(r, { quality: "valid", reasons: [] }, null);
     const snap = env?.value;
     return {
       underlying: r.underlying,
@@ -150,15 +142,10 @@ export class MarketNormalizer {
     if (!parsed.ok) {
       return { points: [], baseDate: new Date() };
     }
-    const env = normalizeDICurvePackage(
-      parsed.data,
-      { quality: "valid", reasons: [] },
-    );
+    const env = normalizeDICurvePackage(parsed.data, { quality: "valid", reasons: [] });
     return {
       baseDate: new Date(),
-      points: env?.value
-        ? env.value.points.map((p) => ({ days: p.days, rate: p.rate }))
-        : [],
+      points: env?.value ? env.value.points.map((p) => ({ days: p.days, rate: p.rate })) : [],
     };
   }
 
@@ -167,10 +154,7 @@ export class MarketNormalizer {
     if (!parsed.ok) {
       return [];
     }
-    const env = normalizeCorporateEventsPackage(
-      parsed.data,
-      { quality: "valid", reasons: [] },
-    );
+    const env = normalizeCorporateEventsPackage(parsed.data, { quality: "valid", reasons: [] });
     if (!env?.value) return [];
     return env.value.map((e) => ({
       ticker: e.ticker,

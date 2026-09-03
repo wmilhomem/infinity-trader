@@ -21,7 +21,13 @@ export type Alerta = {
 
 const KEYS = {
   trava: ["trava", "spread", "sozinha", "seco", "descoberta"],
-  riscoLimitado: ["risco limitado", "perda limitada", "100% limitado", "descoberta", "risco definido"],
+  riscoLimitado: [
+    "risco limitado",
+    "perda limitada",
+    "100% limitado",
+    "descoberta",
+    "risco definido",
+  ],
   vwap: ["vwap"],
   rsi: ["rsi"],
   media: ["média móvel", "media movel", "mm ", "ema", "sma"],
@@ -45,8 +51,7 @@ export function validarRegras(
 ): Alerta[] {
   const alertas: Alerta[] = [];
   const ativas = regras.filter((r) => r.ativa);
-  const compraSeca =
-    pernas.length === 1 && pernas[0].acao === "compra";
+  const compraSeca = pernas.length === 1 && pernas[0].acao === "compra";
   const confirm = ctx.confirmacoes ?? {};
 
   ativas.forEach((r, idx) => {
@@ -55,8 +60,7 @@ export function validarRegras(
     const push = (motivo: string, severidade: Alerta["severidade"] = "aviso") =>
       alertas.push({ ruleId: r.id, indice, regra: r.texto, motivo, severidade });
 
-    if (compraSeca && has(t, KEYS.trava))
-      push("Você está simulando uma opção sozinha, sem trava.");
+    if (compraSeca && has(t, KEYS.trava)) push("Você está simulando uma opção sozinha, sem trava.");
 
     if (!i.perdaLimitada && has(t, KEYS.riscoLimitado))
       push("Esta estrutura tem perna vendida descoberta — o risco não é limitado.", "critico");

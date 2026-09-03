@@ -1066,9 +1066,7 @@ function Simulador() {
                   </div>
                 )}
 
-                {instrumento === "opcoes" && (
-                  <MarketContextCard context={marketContextCanonical} />
-                )}
+                {instrumento === "opcoes" && <MarketContextCard context={marketContextCanonical} />}
 
                 {contexto && instrumento === "opcoes" && (
                   <DecisionCards contexto={contexto} alertas={alertas} />

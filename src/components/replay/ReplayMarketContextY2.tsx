@@ -27,9 +27,21 @@ const QUALITY_LABEL: Record<string, { text: string; class: string }> = {
   absent: { text: "Ausente", class: "text-muted-foreground" },
 };
 
-function ProvenanceBadge({ provenance, quality }: { provenance: { origin: string; source?: string | null; method?: string | null; calculatedAt?: string | null }; quality: string }) {
+function ProvenanceBadge({
+  provenance,
+  quality,
+}: {
+  provenance: {
+    origin: string;
+    source?: string | null;
+    method?: string | null;
+    calculatedAt?: string | null;
+  };
+  quality: string;
+}) {
   const originLabel = ORIGIN_LABEL[provenance.origin] ?? provenance.origin;
-  const sourceLabel = provenance.source === "yahoo-finance" ? "Yahoo Finance" : provenance.source ?? "desconhecida";
+  const sourceLabel =
+    provenance.source === "yahoo-finance" ? "Yahoo Finance" : (provenance.source ?? "desconhecida");
   const timeStr = provenance.calculatedAt
     ? new Date(provenance.calculatedAt).toLocaleTimeString("pt-BR", {
         hour: "2-digit",
@@ -41,9 +53,7 @@ function ProvenanceBadge({ provenance, quality }: { provenance: { origin: string
 
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
-      <span className={qualityInfo.class}>
-        [{qualityInfo.text}]
-      </span>
+      <span className={qualityInfo.class}>[{qualityInfo.text}]</span>
       <span>
         <strong className="font-normal text-foreground">{originLabel}</strong>
         {" · "}
@@ -63,7 +73,15 @@ function FactLine({
 }: {
   label: string;
   value: unknown;
-  envelope: { provenance: { origin: string; source?: string | null; method?: string | null; calculatedAt?: string | null }; quality: string };
+  envelope: {
+    provenance: {
+      origin: string;
+      source?: string | null;
+      method?: string | null;
+      calculatedAt?: string | null;
+    };
+    quality: string;
+  };
   formatter?: (v: unknown) => string;
 }) {
   if (value === null || value === undefined) {
@@ -140,7 +158,8 @@ export function ReplayMarketContextY2({ mercado }: Props) {
       <div className="rounded bg-primary/10 border border-primary/20 p-2.5 text-[11px] text-muted-foreground leading-snug flex items-start gap-2">
         <ShieldAlert size={14} className="text-primary shrink-0 mt-0.5" />
         <span>
-          Este contexto representa o que estava registrado no momento da decisão e não é atualizado com dados atuais. Cada campo carrega sua origem e qualidade.
+          Este contexto representa o que estava registrado no momento da decisão e não é atualizado
+          com dados atuais. Cada campo carrega sua origem e qualidade.
         </span>
       </div>
 
@@ -185,7 +204,8 @@ export function ReplayMarketContextY2({ mercado }: Props) {
               <div className="flex items-center justify-between py-1 border-b border-border/30">
                 <span className="text-[11px] text-muted-foreground ml-4">Faixa</span>
                 <span className="text-[11px] text-muted-foreground font-mono">
-                  R$ {expectedMove.value.lowerBound.toFixed(2)} → R$ {expectedMove.value.upperBound.toFixed(2)}
+                  R$ {expectedMove.value.lowerBound.toFixed(2)} → R${" "}
+                  {expectedMove.value.upperBound.toFixed(2)}
                 </span>
               </div>
             )}
@@ -235,8 +255,8 @@ export function ReplayMarketContextY2({ mercado }: Props) {
         <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
           <HelpCircle size={11} />
           <span>
-            Dados marcados como &quot;ausentes&quot; não estavam disponíveis na fonte naquele momento.
-            Nunca são preenchidos com estimativas retroativas.
+            Dados marcados como &quot;ausentes&quot; não estavam disponíveis na fonte naquele
+            momento. Nunca são preenchidos com estimativas retroativas.
           </span>
         </div>
       </div>

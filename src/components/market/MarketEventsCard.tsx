@@ -18,7 +18,10 @@ export function MarketEventsCard({ title = "Eventos Observados", events }: Props
       </div>
       <div className="space-y-2">
         {events.map((evt, idx) => (
-          <div key={evt.id ?? idx} className="rounded-md border border-border/60 bg-muted/20 p-2.5 text-xs">
+          <div
+            key={evt.id ?? idx}
+            className="rounded-md border border-border/60 bg-muted/20 p-2.5 text-xs"
+          >
             <div className="flex items-center justify-between font-medium text-foreground">
               <span>{evt.title}</span>
               {evt.category && (
@@ -33,7 +36,15 @@ export function MarketEventsCard({ title = "Eventos Observados", events }: Props
               </p>
             )}
             <div className="mt-1.5 flex flex-wrap items-center justify-between text-[10px] text-muted-foreground">
-              {evt.publishedAt && <span>Publicado: {new Date(evt.publishedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</span>}
+              {evt.publishedAt && (
+                <span>
+                  Publicado:{" "}
+                  {new Date(evt.publishedAt).toLocaleTimeString("pt-BR", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              )}
               {evt.source && <span>Fonte: {evt.source}</span>}
               {evt.relevance && (
                 <span className="flex items-center gap-1">
@@ -45,7 +56,8 @@ export function MarketEventsCard({ title = "Eventos Observados", events }: Props
         ))}
       </div>
       <p className="text-[10px] text-muted-foreground italic leading-tight">
-        Eventos trazem contexto ao mercado observado. Nenhum evento gera automaticamente interpretação direcional.
+        Eventos trazem contexto ao mercado observado. Nenhum evento gera automaticamente
+        interpretação direcional.
       </p>
     </div>
   );

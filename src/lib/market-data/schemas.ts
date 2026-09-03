@@ -30,9 +30,7 @@ export interface ValidationError {
   received?: unknown;
 }
 
-export type ParseResult<T> =
-  | { ok: true; data: T }
-  | { ok: false; errors: ValidationError[] };
+export type ParseResult<T> = { ok: true; data: T } | { ok: false; errors: ValidationError[] };
 
 // ─── HELPERS ──────────────────────────────────────────────────────
 
@@ -83,16 +81,16 @@ export function parseAsset(raw: unknown): ParseResult<RawAsset> {
     pushError(errors, "price", "price deve ser number ≥ 0", "number ≥ 0", r.price);
   }
   if (!isFiniteNumber(r.lastUpdate) || r.lastUpdate < 0) {
-    pushError(
-      errors,
-      "lastUpdate",
-      "lastUpdate deve ser number ≥ 0",
-      "number ≥ 0",
-      r.lastUpdate,
-    );
+    pushError(errors, "lastUpdate", "lastUpdate deve ser number ≥ 0", "number ≥ 0", r.lastUpdate);
   }
   if (r.realizedVol !== null && r.realizedVol !== undefined && !isFiniteNumber(r.realizedVol)) {
-    pushError(errors, "realizedVol", "realizedVol deve ser number ou null", "number|null", r.realizedVol);
+    pushError(
+      errors,
+      "realizedVol",
+      "realizedVol deve ser number ou null",
+      "number|null",
+      r.realizedVol,
+    );
   }
   if (r.ivRank !== null && r.ivRank !== undefined) {
     if (!isFiniteNumber(r.ivRank) || r.ivRank < 0 || r.ivRank > 100) {
@@ -142,7 +140,13 @@ export function parseOptionContract(raw: unknown): ParseResult<RawOptionContract
     pushError(errors, "right", "right deve ser 'C' ou 'P'", "'C' | 'P'", r.right);
   }
   if (!isIsoDate(r.expiration)) {
-    pushError(errors, "expiration", "expiration deve ser ISO date YYYY-MM-DD", "ISO date", r.expiration);
+    pushError(
+      errors,
+      "expiration",
+      "expiration deve ser ISO date YYYY-MM-DD",
+      "ISO date",
+      r.expiration,
+    );
   }
   // bid/ask/last: podem ser 0, null ou number.
   if (r.bid !== null && r.bid !== undefined && !isFiniteNumber(r.bid)) {
@@ -155,7 +159,11 @@ export function parseOptionContract(raw: unknown): ParseResult<RawOptionContract
     pushError(errors, "last", "last deve ser number ou null", "number|null", r.last);
   }
   if (r.impliedVolatility !== null && r.impliedVolatility !== undefined) {
-    if (!isFiniteNumber(r.impliedVolatility) || r.impliedVolatility < 0 || r.impliedVolatility > 5) {
+    if (
+      !isFiniteNumber(r.impliedVolatility) ||
+      r.impliedVolatility < 0 ||
+      r.impliedVolatility > 5
+    ) {
       pushError(
         errors,
         "impliedVolatility",
@@ -180,7 +188,8 @@ export function parseOptionContract(raw: unknown): ParseResult<RawOptionContract
       last: ((r.last as number | null | undefined) ?? null) as number | null,
       volume: ((r.volume as number | null | undefined) ?? null) as number | null,
       openInterest: ((r.openInterest as number | null | undefined) ?? null) as number | null,
-      impliedVolatility: ((r.impliedVolatility as number | null | undefined) ?? null) as number | null,
+      impliedVolatility: ((r.impliedVolatility as number | null | undefined) ?? null) as
+        number | null,
       greeks: r.greeks as RawOptionContract["greeks"],
     },
   };
@@ -199,7 +208,13 @@ export function parseOptionChain(raw: unknown): ParseResult<RawOptionChain> {
     pushError(errors, "timestamp", "timestamp deve ser number ≥ 0", "number ≥ 0", r.timestamp);
   }
   if (r.source !== "yahoo" && r.source !== "modelo") {
-    pushError(errors, "source", "source deve ser 'yahoo' ou 'modelo'", "'yahoo' | 'modelo'", r.source);
+    pushError(
+      errors,
+      "source",
+      "source deve ser 'yahoo' ou 'modelo'",
+      "'yahoo' | 'modelo'",
+      r.source,
+    );
   }
   if (!Array.isArray(r.contracts)) {
     pushError(errors, "contracts", "contracts deve ser array", "Array", r.contracts);
@@ -225,7 +240,10 @@ export function parseOptionChain(raw: unknown): ParseResult<RawOptionChain> {
 
 export function parseDICurve(raw: unknown): ParseResult<RawDICurvePoint[]> {
   if (!Array.isArray(raw)) {
-    return { ok: false, errors: [{ path: "", message: "DI curve deve ser array", expected: "Array", received: raw }] };
+    return {
+      ok: false,
+      errors: [{ path: "", message: "DI curve deve ser array", expected: "Array", received: raw }],
+    };
   }
 
   const errors: ValidationError[] = [];
@@ -236,10 +254,20 @@ export function parseDICurve(raw: unknown): ParseResult<RawDICurvePoint[]> {
     const pointErrors: ValidationError[] = [];
 
     if (!isFiniteNumber(r.days) || r.days <= 0) {
-      pointErrors.push({ path: `[${i}].days`, message: "days deve ser number > 0", expected: "number > 0", received: r.days });
+      pointErrors.push({
+        path: `[${i}].days`,
+        message: "days deve ser number > 0",
+        expected: "number > 0",
+        received: r.days,
+      });
     }
     if (!isFiniteNumber(r.rate) || r.rate < 0 || r.rate > 1) {
-      pointErrors.push({ path: `[${i}].rate`, message: "rate deve ser number ∈ [0, 1]", expected: "number ∈ [0, 1]", received: r.rate });
+      pointErrors.push({
+        path: `[${i}].rate`,
+        message: "rate deve ser number ∈ [0, 1]",
+        expected: "number ∈ [0, 1]",
+        received: r.rate,
+      });
     }
 
     if (pointErrors.length > 0) {
@@ -260,11 +288,12 @@ export function parseDICurve(raw: unknown): ParseResult<RawDICurvePoint[]> {
  * Eventos individuais inválidos são filtrados (não geram erro global).
  * Retorna apenas os válidos.
  */
-export function parseCorporateEvents(
-  raw: unknown,
-): ParseResult<RawCorporateEvent[]> {
+export function parseCorporateEvents(raw: unknown): ParseResult<RawCorporateEvent[]> {
   if (!Array.isArray(raw)) {
-    return { ok: false, errors: [{ path: "", message: "events deve ser array", expected: "Array", received: raw }] };
+    return {
+      ok: false,
+      errors: [{ path: "", message: "events deve ser array", expected: "Array", received: raw }],
+    };
   }
 
   const events: RawCorporateEvent[] = [];

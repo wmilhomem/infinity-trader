@@ -2,7 +2,7 @@ import type { MarketDataQuality, MarketDataSource } from "./market-context";
 
 /**
  * Avalia a temporalidade (freshness) de um dado observado.
- * 
+ *
  * Regras:
  * - Se observedAt não for informado: "unknown"
  * - Para dados "delayed" por natureza (ex: cotações 15min atrasadas): "delayed"
