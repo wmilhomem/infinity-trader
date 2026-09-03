@@ -10,7 +10,7 @@
  */
 
 import type { MarketDataPackage } from "./types";
-import type { MercadoObservadoComProvenance } from "./mercado-observado-provenance";
+import type { MercadoObservadoComProvenance, MarketFactEnvelope } from "./mercado-observado-provenance";
 import {
   makeObservedFact,
   makeCalculatedFact,
