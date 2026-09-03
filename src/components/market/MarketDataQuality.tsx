@@ -16,6 +16,7 @@ const COMPLETENESS_LABEL: Record<MarketDataQuality["completeness"], string> = {
   complete: "Completo",
   partial: "Parcial",
   minimal: "Mínimo",
+  empty: "Vazio",
   unknown: "Não verificado",
 };
 

@@ -208,12 +208,12 @@ export function normalizeOptionChainPackage(
       suspiciousReasons.push("extreme-moneyness");
     }
     // volume
-    const vA = assessVolume(c.volume);
+    const vA = assessVolume(c.volume ?? null);
     if (vA.quality === "invalid") {
       continue;
     }
     // oi
-    const oA = assessOpenInterest(c.openInterest);
+    const oA = assessOpenInterest(c.openInterest ?? null);
     if (oA.quality === "invalid") {
       continue;
     }
@@ -226,8 +226,8 @@ export function normalizeOptionChainPackage(
       bid: c.bid,
       ask: c.ask,
       last: c.last,
-      volume: c.volume,
-      openInterest: c.openInterest,
+      volume: c.volume ?? null,
+      openInterest: c.openInterest ?? null,
       impliedVolatility: c.impliedVolatility ?? null,
     });
   }

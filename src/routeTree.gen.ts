@@ -9,66 +9,81 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedCarteiraRouteImport } from './routes/_authenticated/carteira'
-import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated/diario'
-import { Route as AuthenticatedEspelhoRouteImport } from './routes/_authenticated/espelho'
-import { Route as AuthenticatedHistoriaRouteImport } from './routes/_authenticated/historia'
-import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
-import { Route as AuthenticatedLaboratorioRouteImport } from './routes/_authenticated/laboratorio'
-import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
-import { Route as AuthenticatedRegrasRouteImport } from './routes/_authenticated/regras'
-import { Route as AuthenticatedRevisaoRouteImport } from './routes/_authenticated/revisao'
-import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated/simulador'
-import { Route as AuthenticatedTrilhaRouteImport } from './routes/_authenticated/trilha'
-import { Route as ApiChatRouteImport } from './routes/api/chat'
-import { Route as ApiMarketRouteImport } from './routes/api/market'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
-import { Route as AuthenticatedCopilotIndexRouteImport } from './routes/_authenticated/copilot.index'
-import { Route as AuthenticatedCopilotThreadIdRouteImport } from './routes/_authenticated/copilot.$threadId'
-import { Route as AuthenticatedLicaoSlugRouteImport } from './routes/_authenticated/licao.$slug'
+import { Route as ApiMarketRouteImport } from './routes/api/market'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AuthenticatedTrilhaRouteImport } from './routes/_authenticated/trilha'
+import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated/simulador'
+import { Route as AuthenticatedRevisaoRouteImport } from './routes/_authenticated/revisao'
+import { Route as AuthenticatedRegrasRouteImport } from './routes/_authenticated/regras'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedLaboratorioRouteImport } from './routes/_authenticated/laboratorio'
+import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedHistoriaRouteImport } from './routes/_authenticated/historia'
+import { Route as AuthenticatedEspelhoRouteImport } from './routes/_authenticated/espelho'
+import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated/diario'
+import { Route as AuthenticatedCarteiraRouteImport } from './routes/_authenticated/carteira'
 import { Route as AuthenticatedReplayIndexRouteImport } from './routes/_authenticated/replay.index'
+import { Route as AuthenticatedCopilotIndexRouteImport } from './routes/_authenticated/copilot.index'
 import { Route as AuthenticatedReplayIdRouteImport } from './routes/_authenticated/replay.$id'
+import { Route as AuthenticatedLicaoSlugRouteImport } from './routes/_authenticated/licao.$slug'
+import { Route as AuthenticatedCopilotThreadIdRouteImport } from './routes/_authenticated/copilot.$threadId'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedCarteiraRoute = AuthenticatedCarteiraRouteImport.update({
-  id: '/carteira',
-  path: '/carteira',
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
+} as any)
+const ApiMarketRoute = ApiMarketRouteImport.update({
+  id: '/api/market',
+  path: '/api/market',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedTrilhaRoute = AuthenticatedTrilhaRouteImport.update({
+  id: '/trilha',
+  path: '/trilha',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedDiarioRoute = AuthenticatedDiarioRouteImport.update({
-  id: '/diario',
-  path: '/diario',
+const AuthenticatedSimuladorRoute = AuthenticatedSimuladorRouteImport.update({
+  id: '/simulador',
+  path: '/simulador',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedEspelhoRoute = AuthenticatedEspelhoRouteImport.update({
-  id: '/espelho',
-  path: '/espelho',
+const AuthenticatedRevisaoRoute = AuthenticatedRevisaoRouteImport.update({
+  id: '/revisao',
+  path: '/revisao',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedHistoriaRoute = AuthenticatedHistoriaRouteImport.update({
-  id: '/historia',
-  path: '/historia',
+const AuthenticatedRegrasRoute = AuthenticatedRegrasRouteImport.update({
+  id: '/regras',
+  path: '/regras',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
-  id: '/home',
-  path: '/home',
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedLaboratorioRoute =
@@ -77,61 +92,29 @@ const AuthenticatedLaboratorioRoute =
     path: '/laboratorio',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
+const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedRegrasRoute = AuthenticatedRegrasRouteImport.update({
-  id: '/regras',
-  path: '/regras',
+const AuthenticatedHistoriaRoute = AuthenticatedHistoriaRouteImport.update({
+  id: '/historia',
+  path: '/historia',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedRevisaoRoute = AuthenticatedRevisaoRouteImport.update({
-  id: '/revisao',
-  path: '/revisao',
+const AuthenticatedEspelhoRoute = AuthenticatedEspelhoRouteImport.update({
+  id: '/espelho',
+  path: '/espelho',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSimuladorRoute = AuthenticatedSimuladorRouteImport.update({
-  id: '/simulador',
-  path: '/simulador',
+const AuthenticatedDiarioRoute = AuthenticatedDiarioRouteImport.update({
+  id: '/diario',
+  path: '/diario',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedTrilhaRoute = AuthenticatedTrilhaRouteImport.update({
-  id: '/trilha',
-  path: '/trilha',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const ApiChatRoute = ApiChatRouteImport.update({
-  id: '/api/chat',
-  path: '/api/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiMarketRoute = ApiMarketRouteImport.update({
-  id: '/api/market',
-  path: '/api/market',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: '/callback',
-  path: '/callback',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthenticatedCopilotIndexRoute =
-  AuthenticatedCopilotIndexRouteImport.update({
-    id: '/copilot/',
-    path: '/copilot/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedCopilotThreadIdRoute =
-  AuthenticatedCopilotThreadIdRouteImport.update({
-    id: '/copilot/$threadId',
-    path: '/copilot/$threadId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedLicaoSlugRoute = AuthenticatedLicaoSlugRouteImport.update({
-  id: '/licao/$slug',
-  path: '/licao/$slug',
+const AuthenticatedCarteiraRoute = AuthenticatedCarteiraRouteImport.update({
+  id: '/carteira',
+  path: '/carteira',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedReplayIndexRoute =
@@ -140,11 +123,28 @@ const AuthenticatedReplayIndexRoute =
     path: '/replay/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCopilotIndexRoute =
+  AuthenticatedCopilotIndexRouteImport.update({
+    id: '/copilot/',
+    path: '/copilot/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedReplayIdRoute = AuthenticatedReplayIdRouteImport.update({
   id: '/replay/$id',
   path: '/replay/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLicaoSlugRoute = AuthenticatedLicaoSlugRouteImport.update({
+  id: '/licao/$slug',
+  path: '/licao/$slug',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCopilotThreadIdRoute =
+  AuthenticatedCopilotThreadIdRouteImport.update({
+    id: '/copilot/$threadId',
+    path: '/copilot/$threadId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -300,11 +300,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -314,102 +314,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/carteira': {
-      id: '/_authenticated/carteira'
-      path: '/carteira'
-      fullPath: '/carteira'
-      preLoaderRoute: typeof AuthenticatedCarteiraRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/diario': {
-      id: '/_authenticated/diario'
-      path: '/diario'
-      fullPath: '/diario'
-      preLoaderRoute: typeof AuthenticatedDiarioRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/espelho': {
-      id: '/_authenticated/espelho'
-      path: '/espelho'
-      fullPath: '/espelho'
-      preLoaderRoute: typeof AuthenticatedEspelhoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/historia': {
-      id: '/_authenticated/historia'
-      path: '/historia'
-      fullPath: '/historia'
-      preLoaderRoute: typeof AuthenticatedHistoriaRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/home': {
-      id: '/_authenticated/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof AuthenticatedHomeRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/laboratorio': {
-      id: '/_authenticated/laboratorio'
-      path: '/laboratorio'
-      fullPath: '/laboratorio'
-      preLoaderRoute: typeof AuthenticatedLaboratorioRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/onboarding': {
-      id: '/_authenticated/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/regras': {
-      id: '/_authenticated/regras'
-      path: '/regras'
-      fullPath: '/regras'
-      preLoaderRoute: typeof AuthenticatedRegrasRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/revisao': {
-      id: '/_authenticated/revisao'
-      path: '/revisao'
-      fullPath: '/revisao'
-      preLoaderRoute: typeof AuthenticatedRevisaoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/simulador': {
-      id: '/_authenticated/simulador'
-      path: '/simulador'
-      fullPath: '/simulador'
-      preLoaderRoute: typeof AuthenticatedSimuladorRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/trilha': {
-      id: '/_authenticated/trilha'
-      path: '/trilha'
-      fullPath: '/trilha'
-      preLoaderRoute: typeof AuthenticatedTrilhaRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/market': {
-      id: '/api/market'
-      path: '/api/market'
-      fullPath: '/api/market'
-      preLoaderRoute: typeof ApiMarketRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/callback': {
@@ -419,25 +328,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_authenticated/copilot/': {
-      id: '/_authenticated/copilot/'
-      path: '/copilot'
-      fullPath: '/copilot/'
-      preLoaderRoute: typeof AuthenticatedCopilotIndexRouteImport
+    '/api/market': {
+      id: '/api/market'
+      path: '/api/market'
+      fullPath: '/api/market'
+      preLoaderRoute: typeof ApiMarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/trilha': {
+      id: '/_authenticated/trilha'
+      path: '/trilha'
+      fullPath: '/trilha'
+      preLoaderRoute: typeof AuthenticatedTrilhaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/copilot/$threadId': {
-      id: '/_authenticated/copilot/$threadId'
-      path: '/copilot/$threadId'
-      fullPath: '/copilot/$threadId'
-      preLoaderRoute: typeof AuthenticatedCopilotThreadIdRouteImport
+    '/_authenticated/simulador': {
+      id: '/_authenticated/simulador'
+      path: '/simulador'
+      fullPath: '/simulador'
+      preLoaderRoute: typeof AuthenticatedSimuladorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/licao/$slug': {
-      id: '/_authenticated/licao/$slug'
-      path: '/licao/$slug'
-      fullPath: '/licao/$slug'
-      preLoaderRoute: typeof AuthenticatedLicaoSlugRouteImport
+    '/_authenticated/revisao': {
+      id: '/_authenticated/revisao'
+      path: '/revisao'
+      fullPath: '/revisao'
+      preLoaderRoute: typeof AuthenticatedRevisaoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/regras': {
+      id: '/_authenticated/regras'
+      path: '/regras'
+      fullPath: '/regras'
+      preLoaderRoute: typeof AuthenticatedRegrasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/laboratorio': {
+      id: '/_authenticated/laboratorio'
+      path: '/laboratorio'
+      fullPath: '/laboratorio'
+      preLoaderRoute: typeof AuthenticatedLaboratorioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/home': {
+      id: '/_authenticated/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AuthenticatedHomeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/historia': {
+      id: '/_authenticated/historia'
+      path: '/historia'
+      fullPath: '/historia'
+      preLoaderRoute: typeof AuthenticatedHistoriaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/espelho': {
+      id: '/_authenticated/espelho'
+      path: '/espelho'
+      fullPath: '/espelho'
+      preLoaderRoute: typeof AuthenticatedEspelhoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/diario': {
+      id: '/_authenticated/diario'
+      path: '/diario'
+      fullPath: '/diario'
+      preLoaderRoute: typeof AuthenticatedDiarioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/carteira': {
+      id: '/_authenticated/carteira'
+      path: '/carteira'
+      fullPath: '/carteira'
+      preLoaderRoute: typeof AuthenticatedCarteiraRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/replay/': {
@@ -447,11 +426,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReplayIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/copilot/': {
+      id: '/_authenticated/copilot/'
+      path: '/copilot'
+      fullPath: '/copilot/'
+      preLoaderRoute: typeof AuthenticatedCopilotIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/replay/$id': {
       id: '/_authenticated/replay/$id'
       path: '/replay/$id'
       fullPath: '/replay/$id'
       preLoaderRoute: typeof AuthenticatedReplayIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/licao/$slug': {
+      id: '/_authenticated/licao/$slug'
+      path: '/licao/$slug'
+      fullPath: '/licao/$slug'
+      preLoaderRoute: typeof AuthenticatedLicaoSlugRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/copilot/$threadId': {
+      id: '/_authenticated/copilot/$threadId'
+      path: '/copilot/$threadId'
+      fullPath: '/copilot/$threadId'
+      preLoaderRoute: typeof AuthenticatedCopilotThreadIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }

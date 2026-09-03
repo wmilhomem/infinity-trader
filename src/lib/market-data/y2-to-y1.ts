@@ -22,7 +22,7 @@ interface BuildInput {
   symbol: string;
   observedAt?: string | null;
   provenance: {
-    source: "yahoo-finance" | "model" | "mock" | "live" | "delayed" | "provider" | "replay" | "manual" | "unknown";
+    source: "yahoo-finance" | "model" | "mock" | "live" | "delayed" | "provider" | "replay" | "manual" | "unknown" | "bcb";
     provider?: string | null;
   };
   quality: {
@@ -109,6 +109,17 @@ export function packageToBuildInput(
   let optionsChain: BuildInput["optionsChain"] = null;
   if (chain && chain.contracts.length > 0 && asset) {
     const spot = asset.price;
+    if (spot === null) {
+      return {
+        symbol: asset?.ticker ?? asset?.symbol ?? "",
+        observedAt,
+        provenance,
+        quality,
+        quote,
+        volatility,
+        optionsChain: null,
+      };
+    }
     const r = 0.1065; // taxa default BCB; pode ser refinada via pkg.diCurve
 
     // ATM: strike mais próximo do spot
@@ -181,8 +192,8 @@ export function packageToBuildInput(
       const dteContract = daysUntil(c.expiration);
       const tContract = Math.max(dteContract, 1) / 252;
       // Greeks derivados via BSM se temos IV
-      const iv = c.impliedVolatility;
-      const dS = iv
+      const iv = c.impliedVolatility ?? null;
+      const dS = iv !== null
         ? bsmGreeks(c.right === "C" ? "call" : "put", spot, c.strike, tContract, r, iv)
         : null;
       return {
