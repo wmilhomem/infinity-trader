@@ -73,7 +73,9 @@ export function packageToMercadoObservado(
     return null;
   })();
 
-  const expectedMoveEnvelope = expectedMoveValue
+  const expectedMoveEnvelope: MarketFactEnvelope<
+    { value: number | null; lowerBound: number | null; upperBound: number | null } | null
+  > = expectedMoveValue
     ? makeCalculatedFact(
         expectedMoveValue,
         "expected-move-1sigma",
@@ -84,7 +86,9 @@ export function packageToMercadoObservado(
     : makeAbsentFact("not-provided-by-source", "yahoo-finance", capturedAt);
 
   const skewValue = calculateSkew(chain);
-  const skewEnvelope = skewValue
+  const skewEnvelope: MarketFactEnvelope<
+    { putIv: number | null; callIv: number | null; slope: number | null } | null
+  > = skewValue
     ? makeCalculatedFact(skewValue, "volatility-skew", { spot }, capturedAt, chain?.quality ?? "valid")
     : makeAbsentFact("not-provided-by-source", "yahoo-finance", capturedAt);
 
