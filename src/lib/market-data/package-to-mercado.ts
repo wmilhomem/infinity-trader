@@ -49,14 +49,14 @@ export function packageToMercadoObservado(
   })();
 
   const ivRankValue = asset?.value?.ivRank ?? null;
-  const ivRankEnvelope = (() => {
+  const ivRankEnvelope: MarketFactEnvelope<number | null> = (() => {
     if (asset?.value?.ivRank === null && asset?.absenceReason === "not-provided-by-source") {
-      return makeAbsentFact("not-provided-by-source", "yahoo-finance", capturedAt);
+      return makeAbsentFact<number | null>("not-provided-by-source", "yahoo-finance", capturedAt);
     }
     if (asset?.value?.ivRank === null && asset?.absenceReason === "insufficient-history") {
-      return makeAbsentFact("insufficient-history", "yahoo-finance", capturedAt);
+      return makeAbsentFact<number | null>("insufficient-history", "yahoo-finance", capturedAt);
     }
-    return makeObservedFact(ivRankValue, "yahoo-finance", capturedAt, asset?.quality ?? "valid", asset?.reasons ?? []);
+    return makeObservedFact<number | null>(ivRankValue, "yahoo-finance", capturedAt, asset?.quality ?? "valid", asset?.reasons ?? []);
   })();
 
   const expectedMoveValue = (() => {
