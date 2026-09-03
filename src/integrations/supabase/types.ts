@@ -522,10 +522,54 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_positions: {
+        Row: {
+          ativo: string
+          created_at: string
+          id: string
+          lado: string
+          opcao_tipo: string | null
+          preco_entrada: number | null
+          quantidade: number
+          strike: number | null
+          tipo: string
+          user_id: string
+          vencimento: string | null
+        }
+        Insert: {
+          ativo: string
+          created_at?: string
+          id?: string
+          lado: string
+          opcao_tipo?: string | null
+          preco_entrada?: number | null
+          quantidade: number
+          strike?: number | null
+          tipo: string
+          user_id: string
+          vencimento?: string | null
+        }
+        Update: {
+          ativo?: string
+          created_at?: string
+          id?: string
+          lado?: string
+          opcao_tipo?: string | null
+          preco_entrada?: number | null
+          quantidade?: number
+          strike?: number | null
+          tipo?: string
+          user_id?: string
+          vencimento?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          caminho: string
           created_at: string
           email: string | null
+          foco_futuros: string
           id: string
           ja_operou: boolean
           nivel_atual: number
@@ -534,11 +578,14 @@ export type Database = {
           streak_dias: number
           ultima_atividade: string | null
           updated_at: string
+          voz_ativa: boolean
           xp_total: number
         }
         Insert: {
+          caminho?: string
           created_at?: string
           email?: string | null
+          foco_futuros?: string
           id: string
           ja_operou?: boolean
           nivel_atual?: number
@@ -547,11 +594,14 @@ export type Database = {
           streak_dias?: number
           ultima_atividade?: string | null
           updated_at?: string
+          voz_ativa?: boolean
           xp_total?: number
         }
         Update: {
+          caminho?: string
           created_at?: string
           email?: string | null
+          foco_futuros?: string
           id?: string
           ja_operou?: boolean
           nivel_atual?: number
@@ -560,6 +610,7 @@ export type Database = {
           streak_dias?: number
           ultima_atividade?: string | null
           updated_at?: string
+          voz_ativa?: boolean
           xp_total?: number
         }
         Relationships: []
@@ -596,6 +647,7 @@ export type Database = {
           ativo: string | null
           created_at: string
           id: string
+          origem: Json | null
           pernas: Json
           preco_atual: number | null
           tipo_estrategia: string
@@ -605,6 +657,7 @@ export type Database = {
           ativo?: string | null
           created_at?: string
           id?: string
+          origem?: Json | null
           pernas: Json
           preco_atual?: number | null
           tipo_estrategia: string
@@ -614,6 +667,7 @@ export type Database = {
           ativo?: string | null
           created_at?: string
           id?: string
+          origem?: Json | null
           pernas?: Json
           preco_atual?: number | null
           tipo_estrategia?: string
