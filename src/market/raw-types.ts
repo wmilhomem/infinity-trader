@@ -16,10 +16,13 @@ export type RawOptionContract = {
   symbol: string;
   strikePrice: number;
   right: "C" | "P";
-  bid: number;
-  ask: number;
-  last: number;
+  bid: number | null;
+  ask: number | null;
+  last: number | null;
   expiration: string;
+  volume?: number | null;
+  openInterest?: number | null;
+  impliedVolatility?: number | null;
   greeks?: RawGreeks;
 };
 
