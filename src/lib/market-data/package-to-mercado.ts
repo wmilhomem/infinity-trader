@@ -32,9 +32,9 @@ export function packageToMercadoObservado(
       : makeObservedFact<number | null>(spot, "yahoo-finance", capturedAt, asset?.quality ?? "valid", asset?.reasons ?? []);
 
   const ivAtmValue = chain?.value?.contracts[0]?.impliedVolatility ?? null;
-  const ivAtmEnvelope = (() => {
+  const ivAtmEnvelope: MarketFactEnvelope<number | null> = (() => {
     if (chain?.quality === "absent") {
-      return makeAbsentFact("not-provided-by-source", "yahoo-finance", capturedAt);
+      return makeAbsentFact<number | null>("not-provided-by-source", "yahoo-finance", capturedAt);
     }
     if (ivAtmValue !== null) {
       const prov = chain?.provenance;
@@ -45,7 +45,7 @@ export function packageToMercadoObservado(
         reasons: chain?.reasons ?? [],
       };
     }
-    return makeAbsentFact("not-provided-by-source", "yahoo-finance", capturedAt);
+    return makeAbsentFact<number | null>("not-provided-by-source", "yahoo-finance", capturedAt);
   })();
 
   const ivRankValue = asset?.value?.ivRank ?? null;
