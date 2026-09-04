@@ -15,6 +15,7 @@ import type {
   PracticeChoice,
   SessionStep,
 } from "@/lib/practice-session-types";
+import type { PracticeComplexity } from "@/lib/practice-complexity-types";
 import { PROTOCOL_STEPS } from "@/lib/practice-session-types";
 
 let _idCounter = 0;
@@ -35,7 +36,10 @@ export function createFrozenContext(
   };
 }
 
-export function createPracticeSession(frozenContextId: string): PracticeSession {
+export function createPracticeSession(
+  frozenContextId: string,
+  complexity?: PracticeComplexity,
+): PracticeSession {
   return {
     id: genId("ps"),
     contextId: frozenContextId,
@@ -51,6 +55,7 @@ export function createPracticeSession(frozenContextId: string): PracticeSession 
     practiceSnapshot: null,
     reflectionScheduled: false,
     reflectionCompleted: false,
+    _practiceComplexity: complexity,
   };
 }
 

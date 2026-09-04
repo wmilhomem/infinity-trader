@@ -6,6 +6,7 @@
 
 import type { MarketContext } from "@/lib/market-context";
 import type { DecisionSnapshot } from "@/lib/decision-snapshot";
+import type { PracticeComplexity } from "@/lib/practice-complexity-types";
 
 export type ProtocolStep =
   | "context"
@@ -67,6 +68,7 @@ export type PracticeSession = {
   practiceSnapshot: DecisionSnapshot | null;
   reflectionScheduled: boolean;
   reflectionCompleted: boolean;
+  _practiceComplexity?: PracticeComplexity;
 };
 
 export type PracticeReflection = {
