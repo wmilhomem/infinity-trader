@@ -31,6 +31,7 @@ import { VolatilityContext } from "@/components/options/VolatilityContext";
 import { GreeksVisual } from "@/components/options/GreeksVisual";
 import { StructureComparison } from "@/components/options/StructureComparison";
 import { EvidenceChain } from "@/components/options/EvidenceChain";
+import { RiskRules } from "@/components/options/RiskRules";
 import {
   Eye,
   Brain,
@@ -485,6 +486,11 @@ export function OptionsChainReader({ context, onSaveReading }: Props) {
           <EvidenceChain state={state} />
         </div>
       )}
+
+      <div className="rounded-xl border border-border bg-card p-5">
+        <h2 className="text-sm font-semibold text-foreground mb-4">Regras Pessoais</h2>
+        <RiskRules context={context} />
+      </div>
     </div>
   );
 }

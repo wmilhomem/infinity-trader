@@ -537,6 +537,47 @@ Frases proibidas:
 
 ---
 
+## Y.3.6 — Risk & Personal Rules
+
+### Objetivo
+
+Mostrar as regras pessoais de risco do trader como fatos — não como validação.
+
+### Conceito
+
+O trader documenta suas regras pessoais de risco (ex: "não opero com mais de 2% de perda por operação", "IV > 40% é filtro de exclusão"). O sistema mostra essas regras como fatos declarados, não como recomendações.
+
+### Contratos
+
+```typescript
+type PersonalRiskRule = {
+  id: string;
+  texto: string;
+  tipo: "stop-loss" | "position-size" | "iv-filter" | "dte-filter" | "other";
+  active: boolean;
+  createdAt: string;
+};
+
+type RiskCheck = {
+  ruleId: string;
+  applicable: boolean;
+  status: "ok" | "violated" | "na";
+  observation: string | null;
+};
+```
+
+### Anti-Recomendação Y.3.6
+
+Frases proibidas:
+- "regra de proteção"
+- "gestão conservative"
+- "risco acceptable"
+- "posição segura"
+- "risco controlado"
+- "stop garantido"
+
+---
+
 ## Referências
 
 - ADR-001: Market Data Infrastructure (Y.2)
