@@ -388,6 +388,57 @@ Frases proibidas:
 
 ---
 
+## Y.3.3 — Greeks in Context
+
+### Objetivo
+
+Ler Delta, Gamma, Theta e Vega como fatos contextuais — não como sinais operacionais.
+
+### Contratos
+
+```typescript
+type GreekFact = {
+  greek: "delta" | "gamma" | "theta" | "vega";
+  label: string;
+  value: number | null;
+  valueFormatted: string;
+  unit: string;
+  strike: number | null;
+  optionType: "CALL" | "PUT" | null;
+  origin: "observed" | "calculated" | "estimated";
+  quality: Quality;
+};
+
+type GreeksReading = {
+  facts: GreekFact[];
+  spot: number | null;
+  dte: number | null;
+};
+```
+
+### Regras de Leitura
+
+| Greek | Unit | Significado factual |
+|-------|------|--------------------|
+| Delta | — | Variação do prêmio por R$1 no ativo base |
+| Gamma | — | Taxa de variação do delta por R$1 |
+| Theta | R$/dia | Sangria de tempo diária |
+| Vega | R$/1% IV | Sensibilidade a mudança de 1% na IV |
+
+### Anti-Recomendação Y.3.3
+
+Frases proibidas:
+- "delta alto = direcional"
+- "gamma alto = aceleração do movimento"
+- "theta mata o prêmio"
+- "vega alto = risco de volatilidade"
+- "grega X indica entrada"
+- "grega Y indica saída"
+- "este greek é bom"
+- "este greek é ruim"
+
+---
+
 ## Referências
 
 - ADR-001: Market Data Infrastructure (Y.2)
