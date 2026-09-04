@@ -27,6 +27,7 @@ import {
 } from "@/lib/options-chain-reader";
 import { originLabel, qualityLabel } from "@/lib/options-chain-types";
 import { MoneynessVisual } from "@/components/options/MoneynessVisual";
+import { VolatilityContext } from "@/components/options/VolatilityContext";
 import {
   Eye,
   Brain,
@@ -301,31 +302,13 @@ export function OptionsChainReader({ context, onSaveReading }: Props) {
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className="space-y-4">
-          {volatilityFacts.length > 0 && (
-            <div>
-              <SectionHeader icon={Eye} title="Contexto de Volatilidade" />
-              <div className="space-y-2">
-                {volatilityFacts.map((f) => (
-                  <FactCard key={f.id} fact={f} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {chainFacts.length > 0 && (
-            <div>
-              <SectionHeader icon={Eye} title="Cadeia de Opções" />
-              <div className="space-y-2">
-                {ivFacts.map((f) => (
-                  <FactCard key={f.id} fact={f} />
-                ))}
-              </div>
-            </div>
-          )}
+      {context.optionsChain?.impliedVolatilityAtm && (
+        <div className="rounded-xl border border-border bg-card p-5">
+          <VolatilityContext context={context} />
         </div>
+      )}
 
+      <div className="grid gap-4 lg:grid-cols-2">
         <div className="space-y-4">
           <div className="rounded-lg border border-border bg-card p-4 space-y-4">
             <SectionHeader icon={Brain} title="O que você observa?" />
@@ -359,7 +342,9 @@ export function OptionsChainReader({ context, onSaveReading }: Props) {
               </div>
             )}
           </div>
+        </div>
 
+        <div className="space-y-4">
           <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 space-y-4">
             <SectionHeader icon={Lightbulb} title="Qual é sua hipótese?" />
             <p className="text-xs text-muted-foreground">

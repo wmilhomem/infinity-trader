@@ -317,6 +317,77 @@ Frases proibidas em qualquer label, tooltip ou descrição:
 
 ---
 
+## Y.3.2 — IV / Skew / Expected Move Experience
+
+### Objetivo
+
+Ensinar a ler volatilidade implícita, skew e expected move como contexto — não como previsão.
+
+### Contratos
+
+```typescript
+type IVFact = {
+  label: "ATM IV" | string;
+  value: number | null;      // em % (0.287 = 28.7%)
+  strike: number | null;
+  origin: "observed" | "calculated" | "estimated";
+  source: string | null;
+  method?: string | null;
+  quality: Quality;
+  provenance: ProvenanceBadge;
+};
+
+type SkewFact = {
+  putIvOtm: number | null;
+  callIvOtm: number | null;
+  slope: number | null;
+  putStrike: number | null;
+  callStrike: number | null;
+  otmDistance: number | null;
+  origin: "observed" | "calculated" | "estimated";
+  quality: Quality;
+  provenance: ProvenanceBadge;
+};
+
+type ExpectedMoveFact = {
+  sigma1Brl: number | null;
+  lowerBound: number | null;
+  upperBound: number | null;
+  ivUsed: number | null;
+  spotUsed: number | null;
+  dteUsed: number | null;
+  dteBase: "calendar" | "trading" | null;
+  formula: string | null;
+  origin: "observed" | "calculated" | "estimated";
+  quality: Quality;
+  provenance: ProvenanceBadge;
+};
+```
+
+### Regras de Leitura
+
+| Campo | Valor | Comportamento |
+|-------|-------|---------------|
+| IV | null | Exibe "—" sem calcular |
+| Skew | null | Não inventa |
+| Expected Move | null | Não inventa |
+| DTE base | calendar/trading | Preservado |
+| Formula | string | Exibida literalmente |
+
+### Anti-Recomendação Y.3.2
+
+Frases proibidas:
+- "IV alta → compre"
+- "skew positivo → queda"
+- "expected move → alvo de preço"
+- "máxima/mínima prevista"
+- "volatilidade elevada é oportunidade"
+- "vencimento X é melhor"
+- "espera-se queda/alta"
+- Qualquer derivação automática de direção
+
+---
+
 ## Referências
 
 - ADR-001: Market Data Infrastructure (Y.2)
