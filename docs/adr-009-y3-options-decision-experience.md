@@ -494,6 +494,49 @@ Frases proibidas:
 
 ---
 
+## Y.3.5 — Evidence Chain
+
+### Objetivo
+
+Conectar observações, hipóteses e evidências já registradas pelo usuário em uma cadeia lógica — Fact → Interpretation → Hypothesis → Evidence.
+
+### Conceito
+
+O sistema não gera evidência. O usuário registra evidências manualmente a partir dos fatos observados nas seções anteriores. A cadeia de evidência mostra:
+- Quais observações apoiaram quais hipóteses
+- Quais evidências favorecem ou contradizem cada hipótese
+- Nenhuma conclusão automática — apenas apresentação da链条
+
+### Contratos
+
+```typescript
+type EvidenceNode = {
+  id: string;
+  type: "observation" | "hypothesis" | "evidence" | "contra-evidence";
+  texto: string;
+  linkedTo: string | null;
+  timestamp: string;
+};
+
+type EvidenceChain = {
+  nodes: EvidenceNode[];
+  hypothesisSupports: Record<string, string[]>;
+  hypothesisContradicts: Record<string, string[]>;
+};
+```
+
+### Anti-Recomendação Y.3.5
+
+Frases proibidas:
+- "evidência forte"
+- "prova definitiva"
+- "confirmação da tendência"
+- "hipótese validada"
+- "dado concreto" (quando é interpretação)
+- "fato comprovado" (quando é hipótese)
+
+---
+
 ## Referências
 
 - ADR-001: Market Data Infrastructure (Y.2)
