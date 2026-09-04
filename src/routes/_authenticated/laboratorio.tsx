@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { FlaskConical, Scale, BookOpen, History, BookMarked } from "lucide-react";
+import { FlaskConical, Scale, BookOpen, History, BookMarked, Copy } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useCaminho } from "@/lib/use-caminho";
 import { HipoteseMap, type FiltroHipotese } from "@/components/laboratorio/HipoteseMap";
@@ -24,6 +24,7 @@ import { ReplayView } from "@/components/options/ReplayView";
 import { PracticeSession } from "@/components/practice/PracticeSession";
 import { buildMarketContext } from "@/lib/market-context-builder";
 import { createFrozenContext } from "@/lib/practice-session";
+import type { FrozenPracticeContext } from "@/lib/practice-session-types";
 
 export const Route = createFileRoute("/_authenticated/laboratorio")({
   head: () => ({
@@ -59,6 +60,9 @@ function Laboratorio() {
     "estrategias",
   );
   const [practiceSessionActive, setPracticeSessionActive] = useState(false);
+  const [activeFrozenContext, setActiveFrozenContext] = useState<FrozenPracticeContext | null>(
+    null,
+  );
 
   const contagens = useMemo(() => {
     const c: Record<string, number> = { todas: FICHAS_ESTRATEGIAS.length };
@@ -303,13 +307,16 @@ function Laboratorio() {
           </button>
           <button
             onClick={() => {
+              if (!activeFrozenContext) return;
               setLabSection("pratica");
               setPracticeSessionActive(true);
             }}
             className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
               labSection === "pratica"
                 ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                : activeFrozenContext
+                  ? "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  : "text-muted-foreground/40 cursor-not-allowed"
             }`}
           >
             <BookMarked size={14} />
@@ -318,17 +325,47 @@ function Laboratorio() {
         </div>
       )}
 
-      {labSection === "pratica" && practiceSessionActive ? (
+      {labSection === "pratica" && practiceSessionActive && activeFrozenContext ? (
         <PracticeSession
-          frozenContext={createFrozenContext(lerCadeiaContext, "laboratory")}
+          frozenContext={activeFrozenContext}
           onSessionComplete={(session) => {
             console.info("Practice session complete:", session.id, session.choice);
             setPracticeSessionActive(false);
+            setActiveFrozenContext(null);
           }}
-          onCancel={() => setPracticeSessionActive(false)}
+          onCancel={() => {
+            setPracticeSessionActive(false);
+            setActiveFrozenContext(null);
+          }}
         />
       ) : labSection === "ler-cadeia" ? (
-        <OptionsChainReader context={lerCadeiaContext} />
+        <div className="space-y-4">
+          <div className="rounded-xl border border-info/30 bg-info/5 p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">Praticar este contexto</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  O contexto atual será congelado para que você possa praticar sua decisão sem
+                  alterar os dados usados nesta sessão.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const frozen = createFrozenContext(lerCadeiaContext, "laboratory");
+                  setActiveFrozenContext(frozen);
+                  setLabSection("pratica");
+                  setPracticeSessionActive(true);
+                }}
+                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 shrink-0"
+              >
+                <Copy size={14} />
+                Praticar
+              </button>
+            </div>
+          </div>
+          <OptionsChainReader context={lerCadeiaContext} />
+        </div>
       ) : labSection === "replay" ? (
         <ReplayView readings={[]} />
       ) : (
