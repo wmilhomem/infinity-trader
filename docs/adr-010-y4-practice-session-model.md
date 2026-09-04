@@ -112,18 +112,54 @@ Um cenário criado especificamente para treinamento. **Não implementado em Y.4.
 
 ---
 
-## 6. Integridade Temporal
+## 6. Integridade Temporal e Epistêmica (TEI)
 
-**Regra absoluta:** O contexto histórico nunca vaza o desfecho para o usuário antes da decisão.
+**Contrato nomeado: Temporal Epistemic Integrity (TEI)**
+
+O sistema deve distinguir rigorosamente entre:
+
+- **T0:** instante da decisão original
+- **T1:** momento atual (após resultado)
+
+### Contrato TEI
 
 ```
-Market Context (real)
+T0 — Decisão original
+  Contexto disponível = ONLY(T0 context)
+  Decisão registrada
+  ↓
+[resultado ocorre]
+  ↓
+T1 — Revisão
+  Contexto T0 permanece INTACTO
+  Novo contexto T1 disponível para comparação
+  Nunca: contexto T1 substitui contexto T0
+```
+
+### Regra absoluta
+
+> O contexto histórico **nunca vaza o desfecho** para o usuário antes da decisão.
+
+Qualquer informação criada após T0 — preço, IV realizada, Greeks realizados — é **sempre** segregada do contexto de prática.
+
+### Propriedade
+
+O sistema sabe distinguir:
+- o que o usuário **poderia saber** quando decidiu
+- o que o sistema **sabe agora**
+
+Essas duas你知道 não se misturam.
+
+### Fluxo
+
+```
+Market Context (T0)
     ↓
 Frozen Practice Context (sem desfecho)
     ↓
 Practice Session
     ↓
-Decision Snapshot (estado no momento)
+Decision Snapshot (T0 state)
     ↓
 [tempo passa]
     ↓
@@ -131,19 +167,20 @@ Replay
     ↓
 Reflection
     ↓
-SÓ ENTÃO: desfecho revelado
+SÓ ENTÃO: desfecho revelado (T1 → T0 comparison)
 ```
 
-**Nunca:**
+### Nunca
+
 ```
-Resultado posterior
+Resultado posterior (T1)
     ↓
-Alteração retroativa
+Alteração retroativa do contexto T0
     ↓
-Decisão original reavaliada
+Decisão original reavaliada com informação de T1
 ```
 
-Isso preserva a mesma integridade epistemológica que Y.2/Y.3 construíram. A decisão original é avaliada no contexto em que foi tomada, não à luz do que aconteceu depois.
+Isso preserva a integridade epistemológica que Y.2/Y.3 construíram. A decisão original é avaliada no contexto em que foi tomada, não à luz do que aconteceu depois.
 
 ---
 
@@ -243,6 +280,7 @@ Alguma regra pessoal precisa ser revista?
 - Transformar resultado financeiro em nota
 - Mostrar "nível" ao usuário
 - Criar score de trader
+- Violar Integridade Temporal e Epistêmica (TEI)
 
 ---
 
@@ -357,6 +395,24 @@ type PracticeReflection = {
 - **Proposed:** este documento
 - **Accepted:** após validação com time de produto
 - **Implemented:** quando Y.4.1 estiver shipped e contratos testados
+
+---
+
+## 16. Contratos Nomeados de Primeira Classe
+
+Os seguintes contratos são **obrigatórios** e **não negociáveis** em qualquer implementação Y.4:
+
+| # | Contrato | Definição |
+|---|----------|-----------|
+| C1 | **Anti-Recomendação** | Y.4 não transforma interpretação em prescrição. Nunca sugere direção, contrato, strike, vencimento ou estrutura. |
+| C2 | **Null-Safe** | null ≠ 0 em todo o pipeline. Valores ausentes permanecem nulos. |
+| C3 | **Proveniência** | A origem de cada dado é preservada e nunca reatribuída. |
+| C4 | **Temporal Epistemic Integrity (TEI)** | O contexto T0 nunca é contaminado por informação de T1. O que o usuário podia saber em T0 permanece intacto quando o sistema sabe T1. |
+| C5 | **Escolha Completa** | Observar, simular, seguir e não-seguir são estados terminais igualmente válidos. |
+| C6 | **Revisão Postergada** | A reflexão não é exigida no momento da decisão. É agendada e executada em momento semanticamente apropriado. |
+| C7 | **Sem Métricas de Performance** | O sistema nunca avalia qualidade da decisão, taxa de acerto, ou transforma resultado financeiro em nota. |
+
+Estes contratos são testáveis e auditáveis. Qualquer violação é um bug, não uma feature.
 
 ---
 
