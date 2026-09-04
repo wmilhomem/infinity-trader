@@ -666,6 +666,36 @@ Frases proibidas:
 
 ---
 
+## Y.3.9 — Final Anti-Recommendation Gate
+
+### Objetivo
+
+Declarar explicitamente que o sistema não fez nenhuma recomendação antes de qualquer ação do usuário.
+
+### Conceito
+
+Antes de "Salvar Leitura" ou qualquer ação similar, o sistema exibe um gate final que reaffirma:
+1. O sistema apresentou FACTS apenas
+2. Nenhuma recomendação foi feita
+3. O usuário é totalmente responsável por suas decisões
+
+### Contratos
+
+```typescript
+type FinalGate = {
+  show: boolean;
+  factsPresented: string[];
+  recommendationsMade: never; // explicitly never
+  userResponsibility: string;
+};
+```
+
+### Anti-Recomendação Y.3.9
+
+Este layer É a anti-recomendação. Declara explicitamente que nenhuma recomendação foi feita.
+
+---
+
 ## Referências
 
 - ADR-001: Market Data Infrastructure (Y.2)

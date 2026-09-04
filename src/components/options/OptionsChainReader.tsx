@@ -33,6 +33,7 @@ import { StructureComparison } from "@/components/options/StructureComparison";
 import { EvidenceChain } from "@/components/options/EvidenceChain";
 import { RiskRules } from "@/components/options/RiskRules";
 import { DecisionSnapshot } from "@/components/options/DecisionSnapshot";
+import { FinalGate } from "@/components/options/FinalGate";
 import {
   Eye,
   Brain,
@@ -226,6 +227,7 @@ export function OptionsChainReader({ context, onSaveReading }: Props) {
   const [evText, setEvText] = useState("");
   const [evType, setEvType] = useState<"evidencia" | "contraEvidencia">("evidencia");
   const [selectedInterpId, setSelectedInterpId] = useState<string | null>(null);
+  const [showGate, setShowGate] = useState(false);
 
   const spotFact = facts.find((f) => f.tipo === "spot");
   const volatilityFacts = facts.filter((f) =>
@@ -473,7 +475,7 @@ export function OptionsChainReader({ context, onSaveReading }: Props) {
         <div className="flex justify-end">
           <button
             type="button"
-            onClick={() => onSaveReading(state)}
+            onClick={() => setShowGate(true)}
             className="rounded-md bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
           >
             Salvar leitura
@@ -498,6 +500,16 @@ export function OptionsChainReader({ context, onSaveReading }: Props) {
           <h2 className="text-sm font-semibold text-foreground mb-4">Snapshot da Leitura</h2>
           <DecisionSnapshot context={context} state={state} />
         </div>
+      )}
+
+      {showGate && onSaveReading && (
+        <FinalGate
+          onConfirm={() => {
+            onSaveReading(state);
+            setShowGate(false);
+          }}
+          onCancel={() => setShowGate(false)}
+        />
       )}
     </div>
   );
