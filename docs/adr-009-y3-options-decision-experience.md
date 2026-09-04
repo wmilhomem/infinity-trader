@@ -618,6 +618,54 @@ Frases proibidas:
 
 ---
 
+## Y.3.8 — Replay & Cognitive Review
+
+### Objetivo
+
+Comparar readings salvos para identificar padrões de pensamento e possíveis vieses cognitivos — sem recomendar.
+
+### Conceito
+
+O usuário carrega readings anteriores e os compara lado a lado. O sistema mostra:
+- Evolução das observações ao longo do tempo
+- Contraste entre interpretações passadas e atuais
+- Possíveis padrões (ex: "você frequentemente observa IV antes de estruturar")
+
+O sistema NÃO diz "você tem viés de confirmação" — apenas mostra os fatos para que o usuário reflita.
+
+### Contratos
+
+```typescript
+type SavedReading = {
+  id: string;
+  symbol: string;
+  timestamp: string;
+  spot: number | null;
+  interpretationCount: number;
+  hypothesisCount: number;
+  evidenceCount: number;
+  notes?: string;
+};
+
+type ReplayComparison = {
+  readings: SavedReading[];
+  temporalGaps: { from: string; to: string; days: number }[];
+  patternObservations: string[];
+};
+```
+
+### Anti-Recomendação Y.3.8
+
+Frases proibidas:
+- "você tem viés de confirmação"
+- "padrão de comportamento"
+- "tendencia identficada"
+- "erro comum"
+- "você sempre erra"
+- "você nunca aprende"
+
+---
+
 ## Referências
 
 - ADR-001: Market Data Infrastructure (Y.2)
