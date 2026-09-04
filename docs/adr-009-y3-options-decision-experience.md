@@ -1,7 +1,7 @@
 # ADR-009: Y.3 — Options Decision Experience
 
 **Data:** 2026-09-03
-**Status:** Proposed
+**Status:** Accepted
 **Decisão:** Estabelecer arquitetura e contratos para Y.3 Options Decision Experience
 
 ---
@@ -252,6 +252,68 @@ Ao final de Y.3.9:
 - Sistema nunca recomenda, apenas contextualiza
 - Decisões são registradas com provenance completa
 - Replay permite revisão cognitiva
+
+---
+
+---
+
+## Y.3.1 — Moneyness & Expiration Experience
+
+### Objetivo
+
+Responder visualmente: "Onde estou em relação ao preço atual e quanto tempo existe até o vencimento?"
+
+### Contratos de Moneyness
+
+```typescript
+type Moneyness = "ITM" | "ATM" | "OTM";
+
+type OptionMoneynessFact = {
+  optionType: "CALL" | "PUT";
+  strike: number;
+  spot: number;
+  moneyness: Moneyness;
+  distanceAbs: number;      // strike - spot (sinal preservado)
+  distancePct: number;     // (strike - spot) / spot * 100
+  atmStrike: number;       // ATM strike do contexto
+  atmMethod: "nearest-strike" | "delta-neutral";
+  provenance: ProvenanceBadge;
+};
+
+type ExpirationFact = {
+  expiration: string;       // ISO date
+  dte: number;             // dias até vencimento
+  contractCount: number;   // quantidade de strikes disponíveis
+  quality: Quality;
+  provenance: ProvenanceBadge;
+};
+```
+
+### Regras de Cálculo
+
+| Situação | CALL | PUT |
+|----------|------|-----|
+| strike < spot | ITM | OTM |
+| strike = ATM | ATM | ATM |
+| strike > spot | OTM | ITM |
+
+### Regras Nulas
+
+- `spot = null` → `moneyness = null`
+- `strike = null` → `moneyness = null`
+- `spot = 0` → `moneyness` calculado (0 é valor válido)
+- `atmStrike = null` → não calcular moneyness
+- `expiration = null` → não inventar DTE
+
+### Anti-Recomendação Y.3.1
+
+Frases proibidas em qualquer label, tooltip ou descrição:
+- "melhor", "mais interessante", "favorável", "oportunidade"
+- "CALL ITM é melhor"
+- "OTM oferece mais oportunidade"
+- "vencimento mais longo é melhor"
+- "escolha o vencimento X"
+- "essa opção é mais interessante"
 
 ---
 

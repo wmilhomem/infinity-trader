@@ -26,6 +26,7 @@ import {
   type Fact,
 } from "@/lib/options-chain-reader";
 import { originLabel, qualityLabel } from "@/lib/options-chain-types";
+import { MoneynessVisual } from "@/components/options/MoneynessVisual";
 import {
   Eye,
   Brain,
@@ -293,6 +294,12 @@ export function OptionsChainReader({ context, onSaveReading }: Props) {
           </span>
         </div>
       </div>
+
+      {context.optionsChain?.contracts && context.optionsChain.contracts.length > 0 && (
+        <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+          <MoneynessVisual context={context} />
+        </div>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="space-y-4">
