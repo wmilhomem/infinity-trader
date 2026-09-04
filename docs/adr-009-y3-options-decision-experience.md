@@ -578,6 +578,46 @@ Frases proibidas:
 
 ---
 
+## Y.3.7 — Decision Snapshot
+
+### Objetivo
+
+Capturar o ponto de decisão — todos os fatos, interpretações, hipóteses, evidências e regras declaradas pelo usuário em um timestamp.
+
+### Conceito
+
+O snapshot é um registro de tudo que o usuário observou e declarou antes de tomar uma decisão. Não é uma recomendação. Não é uma conclusão. É um registro do estado mental do trader no momento da leitura.
+
+### Contratos
+
+```typescript
+type DecisionSnapshot = {
+  id: string;
+  symbol: string;
+  spot: number | null;
+  timestamp: string;
+  context: {
+    moneyness: MoneynessReading | null;
+    volatility: VolatilityReading | null;
+    greeks: GreeksReading | null;
+    structures: StructureScenario[];
+  };
+  state: ChainReadingState;
+  rules: PersonalRiskRule[];
+};
+```
+
+### Anti-Recomendação Y.3.7
+
+Frases proibidas:
+- "decisão tomada"
+- "opinião formada"
+- "conclusão"
+- "veredicto"
+- "posicionamento decidido"
+
+---
+
 ## Referências
 
 - ADR-001: Market Data Infrastructure (Y.2)
