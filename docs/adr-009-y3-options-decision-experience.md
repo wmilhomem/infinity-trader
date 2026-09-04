@@ -439,6 +439,61 @@ Frases proibidas:
 
 ---
 
+## Y.3.4 — Structure Comparison
+
+### Objetivo
+
+Comparar estruturas (combinações de pernas) como fatos — não como recomendação.
+
+### Conceito
+
+Uma estrutura é expressa por:
+- Tipo (call spread, put spread, straddle, strangle, iron condor, etc.)
+- Strikes envolvidos
+- Net debit / net credit
+- Max profit / max loss
+- Breakeven(s)
+
+O sistema mostra os fatos de cada estrutura — o usuário avalia.
+
+### Contratos
+
+```typescript
+type StructureScenario = {
+  id: string;
+  name: string;
+  type: string;
+  legs: LegFact[];
+  netDebit: number | null;
+  netCredit: number | null;
+  maxProfit: number | null;
+  maxLoss: number | null;
+  breakevens: number[];
+  spot: number | null;
+  quality: Quality;
+};
+
+type LegFact = {
+  type: "call" | "put";
+  direction: "buy" | "sell";
+  strike: number;
+  premium: number | null;
+  quantity: number;
+};
+```
+
+### Anti-Recomendação Y.3.4
+
+Frases proibidas:
+- "esta estrutura é melhor"
+- "estratégia X é recomendada"
+- "combinaçãoideal"
+- "montar esta posição"
+- "operação recomendada"
+- "melhor para este cenário"
+
+---
+
 ## Referências
 
 - ADR-001: Market Data Infrastructure (Y.2)
