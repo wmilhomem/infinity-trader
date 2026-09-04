@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { FlaskConical, Scale, BookOpen, History } from "lucide-react";
+import { FlaskConical, Scale, BookOpen, History, BookMarked } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useCaminho } from "@/lib/use-caminho";
 import { HipoteseMap, type FiltroHipotese } from "@/components/laboratorio/HipoteseMap";
@@ -21,7 +21,9 @@ import { PRESETS_ESTRATEGIA } from "@/lib/presets-estrategias";
 import { summary } from "@/lib/payoff";
 import { OptionsChainReader } from "@/components/options/OptionsChainReader";
 import { ReplayView } from "@/components/options/ReplayView";
+import { PracticeSession } from "@/components/practice/PracticeSession";
 import { buildMarketContext } from "@/lib/market-context-builder";
+import { createFrozenContext } from "@/lib/practice-session";
 
 export const Route = createFileRoute("/_authenticated/laboratorio")({
   head: () => ({
@@ -53,9 +55,10 @@ function Laboratorio() {
   const [fichaAberta, setFichaAberta] = useState<string | null>(fichaParam ?? null);
   const [selecionadas, setSelecionadas] = useState<string[]>([]);
   const [comparando, setComparando] = useState(false);
-  const [labSection, setLabSection] = useState<"estrategias" | "ler-cadeia" | "replay">(
+  const [labSection, setLabSection] = useState<"estrategias" | "ler-cadeia" | "replay" | "pratica">(
     "estrategias",
   );
+  const [practiceSessionActive, setPracticeSessionActive] = useState(false);
 
   const contagens = useMemo(() => {
     const c: Record<string, number> = { todas: FICHAS_ESTRATEGIAS.length };
@@ -285,7 +288,10 @@ function Laboratorio() {
             Ler Cadeia
           </button>
           <button
-            onClick={() => setLabSection("replay")}
+            onClick={() => {
+              setLabSection("replay");
+              setPracticeSessionActive(false);
+            }}
             className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
               labSection === "replay"
                 ? "bg-primary text-primary-foreground"
@@ -295,10 +301,33 @@ function Laboratorio() {
             <History size={14} />
             Replay
           </button>
+          <button
+            onClick={() => {
+              setLabSection("pratica");
+              setPracticeSessionActive(true);
+            }}
+            className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              labSection === "pratica"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground"
+            }`}
+          >
+            <BookMarked size={14} />
+            Prática
+          </button>
         </div>
       )}
 
-      {labSection === "ler-cadeia" ? (
+      {labSection === "pratica" && practiceSessionActive ? (
+        <PracticeSession
+          frozenContext={createFrozenContext(lerCadeiaContext, "laboratory")}
+          onSessionComplete={(session) => {
+            console.info("Practice session complete:", session.id, session.choice);
+            setPracticeSessionActive(false);
+          }}
+          onCancel={() => setPracticeSessionActive(false)}
+        />
+      ) : labSection === "ler-cadeia" ? (
         <OptionsChainReader context={lerCadeiaContext} />
       ) : labSection === "replay" ? (
         <ReplayView readings={[]} />
